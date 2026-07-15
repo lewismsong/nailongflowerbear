@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="🖤" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐻</text></svg>" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><text y=%22.9em%22 font-size=%2270%22 x=%2215%22>🐻</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%231a1a1a%22 d=%22M50 86 C22 62 6 44 6 27 C6 13 17 5 29 5 C38 5 46 11 50 19 C54 11 62 5 71 5 C83 5 94 13 94 27 C94 44 78 62 50 86 Z%22/></svg>" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><path fill=%22%231a1a1a%22 d=%22M50 79 C28 60 15 46 15 32 C15 21 24 14 33 14 C40 14 47 19 50 25 C53 19 60 14 67 14 C76 14 85 21 85 32 C85 46 72 60 50 79 Z%22/></svg>" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap');
   :root {
@@ -155,7 +155,8 @@
   /* thinking of you calendar */
   h2.feed-title.cal-title { margin: 36px 0 12px; }
   #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); }
+  #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .day-score { font-size: 9px; font-weight: 700; color: rgba(61,52,43,0.85); letter-spacing: -0.2px; white-space: nowrap; }
   #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
   #cal-grid .day.l { background: rgba(142,212,245,0.85); border-color: rgba(84,172,221,0.5); }
   #cal-grid .day.b { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); border-color: rgba(74,53,36,0.2); }
@@ -253,7 +254,7 @@
     <div class="call-box">
       <div>
         <div class="call-title">📞 on call</div>
-        <div class="call-sub" id="call-sub">flip this when you're on a call — every 45m adds +45 to both counters</div>
+        <div class="call-sub" id="call-sub">flip this when you're on a call: every 45m adds +45 to both counters</div>
       </div>
       <label class="switch">
         <input type="checkbox" id="call-toggle" />
@@ -285,7 +286,7 @@
    </div>
    </div>
    <img class="footer-pic" src="bears.jpg" alt="us, basically" />
-   <p class="trademark">lewiskhalico™ <span id="ver">v2.2</span></p>
+   <p class="trademark">lewiskhalico™</p>
   </div>
 </div>
 
@@ -306,6 +307,7 @@ const firebaseConfig = {
 /* ============================================================ */
 
 const COOLDOWN_MS = 60 * 1000;
+console.log("lewiskhalico v2.3"); // hidden version marker — check the browser console when debugging
 const TZ = { khali: "Europe/Berlin", lewis: "America/New_York" };
 const GAME_TZ = "America/Toronto"; // the daily battle runs midnight-to-midnight Toronto time
 const FRANCE_DATE = new Date(2026, 7, 12); // Aug 12, 2026 — change here if the trip moves
@@ -329,7 +331,22 @@ const CALL_BLOCK_MS = 45 * 60 * 1000;
 const CALL_BLOCK_PTS = 45;
 
 const norm = (s) => (s || "").trim().toLowerCase();
-const whenCache = {};
+let whenCache = {};
+
+// adjustments are stored per Toronto day so they count in the daily battle too
+function writeAdjust(person, delta) {
+  if (!db) return;
+  db.ref("adjust/" + torontoDayKey(serverNow()) + "/" + person).transaction((v) => (v || 0) + delta);
+}
+function adjustTotal(person) {
+  let sum = 0;
+  for (const key in adjust) {
+    const v = adjust[key];
+    if (typeof v === "number") { if (key === person) sum += v; } // legacy flat shape
+    else if (v && typeof v === "object") sum += Number(v[person]) || 0;
+  }
+  return sum;
+}
 
 // server-synced clock: Google's time, immune to device clock changes
 let serverOffset = 0;
@@ -421,8 +438,8 @@ function render() {
 
   // tally — khali vs lewis miss counters (x2 misses count double, plus manual adjustments)
   const personPoints = (person) => events.filter((e) => norm(e.from) === person).reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
-  $("their-count").textContent = Math.max(0, personPoints("khali") + (adjust.khali || 0));
-  $("my-count").textContent = Math.max(0, personPoints("lewis") + (adjust.lewis || 0));
+  $("their-count").textContent = Math.max(0, personPoints("khali") + adjustTotal("khali"));
+  $("my-count").textContent = Math.max(0, personPoints("lewis") + adjustTotal("lewis"));
 }
 
 let feedExpanded = false;
@@ -492,6 +509,15 @@ function renderCal() {
     if (norm(e.from) === "khali") rec.k += v;
     if (norm(e.from) === "lewis") rec.l += v;
   }
+  // dated adjustments (khaliwins bypass + on-call bonuses) count in the day they happened
+  for (const key in adjust) {
+    const v = adjust[key];
+    if (v && typeof v === "object") {
+      const rec = days[key] || (days[key] = { k: 0, l: 0 });
+      rec.k += Number(v.khali) || 0;
+      rec.l += Number(v.lewis) || 0;
+    }
+  }
   const todayKey = torontoDayKey(serverNow());
   grid.innerHTML = "";
   for (let i = 0; i <= 27; i++) {
@@ -503,6 +529,12 @@ function renderCal() {
     else if (rec.l > rec.k) cell.classList.add("l");
     else if (rec.k > 0) cell.classList.add("b");
     if (key === todayKey) cell.classList.add("today");
+    if (rec.k > 0 || rec.l > 0) {
+      const s = document.createElement("span");
+      s.className = "day-score";
+      s.textContent = rec.k + "–" + rec.l;
+      cell.appendChild(s);
+    }
     cell.title = key + " · khali " + rec.k + " – " + rec.l + " lewis";
     grid.appendChild(cell);
   }
@@ -575,8 +607,8 @@ function creditCallBlocks(alsoEnd) {
     return { on: true, since: c.since, credited: blocks };
   }, (err, committed) => {
     if (committed && delta > 0) {
-      db.ref("adjust/khali").transaction((v) => (v || 0) + delta * CALL_BLOCK_PTS);
-      db.ref("adjust/lewis").transaction((v) => (v || 0) + delta * CALL_BLOCK_PTS);
+      writeAdjust("khali", delta * CALL_BLOCK_PTS);
+      writeAdjust("lewis", delta * CALL_BLOCK_PTS);
     }
   });
 }
@@ -591,7 +623,7 @@ function renderCall() {
     const nextIn = Math.ceil((CALL_BLOCK_MS - (elapsed % CALL_BLOCK_MS)) / 60000);
     sub.textContent = "on call for " + (h ? h + "h " : "") + m + "m · next +45 in " + nextIn + "m";
   } else {
-    sub.textContent = "flip this when you're on a call — every 45m adds +45 to both counters";
+    sub.textContent = "flip this when you're on a call: every 45m adds +45 to both counters";
   }
 }
 
@@ -624,7 +656,7 @@ document.querySelectorAll(".adj-btn").forEach((b) => {
   b.addEventListener("click", () => {
     if (!adminMode || !db) return;
     const p = b.dataset.p, d = Number(b.dataset.d);
-    db.ref("adjust/" + p).transaction((v) => (v || 0) + d);
+    writeAdjust(p, d);
   });
 });
 
@@ -653,11 +685,13 @@ beacon.addEventListener("click", async () => {
   $("err").textContent = "";
   try {
     if (!eventsRef) throw new Error("not connected");
+    whenCache = {}; // recompute all "x min ago" times on every press
     const stamp = firebase.database.ServerValue.TIMESTAMP;
     await eventsRef.push(bonus ? { from: name, at: stamp, x2: true } : { from: name, at: stamp });
     localStorage.setItem("ily:lastSent", String(serverNow()));
     spawnHearts(7);
     render();
+    renderFeed();
   } catch (e) {
     $("err").textContent = "couldn't send — check your connection and try again";
   }

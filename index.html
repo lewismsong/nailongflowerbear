@@ -55,6 +55,7 @@
     background: var(--yellow); color: var(--deep); font-size: 16px; font-weight: 700; cursor: pointer;
   }
   #start-btn:disabled { background: rgba(0,0,0,0.06); color: var(--muted); cursor: default; }
+  .name-err { color: var(--pink-deep); font-size: 13px; font-weight: 700; margin-top: 12px; min-height: 1em; }
 
   /* header */
   header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -129,9 +130,7 @@
   .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
   /* thinking of you calendar */
-  h2.feed-title.cal-title {
-  margin: 36px 0 12px;
-  }
+  h2.feed-title.cal-title { margin: 36px 0 12px; }
   #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); }
   #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
@@ -143,6 +142,8 @@
   .dl { background: rgba(142,212,245,0.9); }
   .db { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); }
   .streak { margin-left: auto; font-weight: 700; color: var(--text); }
+  .today-score { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+  #cal-grid .day.today { border: 2px dashed rgba(74,53,36,0.35); }
 
   /* floating hearts */
   #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
@@ -168,6 +169,7 @@
     <label for="name-in">add your name</label>
     <input id="name-in" placeholder="e.g. Khali" maxlength="24" autocomplete="off" />
     <button id="start-btn" disabled>Start sending misses</button>
+    <p id="name-err" class="name-err"></p>
     <p id="config-warn" class="hidden" style="color: var(--pink-deep); font-size: 13px; margin-top: 18px;">
       Setup isn't finished yet — the Firebase config still needs to be pasted into this file.
     </p>
@@ -231,11 +233,12 @@
     <h2 class="feed-title cal-title">thinking of you</h2>
     <div id="cal-grid"></div>
     <p class="cal-legend">
-      <span class="dot dk"></span> khali
-      <span class="dot dl"></span> lewis
-      <span class="dot db"></span> both
+      <span class="dot dk"></span> khali won
+      <span class="dot dl"></span> lewis won
+      <span class="dot db"></span> tie
       <span class="streak" id="streak"></span>
     </p>
+    <p class="today-score" id="today-score"></p>
 
     <button id="refresh-btn">refresh misses</button>
    </div>
@@ -263,6 +266,7 @@ const firebaseConfig = {
 
 const COOLDOWN_MS = 60 * 1000;
 const TZ = { khali: "Europe/Berlin", lewis: "America/New_York" };
+const GAME_TZ = "America/Toronto"; // the daily battle runs midnight-to-midnight Toronto time
 const FRANCE_DATE = new Date(2026, 7, 12); // Aug 12, 2026 — change here if the trip moves
 
 const $ = (id) => document.getElementById(id);
@@ -280,6 +284,16 @@ let prevIncoming = null;
 
 const norm = (s) => (s || "").trim().toLowerCase();
 const whenCache = {};
+
+// server-synced clock: Google's time, immune to device clock changes
+let serverOffset = 0;
+const serverNow = () => Date.now() + serverOffset;
+function hourFor(person) {
+  const tz = TZ[person];
+  const d = new Date(serverNow());
+  if (!tz) return d.getHours();
+  return Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: tz }).format(d)) % 24;
+}
 
 const configured = Boolean(firebaseConfig.databaseURL);
 
@@ -319,11 +333,12 @@ function myLastAt() {
 }
 
 function render() {
-  const now = Date.now();
-  const remaining = Math.max(0, COOLDOWN_MS - (now - myLastAt()));
+  const now = serverNow();
+  const remaining = Math.min(COOLDOWN_MS, Math.max(0, COOLDOWN_MS - (now - myLastAt())));
   const cooling = remaining > 0;
 
-  const bonusNow = new Date().getHours() < 6;
+  const me = norm(name);
+  const bonusNow = hourFor(me) < 6;
 
   // beacon
   beacon.disabled = cooling;
@@ -338,15 +353,14 @@ function render() {
   $("bonus-note").classList.toggle("hidden", !bonusNow);
 
   // partner clock — shows the OTHER person's local time
-  const me = norm(name);
   const partner = me === "lewis" ? "khali" : me === "khali" ? "lewis" : null;
   const pc = $("partner-clock");
   if (partner) {
     pc.classList.remove("hidden");
     $("pc-label").textContent = partner + "'s time";
-    const nowD = new Date();
+    const nowD = new Date(serverNow());
     const timeStr = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZone: TZ[partner] }).format(nowD);
-    const pHr = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: TZ[partner] }).format(nowD)) % 24;
+    const pHr = hourFor(partner);
     const icon = pHr >= 22 || pHr < 6 ? "🌙 " : pHr < 9 ? "🌅 " : pHr < 18 ? "☀️ " : "🌆 ";
     $("pc-time").textContent = icon + timeStr;
   } else {
@@ -354,7 +368,7 @@ function render() {
   }
 
   // france countdown
-  const franceDays = Math.ceil((FRANCE_DATE - new Date()) / 86400000);
+  const franceDays = Math.ceil((FRANCE_DATE - new Date(serverNow())) / 86400000);
   $("france-box").textContent = franceDays > 1 ? "🇫🇷 " + franceDays + " days until france"
     : franceDays === 1 ? "🇫🇷 1 day until france!!"
     : "🇫🇷 it's france time 🥖";
@@ -386,7 +400,7 @@ function renderFeed() {
     const latest = g.items[g.items.length - 1];
     const count = g.items.length;
     const pts = g.items.reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
-    if (!whenCache[latest.at]) whenCache[latest.at] = ago(latest.at, Date.now());
+    if (!whenCache[latest.at]) whenCache[latest.at] = ago(latest.at, serverNow());
     const mineItem = norm(g.from) === norm(name);
     const li = document.createElement("li");
     if (norm(g.from) === "khali") li.classList.add("khali");
@@ -409,41 +423,54 @@ function renderFeed() {
   }
 }
 
+function torontoDayKey(t) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(t));
+}
+
+function timeLeftToronto() {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: GAME_TZ, hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date(serverNow()));
+  const h = Number(parts.find((p) => p.type === "hour").value) % 24;
+  const m = Number(parts.find((p) => p.type === "minute").value);
+  const left = 24 * 60 - (h * 60 + m);
+  return Math.floor(left / 60) + "h " + (left % 60) + "m";
+}
+
 function renderCal() {
   const grid = $("cal-grid");
-  const dayKey = (d) => d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
-  const kDays = new Set(), lDays = new Set();
+  // bucket points into Toronto days (x2 misses worth 2)
+  const days = {};
   for (const e of events) {
-    const key = dayKey(new Date(e.at));
-    const who = norm(e.from);
-    if (who === "khali") kDays.add(key);
-    if (who === "lewis") lDays.add(key);
+    const key = torontoDayKey(e.at);
+    const rec = days[key] || (days[key] = { k: 0, l: 0 });
+    const v = e.x2 ? 2 : 1;
+    if (norm(e.from) === "khali") rec.k += v;
+    if (norm(e.from) === "lewis") rec.l += v;
   }
+  const todayKey = torontoDayKey(serverNow());
   grid.innerHTML = "";
-  const today = new Date();
   for (let i = 0; i <= 27; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
-    const key = dayKey(d);
+    const key = torontoDayKey(serverNow() - i * 86400000);
+    const rec = days[key] || { k: 0, l: 0 };
     const cell = document.createElement("div");
     cell.className = "day";
-    const k = kDays.has(key), l = lDays.has(key);
-    if (k && l) cell.classList.add("b");
-    else if (k) cell.classList.add("k");
-    else if (l) cell.classList.add("l");
-    cell.title = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    if (rec.k > rec.l) cell.classList.add("k");
+    else if (rec.l > rec.k) cell.classList.add("l");
+    else if (rec.k > 0) cell.classList.add("b");
+    if (key === todayKey) cell.classList.add("today");
+    cell.title = key + " · khali " + rec.k + " – " + rec.l + " lewis";
     grid.appendChild(cell);
   }
-  // streak: consecutive days with at least one miss from either of you.
-  // an empty today doesn't break it — the day isn't over yet.
-  let streak = 0;
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
-    const hit = kDays.has(dayKey(d)) || lDays.has(dayKey(d));
-    if (hit) streak++;
-    else if (i === 0) continue;
-    else break;
+  // trophy count: completed days only — today isn't decided yet
+  let kWins = 0, lWins = 0;
+  for (const key in days) {
+    if (key === todayKey) continue;
+    const r = days[key];
+    if (r.k > r.l) kWins++;
+    else if (r.l > r.k) lWins++;
   }
-  $("streak").textContent = streak > 0 ? "🔥 " + streak + " day streak" : "";
+  $("streak").textContent = "🏆 khali " + kWins + " – " + lWins + " lewis";
+  const t = days[todayKey] || { k: 0, l: 0 };
+  $("today-score").textContent = "today: khali " + t.k + " – " + t.l + " lewis · " + timeLeftToronto() + " left in the day";
 }
 
 function showMain() {
@@ -468,6 +495,11 @@ nameIn.addEventListener("keydown", (e) => { if (e.key === "Enter" && nameIn.valu
 startBtn.addEventListener("click", () => {
   const n = nameIn.value.trim();
   if (!n) return;
+  if (!["khali", "lewis"].includes(norm(n))) {
+    $("name-err").textContent = "that's not khali, fix it.";
+    return;
+  }
+  $("name-err").textContent = "";
   name = n;
   localStorage.setItem("ily:name", n);
   prevIncoming = null;
@@ -507,14 +539,13 @@ $("refresh-btn").addEventListener("click", async () => {
 
 beacon.addEventListener("click", async () => {
   if (beacon.disabled || !name) return;
-  const at = Date.now();
-  const hr = new Date().getHours();
-  const bonus = hr >= 0 && hr < 6;
+  const bonus = hourFor(norm(name)) < 6;
   $("err").textContent = "";
   try {
     if (!eventsRef) throw new Error("not connected");
-    await eventsRef.push(bonus ? { from: name, at, x2: true } : { from: name, at });
-    localStorage.setItem("ily:lastSent", String(at));
+    const stamp = firebase.database.ServerValue.TIMESTAMP;
+    await eventsRef.push(bonus ? { from: name, at: stamp, x2: true } : { from: name, at: stamp });
+    localStorage.setItem("ily:lastSent", String(serverNow()));
     spawnHearts(7);
     render();
   } catch (e) {
@@ -528,6 +559,7 @@ if (configured) {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     eventsRef = db.ref("misses");
+    db.ref(".info/serverTimeOffset").on("value", (s) => { serverOffset = s.val() || 0; });
     eventsRef.on("value", (snap) => {
       const val = snap.val() || {};
       events = Object.values(val).sort((a, b) => a.at - b.at);

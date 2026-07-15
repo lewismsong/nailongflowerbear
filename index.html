@@ -119,16 +119,17 @@
     font-family: 'Nunito Sans', system-ui, sans-serif;
   }
   #refresh-btn:active { background: var(--card); }
+  #more-btn { display: block; margin: 12px auto 0; background: none; border: none; color: var(--muted); font-size: 12px; text-decoration: underline; cursor: pointer; font-family: 'Nunito Sans', system-ui, sans-serif; }
 
   /* partner clock */
-  .partner-clock { text-align: right; }
+  .partner-clock { text-align: right; margin: 2px 4px 24px 0; }
   .pc-time { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 700; }
 
   /* france countdown */
-  .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -14px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
+  .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
   /* thinking of you calendar */
-  .cal-title { margin: 28px 0 10px; }
+  .cal-title { margin: 44px 0 10px; }
   #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); }
   #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
@@ -179,10 +180,6 @@
         <div class="eyebrow">Signed in as</div>
         <div class="who" id="who"></div>
       </div>
-      <div class="partner-clock hidden" id="partner-clock">
-        <div class="eyebrow" id="pc-label"></div>
-        <div class="pc-time" id="pc-time"></div>
-      </div>
     </header>
 
     <div class="beacon-zone">
@@ -202,6 +199,11 @@
       <p id="err"></p>
     </div>
 
+    <div class="partner-clock hidden" id="partner-clock">
+      <div class="eyebrow" id="pc-label"></div>
+      <div class="pc-time" id="pc-time"></div>
+    </div>
+
     <div class="tally">
       <div class="k">
         <div class="num k-num" id="their-count">0</div>
@@ -212,7 +214,6 @@
         <div class="cap">lewis' misses 🐻</div>
       </div>
     </div>
-    <p class="bonus-rule">🌙 double miss hours: misses sent between 12am and 6am count double</p>
     <p class="france-box" id="france-box">🇫🇷 … days until france</p>
    </div>
 
@@ -223,6 +224,7 @@
     </div>
     <p id="empty">this means you don't miss me</p>
     <ul id="feed"></ul>
+    <button id="more-btn" class="hidden">see more</button>
 
     <h2 class="feed-title cal-title">thinking of you</h2>
     <div id="cal-grid"></div>
@@ -361,6 +363,8 @@ function render() {
   $("my-count").textContent = personPoints("lewis");
 }
 
+let feedExpanded = false;
+
 function renderFeed() {
   const feedEl = $("feed");
   // group consecutive misses from the same person
@@ -370,7 +374,10 @@ function renderFeed() {
     if (last && norm(last.from) === norm(e.from)) last.items.push(e);
     else groups.push({ from: e.from, items: [e] });
   }
-  const items = groups.slice(-5).reverse();
+  const items = (feedExpanded ? groups.slice() : groups.slice(-5)).reverse();
+  const moreBtn = $("more-btn");
+  moreBtn.classList.toggle("hidden", groups.length <= 5);
+  moreBtn.textContent = feedExpanded ? "see less" : "see more (" + groups.length + " total)";
   $("empty").classList.toggle("hidden", items.length > 0);
   feedEl.innerHTML = "";
   for (const g of items) {
@@ -412,7 +419,7 @@ function renderCal() {
   }
   grid.innerHTML = "";
   const today = new Date();
-  for (let i = 27; i >= 0; i--) {
+  for (let i = 0; i <= 27; i++) {
     const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
     const key = dayKey(d);
     const cell = document.createElement("div");
@@ -473,6 +480,11 @@ $("reset-btn").addEventListener("click", () => {
   showSetup();
 });
 
+$("more-btn").addEventListener("click", () => {
+  feedExpanded = !feedExpanded;
+  renderFeed();
+});
+
 $("refresh-btn").addEventListener("click", async () => {
   const sure = confirm("⚠️ warning: this erases every miss for BOTH of you and resets the counters to zero. it can't be undone. continue?");
   if (!sure) return;
@@ -514,7 +526,7 @@ if (configured) {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     eventsRef = db.ref("misses");
-    eventsRef.limitToLast(100).on("value", (snap) => {
+    eventsRef.on("value", (snap) => {
       const val = snap.val() || {};
       events = Object.values(val).sort((a, b) => a.at - b.at);
       const incoming = theirEvents().length;

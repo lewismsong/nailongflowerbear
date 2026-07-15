@@ -120,6 +120,27 @@
   }
   #refresh-btn:active { background: var(--card); }
 
+  /* partner clock */
+  .partner-clock { text-align: right; }
+  .pc-time { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 700; }
+
+  /* france countdown */
+  .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -14px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
+
+  /* thinking of you calendar */
+  .cal-title { margin: 28px 0 10px; }
+  #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); }
+  #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
+  #cal-grid .day.l { background: rgba(142,212,245,0.85); border-color: rgba(84,172,221,0.5); }
+  #cal-grid .day.b { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); border-color: rgba(74,53,36,0.2); }
+  .cal-legend { font-size: 11px; color: var(--muted); margin: 10px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .dk { background: rgba(255,201,77,0.85); }
+  .dl { background: rgba(142,212,245,0.9); }
+  .db { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); }
+  .streak { margin-left: auto; font-weight: 700; color: var(--text); }
+
   /* floating hearts */
   #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
   .heart-float { position: absolute; bottom: 30%; animation: floatUp 2.6s ease-out forwards; filter: drop-shadow(0 2px 4px rgba(74,53,36,0.35)); }
@@ -158,6 +179,10 @@
         <div class="eyebrow">Signed in as</div>
         <div class="who" id="who"></div>
       </div>
+      <div class="partner-clock hidden" id="partner-clock">
+        <div class="eyebrow" id="pc-label"></div>
+        <div class="pc-time" id="pc-time"></div>
+      </div>
     </header>
 
     <div class="beacon-zone">
@@ -188,6 +213,7 @@
       </div>
     </div>
     <p class="bonus-rule">🌙 double miss hours: misses sent between 12am and 6am count double</p>
+    <p class="france-box" id="france-box">🇫🇷 … days until france</p>
    </div>
 
    <div class="col-right">
@@ -197,6 +223,16 @@
     </div>
     <p id="empty">this means you don't miss me</p>
     <ul id="feed"></ul>
+
+    <h2 class="feed-title cal-title">thinking of you</h2>
+    <div id="cal-grid"></div>
+    <p class="cal-legend">
+      <span class="dot dk"></span> khali
+      <span class="dot dl"></span> lewis
+      <span class="dot db"></span> both
+      <span class="streak" id="streak"></span>
+    </p>
+
     <button id="refresh-btn">refresh misses</button>
    </div>
    </div>
@@ -222,6 +258,8 @@ const firebaseConfig = {
 /* ============================================================ */
 
 const COOLDOWN_MS = 60 * 1000;
+const TZ = { khali: "Europe/Berlin", lewis: "America/New_York" };
+const FRANCE_DATE = new Date(2026, 7, 12); // Aug 12, 2026 — change here if the trip moves
 
 const $ = (id) => document.getElementById(id);
 const setupEl = $("setup"), mainEl = $("main");
@@ -295,6 +333,28 @@ function render() {
   // bonus hours indicator (sender's local midnight–6am)
   $("bonus-note").classList.toggle("hidden", !bonusNow);
 
+  // partner clock — shows the OTHER person's local time
+  const me = norm(name);
+  const partner = me === "lewis" ? "khali" : me === "khali" ? "lewis" : null;
+  const pc = $("partner-clock");
+  if (partner) {
+    pc.classList.remove("hidden");
+    $("pc-label").textContent = partner + "'s time";
+    const nowD = new Date();
+    const timeStr = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZone: TZ[partner] }).format(nowD);
+    const pHr = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: TZ[partner] }).format(nowD)) % 24;
+    const icon = pHr >= 22 || pHr < 6 ? "🌙 " : pHr < 9 ? "🌅 " : pHr < 18 ? "☀️ " : "🌆 ";
+    $("pc-time").textContent = icon + timeStr;
+  } else {
+    pc.classList.add("hidden");
+  }
+
+  // france countdown
+  const franceDays = Math.ceil((FRANCE_DATE - new Date()) / 86400000);
+  $("france-box").textContent = franceDays > 1 ? "🇫🇷 " + franceDays + " days until france"
+    : franceDays === 1 ? "🇫🇷 1 day until france!!"
+    : "🇫🇷 it's france time 🥖";
+
   // tally — khali vs lewis miss counters (x2 misses count double)
   const personPoints = (person) => events.filter((e) => norm(e.from) === person).reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
   $("their-count").textContent = personPoints("khali");
@@ -340,12 +400,50 @@ function renderFeed() {
   }
 }
 
+function renderCal() {
+  const grid = $("cal-grid");
+  const dayKey = (d) => d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+  const kDays = new Set(), lDays = new Set();
+  for (const e of events) {
+    const key = dayKey(new Date(e.at));
+    const who = norm(e.from);
+    if (who === "khali") kDays.add(key);
+    if (who === "lewis") lDays.add(key);
+  }
+  grid.innerHTML = "";
+  const today = new Date();
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+    const key = dayKey(d);
+    const cell = document.createElement("div");
+    cell.className = "day";
+    const k = kDays.has(key), l = lDays.has(key);
+    if (k && l) cell.classList.add("b");
+    else if (k) cell.classList.add("k");
+    else if (l) cell.classList.add("l");
+    cell.title = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    grid.appendChild(cell);
+  }
+  // streak: consecutive days with at least one miss from either of you.
+  // an empty today doesn't break it — the day isn't over yet.
+  let streak = 0;
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+    const hit = kDays.has(dayKey(d)) || lDays.has(dayKey(d));
+    if (hit) streak++;
+    else if (i === 0) continue;
+    else break;
+  }
+  $("streak").textContent = streak > 0 ? "🔥 " + streak + " day streak" : "";
+}
+
 function showMain() {
   setupEl.classList.add("hidden");
   mainEl.classList.remove("hidden");
   $("who").textContent = name;
   render();
   renderFeed();
+  renderCal();
 }
 
 function showSetup() {
@@ -425,7 +523,7 @@ if (configured) {
         try { if (navigator.vibrate) navigator.vibrate([90, 50, 90]); } catch (e) {}
       }
       prevIncoming = incoming;
-      if (name) { render(); renderFeed(); }
+      if (name) { render(); renderFeed(); renderCal(); }
     }, (err) => {
       $("err").textContent = "can't reach the misses database — check the Firebase rules";
     });

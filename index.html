@@ -16,6 +16,7 @@
     --bg-top: #FFFFFF; --bg-bottom: #FFF4D6; --deep: #4A3524;
     --card: rgba(0,0,0,0.04); --card-edge: rgba(0,0,0,0.08);
     --yellow: #FFC94D; --yellow-deep: #DE9B00;
+    --blue: #8ED4F5; --blue-deep: #3E97C9;
     --text: #3D342B; --muted: #9C8D7A; --pink-deep: #E86A85;
   }
   * { box-sizing: border-box; }
@@ -49,6 +50,7 @@
 
   /* header */
   header { display: flex; justify-content: space-between; align-items: baseline; }
+  .footer-pic { display: block; width: 170px; margin: 34px auto 8px; border-radius: 16px; border: 1px solid var(--card-edge); box-shadow: 0 3px 12px rgba(74,53,36,0.18); }
   header .eyebrow { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
   header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 700; }
   #reset-btn { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; }
@@ -77,8 +79,11 @@
   /* tally */
   .tally { display: flex; gap: 10px; margin: 18px 0 26px; }
   .tally > div { flex: 1; background: var(--card); border: 1px solid var(--card-edge); border-radius: 16px; padding: 12px 14px; text-align: center; }
+  .tally > div.k { background: rgba(255,201,77,0.18); border-color: rgba(222,155,0,0.35); }
+  .tally > div.l { background: rgba(142,212,245,0.22); border-color: rgba(84,172,221,0.4); }
   .tally .num { font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; }
-  .tally .num.gold { color: var(--yellow-deep); }
+  .tally .k-num { color: var(--yellow-deep); }
+  .tally .l-num { color: var(--blue-deep); }
   .tally .cap { font-size: 12px; color: var(--muted); }
   .bonus-rule { font-size: 12px; color: var(--muted); text-align: center; margin: -14px 0 26px; }
 
@@ -91,7 +96,8 @@
     background: var(--card); border: 1px solid var(--card-edge); border-radius: 14px; padding: 11px 14px;
     animation: popIn 0.25s ease-out;
   }
-  #feed li.theirs { background: rgba(255,201,77,0.18); border-color: rgba(222,155,0,0.35); }
+  #feed li.khali { background: rgba(255,201,77,0.18); border-color: rgba(222,155,0,0.35); }
+  #feed li.lewis { background: rgba(142,212,245,0.22); border-color: rgba(84,172,221,0.4); }
   #feed li .what { font-size: 14px; }
   #feed li .when { font-size: 12px; color: var(--muted); white-space: nowrap; margin-left: 10px; }
   #refresh-btn {
@@ -154,26 +160,27 @@
           <span class="tiny hidden" id="beacon-tiny">until your next miss</span>
         </button>
       </div>
-      <p id="bonus-note" class="hidden">🌙 double miss hours: every miss counts ×2 since it's late</p>
+      <p id="bonus-note" class="hidden">🌙 double miss hours — every miss counts ×2 until 6am</p>
       <p id="err"></p>
     </div>
 
     <div class="tally">
-      <div>
-        <div class="num gold" id="their-count">0</div>
-        <div class="cap">khali's misses 🐻‍❄️</div>
+      <div class="k">
+        <div class="num k-num" id="their-count">0</div>
+        <div class="cap">🐻‍❄️ khali's misses</div>
       </div>
-      <div>
-        <div class="num" id="my-count">0</div>
-        <div class="cap">lewis' misses 🐻</div>
+      <div class="l">
+        <div class="num l-num" id="my-count">0</div>
+        <div class="cap">🐻 lewis's misses</div>
       </div>
     </div>
-    <p class="bonus-rule">🌙 x2 bonus: misses sent between 12am and 6am count x2</p>
+    <p class="bonus-rule">🌙 x2 bonus — misses sent between 12am and 6am count double</p>
 
-    <h2 class="feed-title">most recent misses</h2>
+    <h2 class="feed-title">recent misses</h2>
     <p id="empty">this means you don't miss me</p>
     <ul id="feed"></ul>
     <button id="refresh-btn">refresh misses</button>
+    <img class="footer-pic" src="bears.jpg" alt="us, basically" />
   </div>
 </div>
 
@@ -281,7 +288,8 @@ function renderFeed() {
     if (!whenCache[e.at]) whenCache[e.at] = ago(e.at, Date.now());
     const mineItem = norm(e.from) === norm(name);
     const li = document.createElement("li");
-    if (!mineItem) li.classList.add("theirs");
+    if (norm(e.from) === "khali") li.classList.add("khali");
+    if (norm(e.from) === "lewis") li.classList.add("lewis");
     const what = document.createElement("span");
     what.className = "what";
     what.textContent = mineItem ? "💌 you sent a miss" : "🩵 " + e.from + " missed you";

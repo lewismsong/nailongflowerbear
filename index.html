@@ -244,7 +244,7 @@
    </div>
    </div>
    <img class="footer-pic" src="bears.jpg" alt="us, basically" />
-   <p class="trademark">lewiskhalico™</p>
+   <p class="trademark">lewiskhalico™ <span id="ver">v2.0</span></p>
   </div>
 </div>
 
@@ -561,15 +561,22 @@ if (configured) {
     eventsRef = db.ref("misses");
     db.ref(".info/serverTimeOffset").on("value", (s) => { serverOffset = s.val() || 0; });
     eventsRef.on("value", (snap) => {
-      const val = snap.val() || {};
-      events = Object.values(val).sort((a, b) => a.at - b.at);
-      const incoming = theirEvents().length;
-      if (name && prevIncoming !== null && incoming > prevIncoming) {
-        spawnHearts(10);
-        try { if (navigator.vibrate) navigator.vibrate([90, 50, 90]); } catch (e) {}
+      try {
+        const val = snap.val() || {};
+        // keep only well-formed misses: a sender and a sane numeric timestamp
+        events = Object.values(val)
+          .filter((e) => e && typeof e.from === "string" && typeof e.at === "number" && e.at > 0)
+          .sort((a, b) => a.at - b.at);
+        const incoming = theirEvents().length;
+        if (name && prevIncoming !== null && incoming > prevIncoming) {
+          spawnHearts(10);
+          try { if (navigator.vibrate) navigator.vibrate([90, 50, 90]); } catch (e) {}
+        }
+        prevIncoming = incoming;
+        if (name) { render(); renderFeed(); renderCal(); }
+      } catch (e) {
+        console.error("data update failed:", e);
       }
-      prevIncoming = incoming;
-      if (name) { render(); renderFeed(); renderCal(); }
     }, (err) => {
       $("err").textContent = "can't reach the misses database — check the Firebase rules";
     });
@@ -579,7 +586,20 @@ if (configured) {
 }
 
 // tick every second for cooldown + relative times
-setInterval(() => { if (name && !mainEl.classList.contains("hidden")) render(); }, 1000);
+setInterval(() => {
+  if (name && !mainEl.classList.contains("hidden")) {
+    try { render(); } catch (e) { console.error("render failed:", e); }
+  }
+}, 1000);
+
+// self-healing: when the app is brought back to the foreground after 30+ minutes,
+// reload the page so it always picks up the latest deployed version
+const loadedAt = Date.now();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Date.now() - loadedAt > 30 * 60 * 1000) {
+    location.reload();
+  }
+});
 
 // initial screen
 if (name && configured) showMain(); else showSetup();

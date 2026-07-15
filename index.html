@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>hi baby</title>
+<title>🖤</title>
 <meta name="theme-color" content="#FFF4D6" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="hi baby" />
+<meta name="apple-mobile-web-app-title" content="🖤" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐻</text></svg>" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><text y=%22.9em%22 font-size=%2270%22 x=%2215%22>🐻</text></svg>" />
 <style>
@@ -97,6 +97,18 @@
   .tally .k-num { color: var(--yellow-deep); }
   .tally .l-num { color: var(--blue-deep); }
   .tally .cap { font-size: 12px; color: var(--muted); }
+  .num-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .adj-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.95); background: rgba(255,255,255,0.65);
+    color: var(--text); font-size: 16px; font-weight: 700; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 1px 6px rgba(74,53,36,0.12);
+    transition: transform 0.1s ease, background 0.15s ease;
+    font-family: 'Nunito Sans', system-ui, sans-serif; padding: 0;
+  }
+  .adj-btn:active { transform: scale(0.88); background: rgba(255,255,255,0.9); }
+  .trademark { cursor: pointer; -webkit-user-select: none; user-select: none; }
   .bonus-rule { font-size: 12px; color: var(--muted); text-align: center; margin: -8px 0 26px; padding: 11px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
   /* feed */
@@ -128,6 +140,17 @@
 
   /* france countdown */
   .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
+
+  /* on-call toggle */
+  .call-box { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
+  .call-title { font-size: 13px; font-weight: 700; }
+  .call-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .switch { position: relative; display: inline-block; width: 48px; height: 28px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; border-radius: 28px; background: rgba(0,0,0,0.12); transition: background 0.25s ease; cursor: pointer; }
+  .slider::before { content: ""; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.25); transition: transform 0.25s ease; }
+  .switch input:checked + .slider { background: var(--yellow); }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
 
   /* thinking of you calendar */
   h2.feed-title.cal-title { margin: 36px 0 12px; }
@@ -210,15 +233,33 @@
 
     <div class="tally">
       <div class="k">
-        <div class="num k-num" id="their-count">0</div>
+        <div class="num-row">
+          <button class="adj-btn hidden" data-p="khali" data-d="-1" aria-label="minus one for khali">−</button>
+          <div class="num k-num" id="their-count">0</div>
+          <button class="adj-btn hidden" data-p="khali" data-d="1" aria-label="plus one for khali">+</button>
+        </div>
         <div class="cap">khali's misses 🐻‍❄️</div>
       </div>
       <div class="l">
-        <div class="num l-num" id="my-count">0</div>
+        <div class="num-row">
+          <button class="adj-btn hidden" data-p="lewis" data-d="-1" aria-label="minus one for lewis">−</button>
+          <div class="num l-num" id="my-count">0</div>
+          <button class="adj-btn hidden" data-p="lewis" data-d="1" aria-label="plus one for lewis">+</button>
+        </div>
         <div class="cap">lewis' misses 🐻</div>
       </div>
     </div>
     <p class="france-box" id="france-box">🇫🇷 … days until france</p>
+    <div class="call-box">
+      <div>
+        <div class="call-title">📞 on call</div>
+        <div class="call-sub" id="call-sub">flip this when you're on a call — every 45m adds +45 to both counters</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="call-toggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
    </div>
 
    <div class="col-right">
@@ -244,7 +285,7 @@
    </div>
    </div>
    <img class="footer-pic" src="bears.jpg" alt="us, basically" />
-   <p class="trademark">lewiskhalico™ <span id="ver">v2.0</span></p>
+   <p class="trademark">lewiskhalico™ <span id="ver">v2.2</span></p>
   </div>
 </div>
 
@@ -281,6 +322,11 @@ let name = localStorage.getItem("ily:name") || null;
 let events = [];
 let db = null, eventsRef = null;
 let prevIncoming = null;
+let adjust = {}; // manual counter adjustments, synced via firebase
+let adminMode = false;
+let call = null; // shared on-call state, synced via firebase
+const CALL_BLOCK_MS = 45 * 60 * 1000;
+const CALL_BLOCK_PTS = 45;
 
 const norm = (s) => (s || "").trim().toLowerCase();
 const whenCache = {};
@@ -373,10 +419,10 @@ function render() {
     : franceDays === 1 ? "🇫🇷 1 day until france!!"
     : "🇫🇷 it's france time 🥖";
 
-  // tally — khali vs lewis miss counters (x2 misses count double)
+  // tally — khali vs lewis miss counters (x2 misses count double, plus manual adjustments)
   const personPoints = (person) => events.filter((e) => norm(e.from) === person).reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
-  $("their-count").textContent = personPoints("khali");
-  $("my-count").textContent = personPoints("lewis");
+  $("their-count").textContent = Math.max(0, personPoints("khali") + (adjust.khali || 0));
+  $("my-count").textContent = Math.max(0, personPoints("lewis") + (adjust.lewis || 0));
 }
 
 let feedExpanded = false;
@@ -514,9 +560,72 @@ $("reset-btn").addEventListener("click", () => {
   showSetup();
 });
 
+// ---- on-call crediting ----
+// every full 45 minutes of an active call adds +45 to BOTH counters, exactly once,
+// no matter how many devices are open (the transaction claims blocks atomically)
+function creditCallBlocks(alsoEnd) {
+  if (!db) return;
+  let delta = 0;
+  db.ref("call").transaction((c) => {
+    if (!c || !c.on || typeof c.since !== "number") return alsoEnd ? { on: false } : c;
+    const blocks = Math.floor((serverNow() - c.since) / CALL_BLOCK_MS);
+    delta = Math.max(0, blocks - (c.credited || 0));
+    if (alsoEnd) return { on: false };
+    if (delta === 0) return; // nothing new — abort, no write
+    return { on: true, since: c.since, credited: blocks };
+  }, (err, committed) => {
+    if (committed && delta > 0) {
+      db.ref("adjust/khali").transaction((v) => (v || 0) + delta * CALL_BLOCK_PTS);
+      db.ref("adjust/lewis").transaction((v) => (v || 0) + delta * CALL_BLOCK_PTS);
+    }
+  });
+}
+
+function renderCall() {
+  const t = $("call-toggle"), sub = $("call-sub");
+  const on = !!(call && call.on);
+  if (t.checked !== on) t.checked = on;
+  if (on && typeof call.since === "number") {
+    const elapsed = Math.max(0, serverNow() - call.since);
+    const h = Math.floor(elapsed / 3600000), m = Math.floor((elapsed % 3600000) / 60000);
+    const nextIn = Math.ceil((CALL_BLOCK_MS - (elapsed % CALL_BLOCK_MS)) / 60000);
+    sub.textContent = "on call for " + (h ? h + "h " : "") + m + "m · next +45 in " + nextIn + "m";
+  } else {
+    sub.textContent = "flip this when you're on a call — every 45m adds +45 to both counters";
+  }
+}
+
+$("call-toggle").addEventListener("change", (e) => {
+  if (!db) { e.target.checked = false; return; }
+  if (e.target.checked) {
+    db.ref("call").set({ on: true, since: firebase.database.ServerValue.TIMESTAMP, credited: 0 });
+  } else {
+    creditCallBlocks(true); // pay out any earned blocks, then end the call
+  }
+});
+
 $("more-btn").addEventListener("click", () => {
   feedExpanded = !feedExpanded;
   renderFeed();
+});
+
+// hidden counter controls: tap the trademark, enter the password
+function setAdmin(on) {
+  adminMode = on;
+  document.querySelectorAll(".adj-btn").forEach((b) => b.classList.toggle("hidden", !on));
+}
+document.querySelector(".trademark").addEventListener("click", () => {
+  if (adminMode) { setAdmin(false); return; }
+  const pw = prompt("password?");
+  if (pw === "khaliwins") setAdmin(true);
+  else if (pw !== null) alert("no.");
+});
+document.querySelectorAll(".adj-btn").forEach((b) => {
+  b.addEventListener("click", () => {
+    if (!adminMode || !db) return;
+    const p = b.dataset.p, d = Number(b.dataset.d);
+    db.ref("adjust/" + p).transaction((v) => (v || 0) + d);
+  });
 });
 
 $("refresh-btn").addEventListener("click", async () => {
@@ -531,6 +640,7 @@ $("refresh-btn").addEventListener("click", async () => {
   try {
     if (!eventsRef) throw new Error("not connected");
     await eventsRef.remove();
+    await db.ref("adjust").remove();
     alert("all misses cleared — fresh start 🧹");
   } catch (e) {
     $("err").textContent = "couldn't clear — check your connection and try again";
@@ -560,6 +670,8 @@ if (configured) {
     db = firebase.database();
     eventsRef = db.ref("misses");
     db.ref(".info/serverTimeOffset").on("value", (s) => { serverOffset = s.val() || 0; });
+    db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
+    db.ref("call").on("value", (s) => { call = s.val(); renderCall(); });
     eventsRef.on("value", (snap) => {
       try {
         const val = snap.val() || {};
@@ -588,16 +700,16 @@ if (configured) {
 // tick every second for cooldown + relative times
 setInterval(() => {
   if (name && !mainEl.classList.contains("hidden")) {
-    try { render(); } catch (e) { console.error("render failed:", e); }
+    try { render(); renderCall(); if (call && call.on) creditCallBlocks(false); } catch (e) { console.error("render failed:", e); }
   }
 }, 1000);
 
 // self-healing: when the app is brought back to the foreground after 30+ minutes,
-// reload the page so it always picks up the latest deployed version
+// force-fetch the latest deployed version (cache-busting query beats stale caches)
 const loadedAt = Date.now();
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && Date.now() - loadedAt > 30 * 60 * 1000) {
-    location.reload();
+    location.replace(location.pathname + "?r=" + Date.now());
   }
 });
 

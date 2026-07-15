@@ -128,7 +128,7 @@
   <div id="setup">
     <div class="emoji">🐻🐻‍❄️</div>
     <h1>hi baby</h1>
-    <p class="sub">let's see if this actually works the way i wanted it</p>
+    <p class="sub">may the best yearner win 🐻</p>
     <label for="name-in">add your name</label>
     <input id="name-in" placeholder="e.g. Khali" maxlength="24" autocomplete="off" />
     <button id="start-btn" disabled>Start sending misses</button>
@@ -160,21 +160,21 @@
           <span class="tiny hidden" id="beacon-tiny">until your next miss</span>
         </button>
       </div>
-      <p id="bonus-note" class="hidden">🌙 double miss hours — every miss counts ×2 until 6am</p>
+      <p id="bonus-note" class="hidden">🌙 double miss hours: every miss counts double until 6am</p>
       <p id="err"></p>
     </div>
 
     <div class="tally">
       <div class="k">
         <div class="num k-num" id="their-count">0</div>
-        <div class="cap">🐻‍❄️ khali's misses</div>
+        <div class="cap">khali's misses 🐻‍❄️</div>
       </div>
       <div class="l">
         <div class="num l-num" id="my-count">0</div>
-        <div class="cap">🐻 lewis's misses</div>
+        <div class="cap">lewis' misses 🐻</div>
       </div>
     </div>
-    <p class="bonus-rule">🌙 x2 bonus — misses sent between 12am and 6am count double</p>
+    <p class="bonus-rule">🌙 double miss hours: every miss counts double until 6am</p>
 
     <h2 class="feed-title">recent misses</h2>
     <p id="empty">this means you don't miss me</p>
@@ -292,7 +292,7 @@ function renderFeed() {
     if (norm(e.from) === "lewis") li.classList.add("lewis");
     const what = document.createElement("span");
     what.className = "what";
-    what.textContent = mineItem ? "💌 you sent a miss" : "🩵 " + e.from + " missed you";
+    what.textContent = mineItem ? "💌 you sent a miss" : "💌 " + e.from + " missed you";
     if (e.x2) {
       const badge = document.createElement("span");
       badge.className = "x2";

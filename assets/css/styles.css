@@ -71,6 +71,7 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
   animation: breathe 3.2s ease-in-out infinite;
 }
 #beacon:disabled { background: rgba(0,0,0,0.05); color: var(--muted); cursor: default; animation: none; box-shadow: none; }
+#beacon.on-call { background: radial-gradient(circle at 35% 30%, #DDF3FD, rgba(142,212,245,0.45) 58%, rgba(62,151,201,0.3)); color: var(--blue-deep); border: 2px solid rgba(62,151,201,0.22); }
 #beacon .big { font-size: 42px; line-height: 1; }
 #beacon .label { font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 700; margin-top: 6px; }
 #beacon.cooling .label { font-size: 26px; }

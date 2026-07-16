@@ -14,14 +14,14 @@
 .coin-face::after { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(255,255,255,0.62); border-radius: 50%; pointer-events: none; }
 .coin-white { background: radial-gradient(circle at 34% 27%, #fff 0%, #f8f5ec 42%, #d9d3c5 100%); color: var(--deep); transform: rotateY(0deg) translateZ(1px); }
 .coin-brown { background: radial-gradient(circle at 34% 27%, #d9ad78 0%, #a66c37 48%, #65401f 100%); color: #fff8e9; transform: rotateY(180deg) translateZ(1px); }
-.coin-heartbreak { visibility: hidden; background: radial-gradient(circle at 34% 27%, #fff7f8 0%, #f7d8df 48%, #d99aaa 100%); color: #743c49; transform: rotateY(0deg) translateZ(2px); }
+.coin-koala { visibility: hidden; background: radial-gradient(circle at 34% 27%, #f4f5f5 0%, #c8ccce 48%, #858b8f 100%); color: #34383a; transform: rotateY(0deg) translateZ(2px); }
 .coin[data-side="white"] .coin-brown, .coin[data-side="brown"] .coin-white { visibility: hidden; }
-.coin[data-side="heartbreak"] .coin-white, .coin[data-side="heartbreak"] .coin-brown { visibility: hidden; }
-.coin[data-side="heartbreak"] .coin-heartbreak { visibility: visible; }
+.coin[data-side="koala"] .coin-white, .coin[data-side="koala"] .coin-brown { visibility: hidden; }
+.coin[data-side="koala"] .coin-koala { visibility: visible; }
 .coin-bear { position: relative; z-index: 1; font-size: 82px; line-height: 1; filter: drop-shadow(0 4px 5px rgba(74,53,36,0.2)); }
 .coin-side-name { position: relative; z-index: 1; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; }
-.coin-heartbreak-icon { position: relative; z-index: 1; font-size: 58px; line-height: 1; filter: drop-shadow(0 4px 5px rgba(116,60,73,0.18)); }
-.coin-heartbreak-caption { width: 150px; position: relative; z-index: 1; overflow-wrap: anywhere; font-size: 9px; font-weight: 700; line-height: 1.3; }
+.coin-koala-icon { position: relative; z-index: 1; font-size: 68px; line-height: 1; filter: drop-shadow(0 4px 5px rgba(52,56,58,0.18)); }
+.coin-koala-caption { width: 150px; position: relative; z-index: 1; overflow-wrap: anywhere; font-size: 10px; font-weight: 800; line-height: 1.3; }
 .coin-shadow { width: 150px; height: 20px; margin-top: -3px; border-radius: 50%; background: rgba(74,53,36,0.2); filter: blur(9px); transition: transform 0.7s ease, opacity 0.7s ease; }
 .coin-shell.flipping + .coin-shadow { opacity: 0.38; transform: scaleX(0.65); }
 .coin-shell:hover:not(:disabled) { transform: translateY(-4px) scale(var(--coin-scale)); }

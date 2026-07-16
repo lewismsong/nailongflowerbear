@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>our list 🐻‍❄️🐻</title>
+<meta name="theme-color" content="#FFF4D6" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<link rel="stylesheet" href="assets/css/todo.css" />
+</head>
+<body class="todo-page">
+<main class="todo-wrap">
+  <a class="back-link" href="index.html">← back home</a>
+
+  <header class="todo-header">
+    <div>
+      <p class="todo-eyebrow">🐻‍❄️ + 🐻</p>
+      <h1>everything list</h1>
+      <p class="todo-sub">a little scratchpad for all kinds of things</p>
+    </div>
+    <div class="todo-person" id="todo-person"></div>
+  </header>
+
+  <section class="scratchpad" aria-labelledby="list-title">
+    <div class="scratchpad-top">
+      <h2 id="list-title">things to do</h2>
+      <span id="todo-count">0 open</span>
+    </div>
+
+    <form id="todo-form" class="todo-form">
+      <span id="my-bear" class="my-bear" aria-hidden="true"></span>
+      <input id="todo-input" maxlength="280" placeholder="write something, e.g. i miss you" autocomplete="off" />
+      <button type="submit">add</button>
+    </form>
+
+    <p id="todo-empty" class="todo-empty">nothing here yet</p>
+    <ul id="todo-list" class="todo-list"></ul>
+    <p id="todo-error" class="todo-error" role="status"></p>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/todo.js"></script>
+</body>
+</html>

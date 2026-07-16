@@ -124,7 +124,7 @@ function render() {
   const pc = $("partner-clock");
   if (partner) {
     pc.classList.remove("hidden");
-    $("pc-label").textContent = partner + "'s time";
+    $("pc-label").textContent = partner + (partner.endsWith("s") ? "' time" : "'s time");
     const nowD = new Date(serverNow());
     const timeStr = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZone: TIME_ZONES[partner] }).format(nowD);
     const pHr = hourFor(partner);

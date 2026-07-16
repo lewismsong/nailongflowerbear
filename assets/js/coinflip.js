@@ -2,9 +2,9 @@ const coinButton = document.getElementById("coin");
 const coin = coinButton.querySelector(".coin");
 const coinResult = document.getElementById("coin-result");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-const HEARTBREAK_CHANCE = 0.01;
+const RARE_KOALA_CHANCE = 0.01;
 const UINT32_RANGE = 2 ** 32;
-const resultMessages = { white: "🐻‍❄️!", brown: "🐻!", heartbreak: "💔" };
+const resultMessages = { white: "🐻‍❄️!", brown: "🐻!", koala: "🐨!" };
 
 let coinRotation = 0;
 let coinIsFlipping = false;
@@ -14,7 +14,7 @@ function randomCoinResult() {
   if (!window.crypto?.getRandomValues) throw new Error("secure randomness is unavailable");
   const randomValues = new Uint32Array(2);
   window.crypto.getRandomValues(randomValues);
-  if (randomValues[0] / UINT32_RANGE < HEARTBREAK_CHANCE) return "heartbreak";
+  if (randomValues[0] / UINT32_RANGE < RARE_KOALA_CHANCE) return "koala";
   return randomValues[1] % 2 === 0 ? "white" : "brown";
 }
 

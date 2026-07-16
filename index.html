@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>🖤</title>
+<title>🤍</title>
 <meta name="theme-color" content="#FFF4D6" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="🖤" />
+<meta name="apple-mobile-web-app-title" content="🤍" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%23FFFFFF%22 stroke=%22%23B8A488%22 stroke-width=%224%22 d=%22M50 86 C22 62 6 44 6 27 C6 13 17 5 29 5 C38 5 46 11 50 19 C54 11 62 5 71 5 C83 5 94 13 94 27 C94 44 78 62 50 86 Z%22/></svg>" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><path fill=%22%23FFFFFF%22 stroke=%22%23D9C49A%22 stroke-width=%223%22 d=%22M50 79 C28 60 15 46 15 32 C15 21 24 14 33 14 C40 14 47 19 50 25 C53 19 60 14 67 14 C76 14 85 21 85 32 C85 46 72 60 50 79 Z%22/></svg>" />
 <style>
@@ -111,6 +111,11 @@
   .trademark { cursor: pointer; -webkit-user-select: none; user-select: none; }
   .bonus-rule { font-size: 12px; color: var(--muted); text-align: center; margin: -8px 0 26px; padding: 11px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
+  /* all-time total */
+  .total-box { background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 14px; text-align: center; margin: -8px 0 26px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
+  .total-box .num { font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); }
+  .total-box .cap { font-size: 12px; color: var(--muted); }
+
   /* feed */
   .feed-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
   h2.feed-title { font-size: 13px; letter-spacing: 1.5px; color: var(--muted); margin: 0; font-weight: 600; }
@@ -155,8 +160,10 @@
   /* thinking of you calendar */
   h2.feed-title.cal-title { margin: 36px 0 12px; }
   #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .day-score { font-size: 9px; font-weight: 700; color: rgba(61,52,43,0.85); letter-spacing: -0.2px; white-space: nowrap; }
+  #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); position: relative; overflow: hidden; }
+  .ds { position: absolute; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 1px 2px rgba(74,53,36,0.5); line-height: 1; }
+  .ds-k { top: 3px; left: 4px; }
+  .ds-l { bottom: 3px; right: 4px; }
   #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
   #cal-grid .day.l { background: rgba(142,212,245,0.85); border-color: rgba(84,172,221,0.5); }
   #cal-grid .day.b { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); border-color: rgba(74,53,36,0.2); }
@@ -249,6 +256,10 @@
         </div>
         <div class="cap">lewis' misses 🐻</div>
       </div>
+    </div>
+    <div class="total-box">
+      <div class="num" id="total-count">0</div>
+      <div class="cap">total misses sent 🐻‍❄️🐻</div>
     </div>
     <p class="france-box" id="france-box">🇫🇷 … days until france</p>
     <div class="call-box">
@@ -351,6 +362,14 @@ function adjustTotal(person) {
 const ptsOf = (e) => (e.x2 ? 2 : 1) * (e.first ? 2 : 1);
 function personPoints(person) { return events.filter((e) => norm(e.from) === person).reduce((s, e) => s + ptsOf(e), 0); }
 function totalFor(person) { return personPoints(person) + adjustTotal(person); }
+// points for one Toronto day (misses + that day's adjustments)
+function dayPoints(person, key) {
+  let s = events.filter((e) => norm(e.from) === person && torontoDayKey(e.at) === key).reduce((sum, e) => sum + ptsOf(e), 0);
+  const a = adjust[key];
+  if (a && typeof a === "object") s += Number(a[person]) || 0;
+  return s;
+}
+function todayFor(person) { return dayPoints(person, torontoDayKey(serverNow())); }
 
 // server-synced clock: Google's time, immune to device clock changes
 let serverOffset = 0;
@@ -440,9 +459,11 @@ function render() {
     : franceDays === 1 ? "🇫🇷 1 day until france!!"
     : "🇫🇷 it's france time 🥖";
 
-  // tally — khali vs lewis miss counters (bonuses + manual adjustments included)
-  $("their-count").textContent = Math.max(0, totalFor("khali"));
-  $("my-count").textContent = Math.max(0, totalFor("lewis"));
+  // tally — khali vs lewis daily miss counters (reset at Toronto midnight)
+  $("their-count").textContent = Math.max(0, todayFor("khali"));
+  $("my-count").textContent = Math.max(0, todayFor("lewis"));
+  // all-time combined total — this one never resets
+  $("total-count").textContent = Math.max(0, totalFor("khali") + totalFor("lewis"));
 }
 
 let feedExpanded = false;
@@ -538,10 +559,13 @@ function renderCal() {
     else if (rec.k > 0) cell.classList.add("b");
     if (key === todayKey) cell.classList.add("today");
     if (rec.k > 0 || rec.l > 0) {
-      const s = document.createElement("span");
-      s.className = "day-score";
-      s.textContent = rec.k + "–" + rec.l;
-      cell.appendChild(s);
+      const sk = document.createElement("span");
+      sk.className = "ds ds-k";
+      sk.textContent = rec.k;
+      const sl = document.createElement("span");
+      sl.className = "ds ds-l";
+      sl.textContent = rec.l;
+      cell.append(sk, sl);
     }
     cell.title = key + " · khali " + rec.k + " – " + rec.l + " lewis";
     grid.appendChild(cell);
@@ -664,7 +688,7 @@ document.querySelectorAll(".adj-btn").forEach((b) => {
   b.addEventListener("click", () => {
     if (!adminMode || !db) return;
     const p = b.dataset.p, d = Number(b.dataset.d);
-    if (d < 0 && totalFor(p) <= 0) return; // counters can't go below zero
+    if (d < 0 && todayFor(p) <= 0) return; // counters can't go below zero
     writeAdjust(p, d);
   });
 });

@@ -1,5 +1,3 @@
-
-Todo · JS
 const todoName = (localStorage.getItem("ily:name") || "").trim().toLowerCase();
 const todoBears = { khali: "🐻‍❄️", lewis: "🐻" };
 const todoList = document.getElementById("todo-list");
@@ -13,107 +11,68 @@ const todoPerson = document.getElementById("todo-person");
 const myBear = document.getElementById("my-bear");
 const validTodoUser = Boolean(todoBears[todoName]);
 const pendingSaves = new Map();
- 
-firebase.initializeApp(firebaseConfig);
-const todosRef = firebase.database().ref("todos");
- 
+
 let todos = [];
+let todosRef = null;
 let renderQueued = false;
- 
+
 function showTodoError(message) {
   todoError.textContent = message;
 }
- 
+
 function isEditingText() {
-  const active = document.activeElement;
-  return Boolean(active && active.classList && active.classList.contains("todo-text"));
+  return document.activeElement?.classList.contains("todo-text") === true;
 }
- 
+
 function flushQueuedRender() {
   if (!renderQueued) return;
   renderQueued = false;
   renderTodos();
 }
- 
-// firebase: shared value subscription — both devices see the same list, live
-todosRef.on("value", (snapshot) => {
-  const value = snapshot.val() || {};
-  todos = Object.entries(value)
-    .map(([id, todo]) =>
-      todo && typeof todo.text === "string" && todo.text.trim()
-        ? {
-            id,
-            text: todo.text.trim(),
-            from: todoBears[todo.from] ? todo.from : "lewis",
-            done: todo.done === true,
-            at: Number(todo.at) || 0,
-          }
-        : null
-    )
-    .filter(Boolean)
-    .sort((first, second) => first.at - second.at);
-  if (isEditingText()) {
-    renderQueued = true; // don't yank the cursor while someone is mid-edit
-    return;
-  }
-  renderTodos();
-}, (error) => {
-  console.error("todo subscription failed:", error);
-  showTodoError("can't reach the shared list — check the connection (or the firebase rules)");
-});
- 
-// firebase: per-item create, update, and delete operations
-function updateTodo(id, changes) {
-  return todosRef.child(id).update(changes).catch((error) => {
+
+async function updateTodo(id, changes) {
+  try {
+    await todosRef.child(id).update(changes);
+    showTodoError("");
+    return true;
+  } catch (error) {
     console.error("todo update failed:", error);
-    showTodoError("couldn't save that — check your connection");
-    throw error;
-  });
+    showTodoError("couldn't save that — check your connection and try again");
+    return false;
+  }
 }
- 
-function removeTodo(id) {
-  return todosRef.child(id).remove().catch((error) => {
-    console.error("todo delete failed:", error);
-    showTodoError("couldn't delete that — check your connection");
-    throw error;
-  });
-}
- 
+
 function scheduleTextSave(id, textElement) {
   const previousTimer = pendingSaves.get(id);
   if (previousTimer) clearTimeout(previousTimer);
-  const timer = setTimeout(() => {
+  const timer = setTimeout(async () => {
     pendingSaves.delete(id);
     const text = textElement.textContent.trim();
     if (!text) return;
-    updateTodo(id, { text })
-      .then(() => { textElement.dataset.savedText = text; })
-      .catch(() => {});
+    if (await updateTodo(id, { text })) textElement.dataset.savedText = text;
   }, 300);
   pendingSaves.set(id, timer);
 }
- 
+
 function createTodoItem(todo) {
   const item = document.createElement("li");
   item.className = "todo-item";
   item.dataset.id = todo.id;
- 
+
   const checkbox = document.createElement("input");
   checkbox.className = "todo-check";
   checkbox.type = "checkbox";
   checkbox.checked = todo.done;
   checkbox.setAttribute("aria-label", "mark todo complete");
-  checkbox.addEventListener("change", () => {
-    updateTodo(todo.id, { done: checkbox.checked }).catch(() => {
-      checkbox.checked = !checkbox.checked;
-    });
+  checkbox.addEventListener("change", async () => {
+    if (!await updateTodo(todo.id, { done: checkbox.checked })) checkbox.checked = !checkbox.checked;
   });
- 
+
   const bear = document.createElement("span");
   bear.className = "todo-bear";
   bear.textContent = todoBears[todo.from];
   bear.setAttribute("aria-hidden", "true");
- 
+
   const text = document.createElement("div");
   text.className = "todo-text";
   text.contentEditable = "true";
@@ -129,7 +88,7 @@ function createTodoItem(todo) {
       text.blur();
     }
   });
-  text.addEventListener("blur", () => {
+  text.addEventListener("blur", async () => {
     const timer = pendingSaves.get(todo.id);
     if (timer) clearTimeout(timer);
     pendingSaves.delete(todo.id);
@@ -141,66 +100,116 @@ function createTodoItem(todo) {
       return;
     }
     if (newText !== text.dataset.savedText) {
-      updateTodo(todo.id, { text: newText })
-        .then(() => { text.dataset.savedText = newText; })
-        .catch(() => { text.textContent = text.dataset.savedText; });
+      if (await updateTodo(todo.id, { text: newText })) text.dataset.savedText = newText;
+      else text.textContent = text.dataset.savedText;
     }
     flushQueuedRender();
   });
- 
+
   const removeButton = document.createElement("button");
   removeButton.className = "todo-delete";
   removeButton.type = "button";
   removeButton.textContent = "×";
   removeButton.setAttribute("aria-label", "delete todo");
-  removeButton.addEventListener("click", () => {
+  removeButton.addEventListener("click", async () => {
     const timer = pendingSaves.get(todo.id);
     if (timer) clearTimeout(timer);
     pendingSaves.delete(todo.id);
-    removeTodo(todo.id).catch(() => {});
+    try {
+      await todosRef.child(todo.id).remove();
+      showTodoError("");
+    } catch (error) {
+      console.error("todo deletion failed:", error);
+      showTodoError("couldn't delete that — check your connection and try again");
+    }
   });
- 
+
   item.classList.toggle("done", todo.done);
   item.append(checkbox, bear, text, removeButton);
   return item;
 }
- 
+
 function renderTodos() {
   todoList.replaceChildren(...todos.map(createTodoItem));
   const openCount = todos.filter((todo) => !todo.done).length;
   todoCount.textContent = openCount + " open";
   todoEmpty.classList.toggle("hidden", todos.length > 0);
 }
- 
+
+function subscribeToTodos() {
+  todosRef.on("value", (snapshot) => {
+    const value = snapshot.val() || {};
+    todos = Object.entries(value)
+      .map(([id, todo]) => todo && typeof todo === "object" ? { id, ...todo } : null)
+      .filter((todo) => todo && typeof todo.text === "string" && todo.text.trim())
+      .map((todo) => ({
+        id: todo.id,
+        text: todo.text.trim(),
+        from: todoBears[todo.from] ? todo.from : "lewis",
+        done: todo.done === true,
+        at: Number(todo.at) || 0,
+      }))
+      .sort((first, second) => first.at - second.at);
+
+    if (isEditingText()) renderQueued = true;
+    else {
+      renderQueued = false;
+      renderTodos();
+    }
+    if (validTodoUser) showTodoError("");
+  }, (error) => {
+    console.error("todo subscription failed:", error);
+    showTodoError("can't reach the todo database — check the Firebase rules");
+  });
+}
+
 todoPerson.textContent = validTodoUser ? "writing as " + todoName : "not signed in";
 myBear.textContent = todoBears[todoName] || "🐻";
- 
+
 if (!validTodoUser) {
   todoInput.disabled = true;
   todoSubmit.disabled = true;
   showTodoError("go back home and sign in first");
 }
- 
-todoForm.addEventListener("submit", (event) => {
+
+todoForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const text = todoInput.value.trim();
-  if (!text || !validTodoUser) return;
-  todosRef
-    .push({
+  if (!text || !validTodoUser || !todosRef) return;
+  todoSubmit.disabled = true;
+  try {
+    await todosRef.push({
       text,
       from: todoName,
       done: false,
       at: firebase.database.ServerValue.TIMESTAMP,
-    })
-    .then(() => {
-      todoInput.value = "";
-      todoInput.focus();
-      showTodoError("");
-    })
-    .catch((error) => {
-      console.error("todo create failed:", error);
-      showTodoError("couldn't add that — check your connection");
     });
+    todoInput.value = "";
+    todoInput.focus();
+    showTodoError("");
+  } catch (error) {
+    console.error("todo creation failed:", error);
+    showTodoError("couldn't add that — check your connection and try again");
+  } finally {
+    todoSubmit.disabled = !validTodoUser;
+  }
 });
- 
+
 renderTodos();
+
+if (firebaseConfig.databaseURL) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    todosRef = firebase.database().ref("todos");
+    subscribeToTodos();
+  } catch (error) {
+    console.error("firebase initialization failed:", error);
+    todoInput.disabled = true;
+    todoSubmit.disabled = true;
+    showTodoError("couldn't connect to the todo database");
+  }
+} else {
+  todoInput.disabled = true;
+  todoSubmit.disabled = true;
+  showTodoError("Firebase isn't configured yet");
+}

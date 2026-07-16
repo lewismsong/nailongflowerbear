@@ -1,4 +1,4 @@
-.france-page { padding: 0 0 48px; }
+.france-page { padding: 0 0 30px; }
 .france-wrap { width: min(100% - 32px, 680px); margin: 0 auto; padding-top: 26px; }
 
 .france-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }

@@ -47,7 +47,10 @@ body {
 
 /* header */
 header { display: flex; justify-content: space-between; align-items: baseline; }
-.footer-pic { display: block; width: 88px; margin: 38px auto 6px; border-radius: 14px; border: 1px solid var(--card-edge); box-shadow: 0 3px 12px rgba(74,53,36,0.18); }
+.footer-pic-link { display: block; width: fit-content; margin: 38px auto 6px; color: var(--muted); font-size: 11px; text-align: center; text-decoration: none; }
+.footer-pic { display: block; width: 88px; margin: 0 auto 4px; border-radius: 14px; border: 1px solid var(--card-edge); box-shadow: 0 3px 12px rgba(74,53,36,0.18); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.footer-pic-link:hover .footer-pic { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(74,53,36,0.24); }
+.footer-pic-link:focus-visible { outline: 2px solid var(--yellow-deep); outline-offset: 5px; border-radius: 14px; }
 .trademark { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 1px; margin: 0 0 4px; }
 #feed li.multi { border-width: 2px; box-shadow: 0 2px 10px rgba(74,53,36,0.12); }
 #feed li.multi .what { font-weight: 700; }
@@ -68,6 +71,7 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
   animation: breathe 3.2s ease-in-out infinite;
 }
 #beacon:disabled { background: rgba(0,0,0,0.05); color: var(--muted); cursor: default; animation: none; box-shadow: none; }
+#beacon.on-call { background: radial-gradient(circle at 35% 30%, #DDF3FD, rgba(142,212,245,0.45) 58%, rgba(62,151,201,0.3)); color: var(--blue-deep); border: 2px solid rgba(62,151,201,0.22); }
 #beacon .big { font-size: 42px; line-height: 1; }
 #beacon .label { font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 700; margin-top: 6px; }
 #beacon.cooling .label { font-size: 26px; }

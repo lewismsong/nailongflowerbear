@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%23FFFFFF%22 stroke=%22%23B8A488%22 stroke-width=%224%22 d=%22M50 86 C22 62 6 44 6 27 C6 13 17 5 29 5 C38 5 46 11 50 19 C54 11 62 5 71 5 C83 5 94 13 94 27 C94 44 78 62 50 86 Z%22/></svg>" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><path fill=%22%23FFFFFF%22 stroke=%22%23D9C49A%22 stroke-width=%223%22 d=%22M50 79 C28 60 15 46 15 32 C15 21 24 14 33 14 C40 14 47 19 50 25 C53 19 60 14 67 14 C76 14 85 21 85 32 C85 46 72 60 50 79 Z%22/></svg>" />
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
   :root {
     --bg-top: #FFFFFF; --bg-bottom: #FFF4D6; --deep: #4A3524;
     --card: rgba(0,0,0,0.04); --card-edge: rgba(0,0,0,0.08);
@@ -109,6 +109,7 @@
   }
   .adj-btn:active { transform: scale(0.88); background: rgba(255,255,255,0.9); }
   .trademark { cursor: pointer; -webkit-user-select: none; user-select: none; }
+  .secret { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin: 2px 0 0; }
   .bonus-rule { font-size: 12px; color: var(--muted); text-align: center; margin: -8px 0 26px; padding: 11px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
   /* all-time total */
@@ -141,7 +142,7 @@
 
   /* partner clock */
   .partner-clock { text-align: right; margin: 2px 4px 24px 0; }
-  .pc-time { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 700; }
+  .pc-time { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 
   /* france countdown */
   .france-box { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
@@ -164,9 +165,9 @@
   .ds { position: absolute; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 1px 2px rgba(74,53,36,0.5); line-height: 1; }
   .ds-k { top: 3px; left: 4px; }
   .ds-l { bottom: 3px; right: 4px; }
-  #cal-grid .day.k { background: rgba(255,201,77,0.8); border-color: rgba(222,155,0,0.5); }
-  #cal-grid .day.l { background: rgba(142,212,245,0.85); border-color: rgba(84,172,221,0.5); }
-  #cal-grid .day.b { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); border-color: rgba(74,53,36,0.2); }
+  #cal-grid .day.k { background: rgba(255,201,77,0.8); border: 2px solid rgba(222,155,0,0.7); }
+  #cal-grid .day.l { background: rgba(142,212,245,0.85); border: 2px solid rgba(84,172,221,0.75); }
+  #cal-grid .day.b { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); border: 2px solid rgba(74,53,36,0.3); }
   .cal-legend { font-size: 11px; color: var(--muted); margin: 10px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   .dk { background: rgba(255,201,77,0.85); }
@@ -174,7 +175,7 @@
   .db { background: linear-gradient(135deg, rgba(255,201,77,0.85) 50%, rgba(142,212,245,0.85) 50%); }
   .streak { margin-left: auto; font-weight: 700; color: var(--text); }
   .today-score { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
-  #cal-grid .day.today { border: 2px dashed rgba(74,53,36,0.35); }
+  #cal-grid .day.today { border: 2px solid rgba(255,255,255,0.98); box-shadow: 0 1px 6px rgba(74,53,36,0.15); }
 
   /* floating hearts */
   #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
@@ -298,6 +299,7 @@
    </div>
    <img class="footer-pic" src="bears.jpg" alt="us, basically" />
    <p class="trademark">lewiskhalico™</p>
+   <p class="secret hidden" id="secret-stats"></p>
   </div>
 </div>
 
@@ -464,6 +466,10 @@ function render() {
   $("my-count").textContent = Math.max(0, todayFor("lewis"));
   // all-time combined total — this one never resets
   $("total-count").textContent = Math.max(0, totalFor("khali") + totalFor("lewis"));
+
+  // secret per-person all-time stats (revealed in admin mode)
+  const sends = (p) => events.filter((e) => norm(e.from) === p).length;
+  $("secret-stats").textContent = "🐻‍❄️ khali: " + sends("khali") + " sent (" + Math.max(0, totalFor("khali")) + " pts) · 🐻 lewis: " + sends("lewis") + " sent (" + Math.max(0, totalFor("lewis")) + " pts)";
 }
 
 let feedExpanded = false;
@@ -677,6 +683,7 @@ $("more-btn").addEventListener("click", () => {
 function setAdmin(on) {
   adminMode = on;
   document.querySelectorAll(".adj-btn").forEach((b) => b.classList.toggle("hidden", !on));
+  $("secret-stats").classList.toggle("hidden", !on);
 }
 document.querySelector(".trademark").addEventListener("click", () => {
   if (adminMode) { setAdmin(false); return; }
@@ -694,7 +701,7 @@ document.querySelectorAll(".adj-btn").forEach((b) => {
 });
 
 $("refresh-btn").addEventListener("click", async () => {
-  const sure = confirm("⚠️ warning: this erases every miss for BOTH of you and resets the counters to zero. it can't be undone. continue?");
+  const sure = confirm("⚠️ warning: this erases TODAY's misses for both of you and resets today's counters to zero. past days and the total stay. continue?");
   if (!sure) return;
   const pw = prompt("enter the password to refresh the misses:");
   if (pw === null) return;
@@ -704,9 +711,12 @@ $("refresh-btn").addEventListener("click", async () => {
   }
   try {
     if (!eventsRef) throw new Error("not connected");
-    await eventsRef.remove();
-    await db.ref("adjust").remove();
-    alert("all misses cleared — fresh start 🧹");
+    const todayKey = torontoDayKey(serverNow());
+    const updates = {};
+    for (const e of events) if (e.id && torontoDayKey(e.at) === todayKey) updates[e.id] = null;
+    if (Object.keys(updates).length) await eventsRef.update(updates);
+    await db.ref("adjust/" + todayKey).remove();
+    alert("today's misses cleared — fresh day 🧹");
   } catch (e) {
     $("err").textContent = "couldn't clear — check your connection and try again";
   }
@@ -746,8 +756,9 @@ if (configured) {
     eventsRef.on("value", (snap) => {
       try {
         const val = snap.val() || {};
-        // keep only well-formed misses: a sender and a sane numeric timestamp
-        events = Object.values(val)
+        // keep only well-formed misses (with their ids, so day-resets can target them)
+        events = Object.entries(val)
+          .map(([id, e]) => (e && typeof e === "object" ? { id, ...e } : null))
           .filter((e) => e && typeof e.from === "string" && typeof e.at === "number" && e.at > 0)
           .sort((a, b) => a.at - b.at);
         const incoming = theirEvents().length;

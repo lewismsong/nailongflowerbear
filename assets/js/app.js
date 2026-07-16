@@ -1,4 +1,4 @@
-console.log("lewiskhalico v2.3");
+console.log("lewiskhalico v2.6");
 
 const $ = (id) => document.getElementById(id);
 const setupEl = $("setup");
@@ -21,6 +21,9 @@ let prevIncoming = null;
 let adjust = {};
 let adminMode = false;
 let call = null;
+let missSending = false;
+let resolveServerClock;
+const serverClockReady = new Promise((resolve) => { resolveServerClock = resolve; });
 
 const norm = (s) => (s || "").trim().toLowerCase();
 let whenCache = {};
@@ -39,8 +42,8 @@ function adjustTotal(person) {
   }
   return sum;
 }
-// a miss's value: night (12–6am) doubles it, first-of-the-day doubles it — they stack
-const ptsOf = (e) => (e.x2 ? 2 : 1) * (e.first ? 2 : 1);
+// misses sent from midnight to 6am count double
+const ptsOf = (e) => (e.x2 ? 2 : 1);
 function personPoints(person) { return events.filter((e) => norm(e.from) === person).reduce((s, e) => s + ptsOf(e), 0); }
 function totalFor(person) { return personPoints(person) + adjustTotal(person); }
 // points for one Toronto day (misses + that day's adjustments)
@@ -109,7 +112,7 @@ function render() {
   const bonusNow = hourFor(me) < 6;
 
   // beacon
-  beacon.disabled = cooling || onCall;
+  beacon.disabled = cooling || onCall || missSending;
   beacon.classList.toggle("cooling", cooling && !onCall);
   beacon.classList.toggle("on-call", onCall);
   beaconEmoji.textContent = onCall ? "📞" : cooling ? "⏳" : (bonusNow ? "🤍🤍" : "🤍");
@@ -185,10 +188,8 @@ function renderFeed() {
     what.className = "what";
     what.textContent = (mineItem ? "💌 you sent a miss" : "💌 " + g.from + " missed you") + (count > 1 ? " ×" + count : "");
     if (pts > count) {
-      const hasFirst = g.items.some((e) => e.first);
       const hasNight = g.items.some((e) => e.x2);
       const labels = [];
-      if (hasFirst) labels.push("🌅 first miss of the day ×2");
       if (hasNight) labels.push("🌙 ×2");
       const badge = document.createElement("span");
       badge.className = "x2";
@@ -410,17 +411,17 @@ $("refresh-btn").addEventListener("click", async () => {
 });
 
 beacon.addEventListener("click", async () => {
-  if (beacon.disabled || !name) return;
-  const bonus = hourFor(norm(name)) < 6;
+  if (beacon.disabled || !name || missSending) return;
+  missSending = true;
+  render();
   $("err").textContent = "";
   try {
     if (!eventsRef) throw new Error("not connected");
+    await serverClockReady;
+    const bonus = hourFor(norm(name)) < 6;
     whenCache = {}; // recompute all "x min ago" times on every press
-    const todayKey = torontoDayKey(serverNow());
-    const isFirst = !events.some((e) => torontoDayKey(e.at) === todayKey);
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
     if (bonus) ev.x2 = true;
-    if (isFirst) ev.first = true;
     await eventsRef.push(ev);
     localStorage.setItem("ily:lastSent", String(serverNow()));
     spawnHearts(7);
@@ -429,6 +430,9 @@ beacon.addEventListener("click", async () => {
   } catch (error) {
     console.error("miss send failed:", error);
     $("err").textContent = "couldn't send — check your connection and try again";
+  } finally {
+    missSending = false;
+    render();
   }
 });
 
@@ -438,7 +442,10 @@ if (configured) {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     eventsRef = db.ref("misses");
-    db.ref(".info/serverTimeOffset").on("value", (s) => { serverOffset = s.val() || 0; });
+    db.ref(".info/serverTimeOffset").on("value", (s) => {
+      serverOffset = s.val() || 0;
+      resolveServerClock();
+    });
     db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
     db.ref("call").on("value", (s) => { call = s.val(); renderCall(); if (name) render(); });
     eventsRef.on("value", (snap) => {

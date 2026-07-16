@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>coin flip 🐻‍❄️🐻</title>
+<meta name="theme-color" content="#FFF4D6" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<link rel="stylesheet" href="assets/css/coinflip.css?v=2" />
+</head>
+<body class="coinflip-page">
+<main class="coinflip-wrap">
+  <header class="coinflip-header">
+    <p class="coinflip-eyebrow">🐻‍❄️ or 🐻</p>
+    <h1>coin flip</h1>
+    <p>decisions are hard...</p>
+  </header>
+
+  <section class="coin-stage" aria-labelledby="coin-result">
+    <div class="coin-glow" aria-hidden="true"></div>
+    <button class="coin-shell" id="coin" type="button" aria-label="flip the coin">
+      <span class="coin">
+        <span class="coin-face coin-white">
+          <span class="coin-bear" aria-hidden="true">🐻‍❄️</span>
+          <span class="coin-side-name">white bear</span>
+        </span>
+        <span class="coin-face coin-brown">
+          <span class="coin-bear" aria-hidden="true">🐻</span>
+          <span class="coin-side-name">brown bear</span>
+        </span>
+      </span>
+    </button>
+    <div class="coin-shadow" aria-hidden="true"></div>
+  </section>
+
+  <p class="coin-result" id="coin-result" aria-live="polite">tap the coin to flip</p>
+</main>
+
+<bear-tab-nav current="coinflip"></bear-tab-nav>
+
+<script src="assets/js/coinflip.js?v=2"></script>
+<script src="assets/js/navigation.js?v=2"></script>
+</body>
+</html>

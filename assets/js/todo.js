@@ -11,6 +11,8 @@ const todoPerson = document.getElementById("todo-person");
 const myBear = document.getElementById("my-bear");
 const validTodoUser = Boolean(todoBears[todoName]);
 const pendingSaves = new Map();
+const todoDateFormatter = new Intl.DateTimeFormat([], { day: "numeric", month: "short", year: "numeric" });
+const todoTimeFormatter = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" });
 
 let todos = [];
 let todosRef = null;
@@ -52,6 +54,25 @@ function scheduleTextSave(id, textElement) {
     if (await updateTodo(id, { text })) textElement.dataset.savedText = text;
   }, 300);
   pendingSaves.set(id, timer);
+}
+
+function createTodoTimestamp(timestamp) {
+  const stamp = document.createElement("time");
+  stamp.className = "todo-stamp";
+  if (timestamp <= 0) {
+    stamp.textContent = "date unknown";
+    return stamp;
+  }
+
+  const date = new Date(timestamp);
+  stamp.dateTime = date.toISOString();
+
+  const dateText = document.createElement("span");
+  dateText.textContent = todoDateFormatter.format(date);
+  const timeText = document.createElement("span");
+  timeText.textContent = todoTimeFormatter.format(date);
+  stamp.append(dateText, timeText);
+  return stamp;
 }
 
 function createTodoItem(todo) {
@@ -106,6 +127,8 @@ function createTodoItem(todo) {
     flushQueuedRender();
   });
 
+  const stamp = createTodoTimestamp(todo.at);
+
   const removeButton = document.createElement("button");
   removeButton.className = "todo-delete";
   removeButton.type = "button";
@@ -125,7 +148,7 @@ function createTodoItem(todo) {
   });
 
   item.classList.toggle("done", todo.done);
-  item.append(checkbox, bear, text, removeButton);
+  item.append(checkbox, bear, text, stamp, removeButton);
   return item;
 }
 
@@ -149,7 +172,10 @@ function subscribeToTodos() {
         done: todo.done === true,
         at: Number(todo.at) || 0,
       }))
-      .sort((first, second) => first.at - second.at);
+      .sort((first, second) => {
+        if (first.done !== second.done) return Number(first.done) - Number(second.done);
+        return second.at - first.at;
+      });
 
     if (isEditingText()) renderQueued = true;
     else {

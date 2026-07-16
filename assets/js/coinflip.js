@@ -2,23 +2,27 @@ const coinButton = document.getElementById("coin");
 const coin = coinButton.querySelector(".coin");
 const coinResult = document.getElementById("coin-result");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const HEARTBREAK_CHANCE = 0.01;
+const UINT32_RANGE = 2 ** 32;
+const resultMessages = { white: "🐻‍❄️!", brown: "🐻!", heartbreak: "💔" };
 
 let coinRotation = 0;
 let coinIsFlipping = false;
 let finishTimer = null;
 
-function randomBear() {
+function randomCoinResult() {
   if (!window.crypto?.getRandomValues) throw new Error("secure randomness is unavailable");
-  const randomValue = new Uint32Array(1);
-  window.crypto.getRandomValues(randomValue);
-  return randomValue[0] % 2 === 0 ? "white" : "brown";
+  const randomValues = new Uint32Array(2);
+  window.crypto.getRandomValues(randomValues);
+  if (randomValues[0] / UINT32_RANGE < HEARTBREAK_CHANCE) return "heartbreak";
+  return randomValues[1] % 2 === 0 ? "white" : "brown";
 }
 
 function flipCoin() {
   if (coinIsFlipping) return;
 
   try {
-    const result = randomBear();
+    const result = randomCoinResult();
     const sideRotation = result === "brown" ? 180 : 0;
     const nextFullTurn = Math.ceil(coinRotation / 360) * 360;
     coinRotation = nextFullTurn + 5 * 360 + sideRotation;
@@ -28,6 +32,7 @@ function flipCoin() {
     coinButton.setAttribute("aria-label", "coin is flipping");
     coinResult.classList.add("waiting");
     coinResult.textContent = "flipping...";
+    delete coin.dataset.side;
     coin.style.transform = "rotateY(" + coinRotation + "deg)";
 
     const finishFlip = () => {
@@ -38,7 +43,8 @@ function flipCoin() {
       coinButton.classList.remove("flipping");
       coinButton.setAttribute("aria-label", "flip the coin");
       coinResult.classList.remove("waiting");
-      coinResult.textContent = result === "white" ? "🐻‍❄️!" : "🐻!";
+      coin.dataset.side = result;
+      coinResult.textContent = resultMessages[result];
     };
 
     coin.addEventListener("transitionend", finishFlip, { once: true });

@@ -1,7 +1,7 @@
 const bearTabs = [
   { id: "home", label: "misses", href: "index.html", icon: "🤍" },
   { id: "todo", label: "our list", href: "todo.html", image: "assets/images/bears.jpg" },
-  { id: "coinflip", label: "coinflip", href: "coinflip.html?v=2", image: "assets/images/bear-with-flower.png" },
+  { id: "coinflip", label: "coinflip", href: "coinflip.html?v=4", image: "assets/images/bear-with-flower.png" },
 ];
 
 function createBearTab(tab, currentTab) {
@@ -50,7 +50,11 @@ class BearTabNavigation extends HTMLElement {
     const currentTab = this.getAttribute("current");
 
     for (const tab of bearTabs) navigation.appendChild(createBearTab(tab, currentTab));
-    this.appendChild(navigation);
+
+    const brand = document.createElement("p");
+    brand.className = "trademark bear-tab-brand";
+    brand.textContent = "lewiskhalico™";
+    this.append(navigation, brand);
   }
 }
 

@@ -103,17 +103,20 @@ function render() {
   const now = serverNow();
   const remaining = Math.min(COOLDOWN_MS, Math.max(0, COOLDOWN_MS - (now - myLastAt())));
   const cooling = remaining > 0;
+  const onCall = !!(call && call.on);
 
   const me = norm(name);
   const bonusNow = hourFor(me) < 6;
 
   // beacon
-  beacon.disabled = cooling;
-  beacon.classList.toggle("cooling", cooling);
-  beaconEmoji.textContent = cooling ? "⏳" : (bonusNow ? "🤍🤍" : "🤍");
-  beaconLabel.textContent = cooling ? Math.ceil(remaining / 1000) + "s" : "I miss you";
-  beaconTiny.classList.toggle("hidden", !cooling);
-  ringFg.style.display = cooling ? "" : "none";
+  beacon.disabled = cooling || onCall;
+  beacon.classList.toggle("cooling", cooling && !onCall);
+  beacon.classList.toggle("on-call", onCall);
+  beaconEmoji.textContent = onCall ? "📞" : cooling ? "⏳" : (bonusNow ? "🤍🤍" : "🤍");
+  beaconLabel.textContent = onCall ? "on call" : cooling ? Math.ceil(remaining / 1000) + "s" : "I miss you";
+  beaconTiny.textContent = onCall ? "misses paused" : "until your next miss";
+  beaconTiny.classList.toggle("hidden", !cooling && !onCall);
+  ringFg.style.display = cooling && !onCall ? "" : "none";
   ringFg.setAttribute("stroke-dashoffset", CIRCUMFERENCE * (1 - remaining / COOLDOWN_MS));
 
   // bonus hours indicator (sender's local midnight–6am)
@@ -124,7 +127,7 @@ function render() {
   const pc = $("partner-clock");
   if (partner) {
     pc.classList.remove("hidden");
-    $("pc-label").textContent = partner + "'s time";
+    $("pc-label").textContent = partner + (partner.endsWith("s") ? "' time" : "'s time");
     const nowD = new Date(serverNow());
     const timeStr = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZone: TIME_ZONES[partner] }).format(nowD);
     const pHr = hourFor(partner);
@@ -342,9 +345,9 @@ function renderCall() {
     const elapsed = Math.max(0, serverNow() - call.since);
     const h = Math.floor(elapsed / 3600000), m = Math.floor((elapsed % 3600000) / 60000);
     const nextIn = Math.ceil((CALL_BLOCK_MS - (elapsed % CALL_BLOCK_MS)) / 60000);
-    sub.textContent = "on call for " + (h ? h + "h " : "") + m + "m · next +45 in " + nextIn + "m";
+    sub.textContent = "on call for " + (h ? h + "h " : "") + m + "m";
   } else {
-    sub.textContent = "flip this when you're on a call: every 45m adds +45 to both counters";
+    sub.textContent = "flip this when you're on a call.";
   }
 }
 
@@ -437,7 +440,7 @@ if (configured) {
     eventsRef = db.ref("misses");
     db.ref(".info/serverTimeOffset").on("value", (s) => { serverOffset = s.val() || 0; });
     db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
-    db.ref("call").on("value", (s) => { call = s.val(); renderCall(); });
+    db.ref("call").on("value", (s) => { call = s.val(); renderCall(); if (name) render(); });
     eventsRef.on("value", (snap) => {
       try {
         const val = snap.val() || {};

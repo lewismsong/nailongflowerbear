@@ -7,12 +7,15 @@ A small shared “I miss you” web app backed by Firebase Realtime Database.
 ```text
 .
 ├── index.html              # page structure and external resource loading
+├── todo.html               # locally saved editable scratchpad
 └── assets
     ├── css
-    │   └── styles.css      # layout, components, and responsive styles
+    │   ├── styles.css      # main app layout and components
+    │   └── todo.css        # scratchpad layout and components
     ├── images
     │   └── bears.jpg
     └── js
-        ├── app.js          # application state, rendering, and event handling
-        └── config.js       # Firebase and game configuration
+        ├── app.js          # main application state and interactions
+        ├── config.js       # Firebase and game configuration
+        └── todo.js         # local todo state and interactions
 ```

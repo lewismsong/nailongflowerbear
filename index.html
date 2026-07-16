@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="🖤" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%231a1a1a%22 d=%22M50 86 C22 62 6 44 6 27 C6 13 17 5 29 5 C38 5 46 11 50 19 C54 11 62 5 71 5 C83 5 94 13 94 27 C94 44 78 62 50 86 Z%22/></svg>" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><path fill=%22%231a1a1a%22 d=%22M50 79 C28 60 15 46 15 32 C15 21 24 14 33 14 C40 14 47 19 50 25 C53 19 60 14 67 14 C76 14 85 21 85 32 C85 46 72 60 50 79 Z%22/></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path fill=%22%23FFFFFF%22 stroke=%22%23B8A488%22 stroke-width=%224%22 d=%22M50 86 C22 62 6 44 6 27 C6 13 17 5 29 5 C38 5 46 11 50 19 C54 11 62 5 71 5 C83 5 94 13 94 27 C94 44 78 62 50 86 Z%22/></svg>" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FFF4D6%22/><path fill=%22%23FFFFFF%22 stroke=%22%23D9C49A%22 stroke-width=%223%22 d=%22M50 79 C28 60 15 46 15 32 C15 21 24 14 33 14 C40 14 47 19 50 25 C53 19 60 14 67 14 C76 14 85 21 85 32 C85 46 72 60 50 79 Z%22/></svg>" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap');
   :root {
@@ -347,6 +347,10 @@ function adjustTotal(person) {
   }
   return sum;
 }
+// a miss's value: night (12–6am) doubles it, first-of-the-day doubles it — they stack
+const ptsOf = (e) => (e.x2 ? 2 : 1) * (e.first ? 2 : 1);
+function personPoints(person) { return events.filter((e) => norm(e.from) === person).reduce((s, e) => s + ptsOf(e), 0); }
+function totalFor(person) { return personPoints(person) + adjustTotal(person); }
 
 // server-synced clock: Google's time, immune to device clock changes
 let serverOffset = 0;
@@ -436,10 +440,9 @@ function render() {
     : franceDays === 1 ? "🇫🇷 1 day until france!!"
     : "🇫🇷 it's france time 🥖";
 
-  // tally — khali vs lewis miss counters (x2 misses count double, plus manual adjustments)
-  const personPoints = (person) => events.filter((e) => norm(e.from) === person).reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
-  $("their-count").textContent = Math.max(0, personPoints("khali") + adjustTotal("khali"));
-  $("my-count").textContent = Math.max(0, personPoints("lewis") + adjustTotal("lewis"));
+  // tally — khali vs lewis miss counters (bonuses + manual adjustments included)
+  $("their-count").textContent = Math.max(0, totalFor("khali"));
+  $("my-count").textContent = Math.max(0, totalFor("lewis"));
 }
 
 let feedExpanded = false;
@@ -462,7 +465,7 @@ function renderFeed() {
   for (const g of items) {
     const latest = g.items[g.items.length - 1];
     const count = g.items.length;
-    const pts = g.items.reduce((s, e) => s + (e.x2 ? 2 : 1), 0);
+    const pts = g.items.reduce((s, e) => s + ptsOf(e), 0);
     if (!whenCache[latest.at]) whenCache[latest.at] = ago(latest.at, serverNow());
     const mineItem = norm(g.from) === norm(name);
     const li = document.createElement("li");
@@ -473,9 +476,14 @@ function renderFeed() {
     what.className = "what";
     what.textContent = (mineItem ? "💌 you sent a miss" : "💌 " + g.from + " missed you") + (count > 1 ? " ×" + count : "");
     if (pts > count) {
+      const hasFirst = g.items.some((e) => e.first);
+      const hasNight = g.items.some((e) => e.x2);
+      const labels = [];
+      if (hasFirst) labels.push("🌅 first miss of the day ×2");
+      if (hasNight) labels.push("🌙 ×2");
       const badge = document.createElement("span");
       badge.className = "x2";
-      badge.textContent = " 🌙 worth " + pts;
+      badge.textContent = " " + labels.join(" ") + " · worth " + pts;
       what.appendChild(badge);
     }
     const when = document.createElement("span");
@@ -505,7 +513,7 @@ function renderCal() {
   for (const e of events) {
     const key = torontoDayKey(e.at);
     const rec = days[key] || (days[key] = { k: 0, l: 0 });
-    const v = e.x2 ? 2 : 1;
+    const v = ptsOf(e);
     if (norm(e.from) === "khali") rec.k += v;
     if (norm(e.from) === "lewis") rec.l += v;
   }
@@ -656,6 +664,7 @@ document.querySelectorAll(".adj-btn").forEach((b) => {
   b.addEventListener("click", () => {
     if (!adminMode || !db) return;
     const p = b.dataset.p, d = Number(b.dataset.d);
+    if (d < 0 && totalFor(p) <= 0) return; // counters can't go below zero
     writeAdjust(p, d);
   });
 });
@@ -686,8 +695,12 @@ beacon.addEventListener("click", async () => {
   try {
     if (!eventsRef) throw new Error("not connected");
     whenCache = {}; // recompute all "x min ago" times on every press
-    const stamp = firebase.database.ServerValue.TIMESTAMP;
-    await eventsRef.push(bonus ? { from: name, at: stamp, x2: true } : { from: name, at: stamp });
+    const todayKey = torontoDayKey(serverNow());
+    const isFirst = !events.some((e) => torontoDayKey(e.at) === todayKey);
+    const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
+    if (bonus) ev.x2 = true;
+    if (isFirst) ev.first = true;
+    await eventsRef.push(ev);
     localStorage.setItem("ily:lastSent", String(serverNow()));
     spawnHearts(7);
     render();
@@ -732,9 +745,20 @@ if (configured) {
 }
 
 // tick every second for cooldown + relative times
+// tick every second for cooldown + relative times
+let lastDayKey = null;
 setInterval(() => {
   if (name && !mainEl.classList.contains("hidden")) {
-    try { render(); renderCall(); if (call && call.on) creditCallBlocks(false); } catch (e) { console.error("render failed:", e); }
+    try {
+      const dk = torontoDayKey(serverNow());
+      if (dk !== lastDayKey) {
+        lastDayKey = dk;
+        whenCache = {}; // new day: refresh all feed timestamps + roll the calendar
+        renderFeed();
+        renderCal();
+      }
+      render(); renderCall(); if (call && call.on) creditCallBlocks(false);
+    } catch (e) { console.error("render failed:", e); }
   }
 }, 1000);
 

@@ -1,7 +1,7 @@
 const bearTabs = [
   { id: "home", label: "misses", href: "index.html", icon: "🤍" },
   { id: "todo", label: "our list", href: "todo.html", image: "assets/images/bears.jpg" },
-  { id: "coinflip", label: "coinflip", image: "assets/images/bear-with-flower.png" },
+  { id: "coinflip", label: "coinflip", href: "coinflip.html?v=2", image: "assets/images/bear-with-flower.png" },
 ];
 
 function createBearTab(tab, currentTab) {

@@ -13,9 +13,11 @@ A small shared “I miss you” web app backed by Firebase Realtime Database.
     │   ├── styles.css      # main app layout and components
     │   └── todo.css        # scratchpad layout and components
     ├── images
+    │   ├── bear-with-flower.png
     │   └── bears.jpg
     └── js
         ├── app.js          # main application state and interactions
         ├── config.js       # Firebase and game configuration
+        ├── navigation.js   # shared bottom tab navigation
         └── todo.js         # shared todo state and interactions
 ```

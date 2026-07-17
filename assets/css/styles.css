@@ -186,9 +186,111 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
 #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .heart-float { position: absolute; bottom: 30%; animation: floatUp 2.6s ease-out forwards; filter: drop-shadow(0 2px 4px rgba(74,53,36,0.35)); }
 
+/* persistent pixel cat */
+.pixel-cat {
+  position: fixed;
+  z-index: 60;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: 92px;
+  height: 92px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pixel-cat.dragging { cursor: grabbing; }
+.pixel-cat-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--cat-direction, 1)); }
+.pixel-cat-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("../images/cat-sprite-sheet-v3.png") 0 25% / 600% 500% no-repeat;
+  filter: drop-shadow(0 3px 2px rgba(74,53,36,0.16));
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+}
+.pixel-cat[data-behavior="walking"] .pixel-cat-sprite { background-position: 0 0; animation: pixelCatWalkFrames 0.64s steps(1, end) infinite, pixelCatWalkBounce 0.64s ease-in-out infinite; }
+.pixel-cat[data-behavior="idle"] .pixel-cat-sprite { background-position: 0 25%; animation: pixelCatIdleFrames 3.2s steps(1, end) infinite; }
+.pixel-cat[data-behavior="sitting"] .pixel-cat-sprite { background-position: 0 50%; animation: pixelCatSittingFrames 4.8s steps(1, end) infinite; }
+.pixel-cat[data-behavior="rolling"] .pixel-cat-sprite { background-position: 0 75%; animation: pixelCatRollingFrames 3.6s steps(1, end) infinite; }
+.pixel-cat[data-behavior="playing"] .pixel-cat-sprite { background-position: 0 100%; animation: pixelCatPlayingFrames 3s steps(1, end) infinite; }
+.pixel-cat[data-behavior="sleeping"] .pixel-cat-sprite { background-position: 80% 100%; animation: pixelCatSleepingFrames 2.6s steps(1, end) infinite; }
+.pixel-cat.loved .pixel-cat-sprite { animation: pixelCatLove 0.5s steps(3, end); }
+.pixel-cat:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
+
+.pixel-cat-heart {
+  position: fixed;
+  z-index: 80;
+  width: 14px;
+  height: 12px;
+  pointer-events: none;
+  color: var(--heart-color);
+  animation: pixelCatHeartFloat 1.55s steps(12, end) var(--heart-delay) forwards;
+}
+.pixel-cat-heart svg { display: block; width: 100%; height: 100%; fill: currentColor; filter: drop-shadow(0 2px 1px rgba(74,53,36,0.12)); }
+
 button:focus-visible, input:focus-visible { outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
 
 @keyframes breathe { 0%,100% { box-shadow: 0 0 40px 8px rgba(255,201,77,0.4); } 50% { box-shadow: 0 0 75px 20px rgba(255,183,50,0.65); } }
 @keyframes floatUp { 0% { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-260px) translateX(var(--drift)) scale(1.1); opacity: 0; } }
 @keyframes popIn { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { #beacon, .heart-float, #feed li { animation: none !important; } }
+@keyframes pixelCatWalkFrames {
+  0%, 16.5%, 100% { background-position: 0 0; }
+  16.6%, 33.2% { background-position: 20% 0; }
+  33.3%, 49.9% { background-position: 40% 0; }
+  50%, 66.5% { background-position: 60% 0; }
+  66.6%, 83.2% { background-position: 80% 0; }
+  83.3%, 99.9% { background-position: 100% 0; }
+}
+@keyframes pixelCatWalkBounce { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-1px); } }
+@keyframes pixelCatIdleFrames {
+  0%, 22%, 100% { background-position: 0 25%; }
+  22.1%, 32% { background-position: 20% 25%; }
+  32.1%, 48% { background-position: 40% 25%; }
+  48.1%, 64% { background-position: 60% 25%; }
+  64.1%, 80% { background-position: 80% 25%; }
+  80.1%, 99.9% { background-position: 100% 25%; }
+}
+@keyframes pixelCatSittingFrames {
+  0%, 19.9%, 100% { background-position: 0 50%; }
+  20%, 39.9% { background-position: 20% 50%; }
+  40%, 54.9% { background-position: 40% 50%; }
+  55%, 64.9% { background-position: 60% 50%; }
+  65%, 82.9% { background-position: 80% 50%; }
+  83%, 99.9% { background-position: 100% 50%; }
+}
+@keyframes pixelCatRollingFrames {
+  0%, 16.5%, 100% { background-position: 0 75%; }
+  16.6%, 33.2% { background-position: 20% 75%; }
+  33.3%, 49.9% { background-position: 40% 75%; }
+  50%, 66.5% { background-position: 60% 75%; }
+  66.6%, 83.2% { background-position: 80% 75%; }
+  83.3%, 99.9% { background-position: 100% 75%; }
+}
+@keyframes pixelCatPlayingFrames {
+  0%, 16.5%, 100% { background-position: 0 100%; }
+  16.6%, 33.2% { background-position: 20% 100%; }
+  33.3%, 49.9% { background-position: 40% 100%; }
+  50%, 66.5% { background-position: 60% 100%; }
+  66.6%, 83.2% { background-position: 40% 100%; }
+  83.3%, 99.9% { background-position: 20% 100%; }
+}
+@keyframes pixelCatSleepingFrames { 0%, 62%, 100% { background-position: 80% 100%; } 62.1%, 99.9% { background-position: 100% 100%; } }
+@keyframes pixelCatLove { 0%, 100% { transform: translateY(0) scale(1); } 35% { transform: translateY(-7px) scale(1.04); } 65% { transform: translateY(-2px) scale(0.98); } }
+@keyframes pixelCatHeartFloat {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--heart-drift)), -92px) scale(1.05); }
+}
+
+@media (max-width: 520px) {
+  .pixel-cat { width: 80px; height: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #beacon, .heart-float, #feed li, .pixel-cat-sprite { animation: none !important; }
+  .pixel-cat-heart { animation-duration: 0.7s; animation-timing-function: ease-out; }
+}

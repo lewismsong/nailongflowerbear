@@ -6,8 +6,8 @@
 <title>our list 🐻‍❄️🐻</title>
 <meta name="theme-color" content="#FFF4D6" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" />
-<link rel="stylesheet" href="assets/css/styles.css?v=4" />
-<link rel="stylesheet" href="assets/css/todo.css" />
+<link rel="stylesheet" href="assets/css/styles.css?v=10" />
+<link rel="stylesheet" href="assets/css/todo.css?v=7" />
 </head>
 <body class="todo-page">
 <main class="todo-wrap">
@@ -16,23 +16,40 @@
   <header class="todo-header">
     <div>
       <p class="todo-eyebrow">🐻‍❄️ + 🐻</p>
-      <h1>everything list</h1>
-      <p class="todo-sub">a little scratchpad for all kinds of things</p>
+      <h1>list</h1>
+      <p class="todo-sub">scratchpad for all kinds of things</p>
     </div>
     <div class="todo-person" id="todo-person"></div>
   </header>
 
-  <section class="scratchpad" aria-labelledby="list-title">
-    <div class="scratchpad-top">
-      <h2 id="list-title">things to do</h2>
-      <span id="todo-count">0 open</span>
+  <div class="todo-filters todo-mobile-filters" role="group" aria-label="filter list">
+    <button type="button" data-filter="all" aria-pressed="true">all</button>
+    <button type="button" data-filter="open" aria-pressed="false">open</button>
+    <button type="button" data-filter="done" aria-pressed="false">done</button>
+  </div>
+
+  <section class="scratchpad" aria-label="todo list">
+    <div class="todo-progress">
+      <div class="todo-progress-copy">
+        <span id="todo-count">0 open</span>
+        <span id="todo-progress-text">0 of 0 done</span>
+      </div>
+      <div class="todo-progress-track" aria-hidden="true">
+        <span id="todo-progress-bar"></span>
+      </div>
     </div>
 
     <form id="todo-form" class="todo-form">
       <span id="my-bear" class="my-bear" aria-hidden="true"></span>
-      <input id="todo-input" maxlength="280" placeholder="write something, e.g. i miss you" autocomplete="off" />
+      <input id="todo-input" maxlength="280" placeholder="write something" autocomplete="off" />
       <button type="submit">add</button>
     </form>
+
+    <div class="todo-filters todo-desktop-filters" role="group" aria-label="filter list">
+      <button type="button" data-filter="all" aria-pressed="true">all</button>
+      <button type="button" data-filter="open" aria-pressed="false">open</button>
+      <button type="button" data-filter="done" aria-pressed="false">done</button>
+    </div>
 
     <p id="todo-empty" class="todo-empty">nothing here yet</p>
     <ul id="todo-list" class="todo-list"></ul>
@@ -45,7 +62,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="assets/js/config.js"></script>
-<script src="assets/js/todo.js"></script>
-<script src="assets/js/navigation.js?v=5"></script>
+<script src="assets/js/todo.js?v=5"></script>
+<script src="assets/js/navigation.js?v=11"></script>
 </body>
 </html>

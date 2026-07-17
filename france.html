@@ -6,59 +6,100 @@
 <title>france 🇫🇷</title>
 <meta name="theme-color" content="#FFF4D6" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇫🇷</text></svg>" />
-<link rel="stylesheet" href="assets/css/styles.css?v=4" />
-<link rel="stylesheet" href="assets/css/france.css?v=2" />
+<link rel="stylesheet" href="assets/css/styles.css?v=10" />
+<link rel="stylesheet" href="assets/css/france.css?v=4" />
 </head>
 <body class="france-page">
 <main class="france-wrap">
+  <a class="back-link france-back-link" href="index.html">← back home</a>
+
   <header class="france-header">
-    <div>
+    <div class="france-heading">
       <p class="france-eyebrow">🐻‍❄️ + 🐻 go to</p>
       <h1>france</h1>
-      <p class="france-sub">aug 13 - aug 27 , 2026(</p>
+      <p class="france-sub">aug 13 – aug 27, 2026</p>
     </div>
-    <div class="france-count" id="france-count"></div>
+    <div class="france-count" id="france-count" aria-live="polite"></div>
   </header>
 
-  <ol class="days" id="days"></ol>
+  <section class="itinerary" aria-labelledby="itinerary-title">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">the adventure</p>
+        <h2 id="itinerary-title">our itinerary</h2>
+      </div>
+      <div class="section-heading-actions">
+        <span class="section-icon" aria-hidden="true">🥐</span>
+        <button class="itinerary-toggle" id="itinerary-toggle" type="button" aria-expanded="true" aria-controls="days">
+          <span id="itinerary-toggle-label">collapse</span>
+          <span class="itinerary-toggle-icon" aria-hidden="true">⌃</span>
+        </button>
+      </div>
+    </div>
+    <ol class="days" id="days"></ol>
+  </section>
 
-  <section class="resv" aria-label="reservations">
-    <h2 class="resv-title">reservations</h2>
+  <section class="resv" aria-labelledby="reservations-title">
+    <div class="section-heading resv-title-row">
+      <div>
+        <p class="section-kicker">all in one place</p>
+        <h2 class="resv-title" id="reservations-title">reservations</h2>
+      </div>
+      <span class="section-icon" aria-hidden="true">🎟️</span>
+    </div>
     <div class="resv-grid">
       <div class="resv-col" data-type="train">
-        <h3 class="resv-head">🚆 trains</h3>
+        <div class="resv-col-head">
+          <h3 class="resv-head">🚆 trains</h3>
+          <button class="resv-toggle" type="button" aria-expanded="false" aria-controls="resv-form-train" aria-label="add train reservation">+</button>
+        </div>
         <ul class="resv-list" id="resv-train"></ul>
-        <form class="resv-form" data-type="train">
+        <form class="resv-form" id="resv-form-train" data-type="train" hidden>
           <input class="resv-input" name="title" placeholder="title: e.g. lyon to toulon" maxlength="80" required />
-          <input class="resv-input" name="when" placeholder="date & time: e.g. aug 21, 1:02pm" maxlength="60" />
+          <input class="resv-input" name="when" placeholder="date &amp; time: e.g. aug 21, 1:02pm" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
           <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
-          <button class="resv-add" type="submit">add train</button>
+          <div class="resv-form-actions">
+            <button class="resv-cancel" type="button">cancel</button>
+            <button class="resv-add" type="submit">add train</button>
+          </div>
         </form>
       </div>
       <div class="resv-col" data-type="hotel">
-        <h3 class="resv-head">🏨 hotels</h3>
+        <div class="resv-col-head">
+          <h3 class="resv-head">🏨 hotels</h3>
+          <button class="resv-toggle" type="button" aria-expanded="false" aria-controls="resv-form-hotel" aria-label="add hotel reservation">+</button>
+        </div>
         <ul class="resv-list" id="resv-hotel"></ul>
-        <form class="resv-form" data-type="hotel">
+        <form class="resv-form" id="resv-form-hotel" data-type="hotel" hidden>
           <input class="resv-input" name="title" placeholder="title: e.g. hôtel alexandrine" maxlength="80" required />
           <input class="resv-input" name="when" placeholder="dates: e.g. aug 13-16" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
           <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
-          <button class="resv-add" type="submit">add hotel</button>
+          <div class="resv-form-actions">
+            <button class="resv-cancel" type="button">cancel</button>
+            <button class="resv-add" type="submit">add hotel</button>
+          </div>
         </form>
       </div>
       <div class="resv-col" data-type="restaurant">
-        <h3 class="resv-head">🍽️ restaurants</h3>
+        <div class="resv-col-head">
+          <h3 class="resv-head">🍽️ restaurants</h3>
+          <button class="resv-toggle" type="button" aria-expanded="false" aria-controls="resv-form-restaurant" aria-label="add restaurant reservation">+</button>
+        </div>
         <ul class="resv-list" id="resv-restaurant"></ul>
-        <form class="resv-form" data-type="restaurant">
+        <form class="resv-form" id="resv-form-restaurant" data-type="restaurant" hidden>
           <input class="resv-input" name="title" placeholder="title: e.g. bouillon pigalle" maxlength="80" required />
-          <input class="resv-input" name="when" placeholder="date & time: e.g. aug 14, 12pm" maxlength="60" />
+          <input class="resv-input" name="when" placeholder="date &amp; time: e.g. aug 14, 12pm" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
           <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
-          <button class="resv-add" type="submit">add restaurant</button>
+          <div class="resv-form-actions">
+            <button class="resv-cancel" type="button">cancel</button>
+            <button class="resv-add" type="submit">add restaurant</button>
+          </div>
         </form>
       </div>
     </div>
@@ -72,7 +113,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="assets/js/config.js?v=1"></script>
-<script src="assets/js/france.js?v=2"></script>
-<script src="assets/js/navigation.js?v=6"></script>
+<script src="assets/js/france.js?v=4"></script>
+<script src="assets/js/navigation.js?v=11"></script>
 </body>
 </html>

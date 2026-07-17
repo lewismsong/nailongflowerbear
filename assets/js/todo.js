@@ -3,6 +3,9 @@ const todoBears = { khali: "🐻‍❄️", lewis: "🐻" };
 const todoList = document.getElementById("todo-list");
 const todoEmpty = document.getElementById("todo-empty");
 const todoCount = document.getElementById("todo-count");
+const todoProgressText = document.getElementById("todo-progress-text");
+const todoProgressBar = document.getElementById("todo-progress-bar");
+const todoFilterButtons = document.querySelectorAll(".todo-filters button");
 const todoForm = document.getElementById("todo-form");
 const todoInput = document.getElementById("todo-input");
 const todoSubmit = todoForm.querySelector("button");
@@ -17,6 +20,7 @@ const todoTimeFormatter = new Intl.DateTimeFormat([], { hour: "numeric", minute:
 let todos = [];
 let todosRef = null;
 let renderQueued = false;
+let activeTodoFilter = "all";
 
 function showTodoError(message) {
   todoError.textContent = message;
@@ -30,6 +34,18 @@ function flushQueuedRender() {
   if (!renderQueued) return;
   renderQueued = false;
   renderTodos();
+}
+
+function cancelPendingSave(id) {
+  const timer = pendingSaves.get(id);
+  if (timer) clearTimeout(timer);
+  pendingSaves.delete(id);
+}
+
+function disableTodoForm(message) {
+  todoInput.disabled = true;
+  todoSubmit.disabled = true;
+  showTodoError(message);
 }
 
 async function updateTodo(id, changes) {
@@ -110,9 +126,7 @@ function createTodoItem(todo) {
     }
   });
   text.addEventListener("blur", async () => {
-    const timer = pendingSaves.get(todo.id);
-    if (timer) clearTimeout(timer);
-    pendingSaves.delete(todo.id);
+    cancelPendingSave(todo.id);
     const newText = text.textContent.trim();
     if (!newText) {
       text.textContent = text.dataset.savedText;
@@ -135,9 +149,7 @@ function createTodoItem(todo) {
   removeButton.textContent = "×";
   removeButton.setAttribute("aria-label", "delete todo");
   removeButton.addEventListener("click", async () => {
-    const timer = pendingSaves.get(todo.id);
-    if (timer) clearTimeout(timer);
-    pendingSaves.delete(todo.id);
+    cancelPendingSave(todo.id);
     try {
       await todosRef.child(todo.id).remove();
       showTodoError("");
@@ -153,10 +165,25 @@ function createTodoItem(todo) {
 }
 
 function renderTodos() {
-  todoList.replaceChildren(...todos.map(createTodoItem));
+  const visibleTodos = todos.filter((todo) => {
+    if (activeTodoFilter === "open") return !todo.done;
+    if (activeTodoFilter === "done") return todo.done;
+    return true;
+  });
   const openCount = todos.filter((todo) => !todo.done).length;
+  const completedCount = todos.length - openCount;
+  const completionPercentage = todos.length ? Math.round((completedCount / todos.length) * 100) : 0;
+
+  todoList.replaceChildren(...visibleTodos.map(createTodoItem));
   todoCount.textContent = openCount + " open";
-  todoEmpty.classList.toggle("hidden", todos.length > 0);
+  todoProgressText.textContent = completedCount + " of " + todos.length + " done";
+  todoProgressBar.style.width = completionPercentage + "%";
+  todoEmpty.textContent = todos.length === 0
+    ? "nothing here yet"
+    : activeTodoFilter === "open"
+      ? "all caught up ✨"
+      : "nothing completed yet";
+  todoEmpty.classList.toggle("hidden", visibleTodos.length > 0);
 }
 
 function subscribeToTodos() {
@@ -193,9 +220,7 @@ todoPerson.textContent = validTodoUser ? "writing as " + todoName : "not signed 
 myBear.textContent = todoBears[todoName] || "🐻";
 
 if (!validTodoUser) {
-  todoInput.disabled = true;
-  todoSubmit.disabled = true;
-  showTodoError("go back home and sign in first");
+  disableTodoForm("go back home and sign in first");
 }
 
 todoForm.addEventListener("submit", async (event) => {
@@ -221,6 +246,16 @@ todoForm.addEventListener("submit", async (event) => {
   }
 });
 
+todoFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activeTodoFilter = button.dataset.filter;
+    todoFilterButtons.forEach((filterButton) => {
+      filterButton.setAttribute("aria-pressed", String(filterButton.dataset.filter === activeTodoFilter));
+    });
+    renderTodos();
+  });
+});
+
 renderTodos();
 
 if (firebaseConfig.databaseURL) {
@@ -230,12 +265,8 @@ if (firebaseConfig.databaseURL) {
     subscribeToTodos();
   } catch (error) {
     console.error("firebase initialization failed:", error);
-    todoInput.disabled = true;
-    todoSubmit.disabled = true;
-    showTodoError("couldn't connect to the todo database");
+    disableTodoForm("couldn't connect to the todo database");
   }
 } else {
-  todoInput.disabled = true;
-  todoSubmit.disabled = true;
-  showTodoError("Firebase isn't configured yet");
+  disableTodoForm("Firebase isn't configured yet");
 }

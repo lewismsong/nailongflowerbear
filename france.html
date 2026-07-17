@@ -15,12 +15,49 @@
     <div>
       <p class="france-eyebrow">🐻‍❄️ + 🐻 go to</p>
       <h1>france</h1>
-      <p class="france-sub">aug 13 - aug 27 , 2026(</p>
+      <p class="france-sub">aug 13 - aug 27, 2026</p>
     </div>
     <div class="france-count" id="france-count"></div>
   </header>
 
   <ol class="days" id="days"></ol>
+
+  <section class="resv" aria-label="reservations">
+    <h2 class="resv-title">reservations</h2>
+    <p class="resv-sub">bookings</p>
+    <div class="resv-grid">
+      <div class="resv-col" data-type="train">
+        <h3 class="resv-head">🚆 trains</h3>
+        <ul class="resv-list" id="resv-train"></ul>
+        <form class="resv-form" data-type="train">
+          <input class="resv-input" name="title" placeholder="title — e.g. lyon → toulon" maxlength="80" required />
+          <input class="resv-input" name="when" placeholder="date & time — e.g. aug 21, 1:02pm" maxlength="60" />
+          <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
+          <button class="resv-add" type="submit">add train</button>
+        </form>
+      </div>
+      <div class="resv-col" data-type="hotel">
+        <h3 class="resv-head">🏨 hotels</h3>
+        <ul class="resv-list" id="resv-hotel"></ul>
+        <form class="resv-form" data-type="hotel">
+          <input class="resv-input" name="title" placeholder="title — e.g. hôtel alexandrine" maxlength="80" required />
+          <input class="resv-input" name="when" placeholder="dates — e.g. aug 13–16" maxlength="60" />
+          <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
+          <button class="resv-add" type="submit">add hotel</button>
+        </form>
+      </div>
+      <div class="resv-col" data-type="restaurant">
+        <h3 class="resv-head">🍽️ restaurants</h3>
+        <ul class="resv-list" id="resv-restaurant"></ul>
+        <form class="resv-form" data-type="restaurant">
+          <input class="resv-input" name="title" placeholder="title — e.g. bouillon pigalle" maxlength="80" required />
+          <input class="resv-input" name="when" placeholder="date & time — e.g. aug 14, 12pm" maxlength="60" />
+          <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
+          <button class="resv-add" type="submit">add restaurant</button>
+        </form>
+      </div>
+    </div>
+  </section>
 
   <p id="france-error" class="france-error" role="status"></p>
 </main>

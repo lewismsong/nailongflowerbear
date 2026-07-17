@@ -32,7 +32,8 @@ function flipCoin() {
     coinButton.setAttribute("aria-label", "coin is flipping");
     coinResult.classList.add("waiting");
     coinResult.textContent = "flipping...";
-    delete coin.dataset.side;
+    if (result === "koala") coin.dataset.side = result;
+    else delete coin.dataset.side;
     coin.style.transform = "rotateY(" + coinRotation + "deg)";
 
     const finishFlip = () => {

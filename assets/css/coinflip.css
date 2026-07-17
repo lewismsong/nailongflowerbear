@@ -16,7 +16,7 @@
 .coin-brown { background: radial-gradient(circle at 34% 27%, #d9ad78 0%, #a66c37 48%, #65401f 100%); color: #fff8e9; transform: rotateY(180deg) translateZ(1px); }
 .coin-koala { visibility: hidden; background: radial-gradient(circle at 34% 27%, #f4f5f5 0%, #c8ccce 48%, #858b8f 100%); color: #34383a; transform: rotateY(0deg) translateZ(2px); }
 .coin[data-side="white"] .coin-brown, .coin[data-side="brown"] .coin-white { visibility: hidden; }
-.coin[data-side="koala"] .coin-white, .coin[data-side="koala"] .coin-brown { visibility: hidden; }
+.coin[data-side="koala"] .coin-white { visibility: hidden; }
 .coin[data-side="koala"] .coin-koala { visibility: visible; }
 .coin-bear { position: relative; z-index: 1; font-size: 82px; line-height: 1; filter: drop-shadow(0 4px 5px rgba(74,53,36,0.2)); }
 .coin-side-name { position: relative; z-index: 1; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; }

@@ -1,19 +1,19 @@
 firebase.initializeApp(firebaseConfig);
 const franceRef = firebase.database().ref("france");
 
-// the plan so far — written into the shared itinerary once, then freely editable
+// the plan so far, written into the shared itinerary once, then freely editable
 const DEFAULT_PLANS = {
-  "2026-08-13": "✈️ lewis lands: CDG terminal 1 — free CDGVAL shuttle to terminal 3 / roissypôle\n✈️ khali lands: terminal 2 (2F/2G) — CDGVAL to roissypôle, or follow RER B « gare routière » signs\n12:00pm — meet at roissypôle bus station (9517 gare d'argenteuil, RER B)\n2:00pm — check into paris 🏨 hôtel alexandrine opéra, 10 rue de moscou, 75008 (€317, aug 13–16)\nexpedia.com/Paris-Hotels-Alexandrine-Opera.h1382741.Hotel-Information",
-  "2026-08-14": "montmartre day 🎨\n12:00–2:00pm — reservation at bouillon pigalle\nmetro 9th → 2nd: pigalle station → madeleine station\n(waiting on zam's recos)",
-  "2026-08-15": "bakery run 🥐 — bring croissants + drinks for the garden\nmorning: luxembourg garden (9th → 6th: saint-lazare → rennes)\nchez alain miam miam (9th → 11th: europe station → temple station)\nluxembourg garden → eiffel tower: bus 82\nor: walk to CGOTA montigny → beauchamp",
-  "2026-08-16": "morning flixbus to lyon 🚌 (~6h, €42)\n4:25pm — arrive in lyon\n5:00pm — check into airbnb 🏠 41 rue seguin, 69002 lyon (€332, aug 16–20)\n(lidl closes 12pm on sundays — grocery run moves to monday)",
+  "2026-08-13": "✈️ lewis lands: CDG terminal 1, free CDGVAL shuttle to terminal 3 / roissypôle\n✈️ khali lands: terminal 2 (2F/2G), CDGVAL to roissypôle, or follow RER B « gare routière » signs\n12:00pm: meet at roissypôle bus station (9517 gare d'argenteuil, RER B)\n2:00pm: check into paris 🏨 hôtel alexandrine opéra, 10 rue de moscou, 75008 (€317, aug 13-16)\nexpedia.com/Paris-Hotels-Alexandrine-Opera.h1382741.Hotel-Information",
+  "2026-08-14": "montmartre day 🎨\n12:00-2:00pm: reservation at bouillon pigalle\nmetro 9th → 2nd: pigalle station → madeleine station\n(waiting on zam's recos)",
+  "2026-08-15": "bakery run 🥐, bring croissants + drinks for the garden\nmorning: luxembourg garden (9th → 6th: saint-lazare → rennes)\nchez alain miam miam (9th → 11th: europe station → temple station)\nluxembourg garden → eiffel tower: bus 82\nor: walk to CGOTA montigny → beauchamp",
+  "2026-08-16": "morning flixbus to lyon 🚌 (~6h, €42)\n4:25pm: arrive in lyon\n5:00pm: check into airbnb 🏠 41 rue seguin, 69002 lyon (€332, aug 16-20)\n(lidl closes 12pm on sundays, grocery run moves to monday)",
   "2026-08-17": "stay at home with baby 🐻",
   "2026-08-18": "parc de la tête d'or 🦁",
-  "2026-08-19": "day-trip day — flixbus to annecy (khali's pick, €40, ~1h20)",
+  "2026-08-19": "day-trip day, flixbus to annecy (khali's pick, €40, ~1h20)",
   "2026-08-20": "stay at home with baby (tentative)",
-  "2026-08-21": "9:00–10:00am — check out of airbnb\n11:26am–12:27pm — train to lyon saint-exupéry (TGV inoui/TER → rhônexpress)\n1:02–3:10pm — train to toulon\ntoulon → cassis: 3:28→4:02 or 3:58→4:32 (⚠️ still to book: lyon→toulon + toulon→cassis, depart ~3:30pm)\nto airbnb: 4:38→4:52 or 5:08→5:22 (bus M371)\ngrocery shopping 🐄",
-  "2026-08-24": "cannes fireworks festival 🎆 — 10pm\nfestival-pyrotechnique-cannes.com/en/program/august-24-fireworks",
-  "2026-08-25": "10:45am–1:30pm — bus to marseille (saint-charles)\n5:04–8:26pm — train to paris gare de lyon\n8:30–9:00pm — RER D vepa: villiers-le-bel – gonesse – arnouville",
+  "2026-08-21": "9:00-10:00am: check out of airbnb\n11:26am-12:27pm: train to lyon saint-exupéry (TGV inoui/TER → rhônexpress)\n1:02-3:10pm: train to toulon\ntoulon → cassis: 3:28→4:02 or 3:58→4:32 (⚠️ still to book: lyon→toulon + toulon→cassis, depart ~3:30pm)\nto airbnb: 4:38→4:52 or 5:08→5:22 (bus M371)\ngrocery shopping 🐄",
+  "2026-08-24": "cannes fireworks festival 🎆, 10pm\nfestival-pyrotechnique-cannes.com/en/program/august-24-fireworks",
+  "2026-08-25": "10:45am-1:30pm: bus to marseille (saint-charles)\n5:04-8:26pm: train to paris gare de lyon\n8:30-9:00pm: RER D vepa: villiers-le-bel - gonesse - arnouville",
 };
 
 // write the defaults exactly once (a flag in the database guards against re-seeding,
@@ -25,7 +25,7 @@ function seedDefaultsOnce() {
       if (error || !committed) return;
       franceRef.update(DEFAULT_PLANS).catch((seedError) => {
         console.error("itinerary seed failed:", seedError);
-        showFranceError("couldn't load the starter plans — check the firebase rules");
+        showFranceError("couldn't load the starter plans, check the firebase rules");
       });
     }
   );
@@ -94,7 +94,7 @@ function buildDays() {
     const notes = document.createElement("div");
     notes.className = "day-notes";
     notes.contentEditable = "true";
-    notes.dataset.placeholder = "nothing planned yet";
+    notes.dataset.placeholder = "nothing planned yet, tap to write";
     notes.setAttribute("role", "textbox");
     notes.setAttribute("aria-label", "plans for " + label.textContent);
     notes.setAttribute("spellcheck", "true");
@@ -131,11 +131,11 @@ function saveDay(key, notesElement) {
     .then(() => showFranceError(""))
     .catch((error) => {
       console.error("itinerary save failed:", error);
-      showFranceError("couldn't save that day — check your connection");
+      showFranceError("couldn't save that day, check your connection");
     });
 }
 
-// firebase: shared value subscription — both devices plan the same trip, live
+// firebase: shared value subscription, both devices plan the same trip, live
 franceRef.on("value", (snapshot) => {
   const value = snapshot.val() || {};
   dayNotes.forEach((notesElement, key) => {
@@ -145,7 +145,7 @@ franceRef.on("value", (snapshot) => {
   });
 }, (error) => {
   console.error("itinerary subscription failed:", error);
-  showFranceError("can't reach the itinerary — check the connection (or the firebase rules)");
+  showFranceError("can't reach the itinerary, check the connection (or the firebase rules)");
 });
 
 
@@ -172,6 +172,15 @@ function createResvCard(type, id, entry) {
     when.textContent = entry.when;
     body.appendChild(when);
   }
+  if (entry.address) {
+    const address = document.createElement("a");
+    address.className = "resv-addr";
+    address.textContent = "📍 " + entry.address;
+    address.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(entry.address);
+    address.target = "_blank";
+    address.rel = "noopener";
+    body.appendChild(address);
+  }
   if (entry.code) {
     const code = document.createElement("div");
     code.className = "resv-code";
@@ -187,7 +196,7 @@ function createResvCard(type, id, entry) {
   removeButton.addEventListener("click", () => {
     resvRef.child(type).child(id).remove().catch((error) => {
       console.error("reservation delete failed:", error);
-      showFranceError("couldn't delete that — check your connection");
+      showFranceError("couldn't delete that: check your connection");
     });
   });
 
@@ -202,7 +211,7 @@ function renderReservations() {
     const entries = Object.entries(reservations[type] || {})
       .map(([id, entry]) =>
         entry && typeof entry.title === "string" && entry.title.trim()
-          ? { id, title: entry.title.trim(), when: entry.when || "", code: entry.code || "", at: Number(entry.at) || 0 }
+          ? { id, title: entry.title.trim(), when: entry.when || "", address: entry.address || "", code: entry.code || "", at: Number(entry.at) || 0 }
           : null
       )
       .filter(Boolean)
@@ -216,7 +225,7 @@ resvRef.on("value", (snapshot) => {
   renderReservations();
 }, (error) => {
   console.error("reservations subscription failed:", error);
-  showFranceError("can't reach the reservations — check the connection");
+  showFranceError("can't reach the reservations: check the connection");
 });
 
 document.querySelectorAll(".resv-form").forEach((form) => {
@@ -230,6 +239,7 @@ document.querySelectorAll(".resv-form").forEach((form) => {
       .push({
         title,
         when: form.elements.when.value.trim(),
+        address: form.elements.address.value.trim(),
         code: form.elements.code.value.trim(),
         at: firebase.database.ServerValue.TIMESTAMP,
       })
@@ -239,7 +249,7 @@ document.querySelectorAll(".resv-form").forEach((form) => {
       })
       .catch((error) => {
         console.error("reservation add failed:", error);
-        showFranceError("couldn't add that — check your connection");
+        showFranceError("couldn't add that: check your connection");
       });
   });
 });

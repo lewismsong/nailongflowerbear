@@ -35,6 +35,44 @@
 .day-notes:focus { background: #FFFDF7; box-shadow: 0 0 0 2px rgba(222,155,0,0.25); }
 .day-notes:empty::before { content: attr(data-placeholder); color: var(--muted); opacity: 0.7; }
 
+
+/* reservations */
+.resv { margin-top: 36px; }
+.resv-title { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 700; margin: 0; }
+.resv-sub { color: var(--muted); font-size: 12.5px; margin: 4px 0 14px; }
+.resv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.resv-head { font-size: 13px; letter-spacing: 1px; color: var(--muted); font-weight: 700; margin: 0 0 8px; }
+.resv-list { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.resv-card {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(74,53,36,0.1);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(74,53,36,0.07);
+  padding: 10px 12px;
+}
+.resv-name { font-size: 13.5px; font-weight: 700; overflow-wrap: anywhere; }
+.resv-when { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.resv-code { color: var(--yellow-deep); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; margin-top: 3px; letter-spacing: 0.5px; overflow-wrap: anywhere; }
+.resv-delete { background: none; border: none; color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+.resv-form { display: flex; flex-direction: column; gap: 6px; }
+.resv-input {
+  width: 100%; box-sizing: border-box; padding: 9px 11px; border-radius: 10px;
+  border: 1px solid rgba(74,53,36,0.12); background: #FFFDF7; color: var(--text); font-size: 12.5px;
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+}
+.resv-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(222,155,0,0.25); }
+.resv-add {
+  border: none; border-radius: 10px; padding: 9px 11px; cursor: pointer;
+  background: var(--yellow); color: var(--deep); font-size: 12.5px; font-weight: 700;
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+}
+.resv-add:active { transform: scale(0.98); }
+
+@media (max-width: 640px) {
+  .resv-grid { grid-template-columns: 1fr; gap: 18px; }
+}
+
 .france-error { color: var(--pink-deep); font-size: 12px; min-height: 1em; margin: 16px 0 0; text-align: center; }
 
 @media (max-width: 520px) {

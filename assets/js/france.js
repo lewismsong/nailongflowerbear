@@ -181,6 +181,15 @@ function createResvCard(type, id, entry) {
     address.rel = "noopener";
     body.appendChild(address);
   }
+  if (entry.link) {
+    const link = document.createElement("a");
+    link.className = "resv-link";
+    link.textContent = "📎 open pdf / link";
+    link.href = /^https?:\/\//i.test(entry.link) ? entry.link : "https://" + entry.link;
+    link.target = "_blank";
+    link.rel = "noopener";
+    body.appendChild(link);
+  }
   if (entry.code) {
     const code = document.createElement("div");
     code.className = "resv-code";
@@ -211,7 +220,7 @@ function renderReservations() {
     const entries = Object.entries(reservations[type] || {})
       .map(([id, entry]) =>
         entry && typeof entry.title === "string" && entry.title.trim()
-          ? { id, title: entry.title.trim(), when: entry.when || "", address: entry.address || "", code: entry.code || "", at: Number(entry.at) || 0 }
+          ? { id, title: entry.title.trim(), when: entry.when || "", address: entry.address || "", link: entry.link || "", code: entry.code || "", at: Number(entry.at) || 0 }
           : null
       )
       .filter(Boolean)
@@ -240,6 +249,7 @@ document.querySelectorAll(".resv-form").forEach((form) => {
         title,
         when: form.elements.when.value.trim(),
         address: form.elements.address.value.trim(),
+        link: form.elements.link.value.trim(),
         code: form.elements.code.value.trim(),
         at: firebase.database.ServerValue.TIMESTAMP,
       })

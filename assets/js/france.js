@@ -94,7 +94,7 @@ function buildDays() {
     const notes = document.createElement("div");
     notes.className = "day-notes";
     notes.contentEditable = "true";
-    notes.dataset.placeholder = "nothing planned yet — tap to write";
+    notes.dataset.placeholder = "nothing planned yet";
     notes.setAttribute("role", "textbox");
     notes.setAttribute("aria-label", "plans for " + label.textContent);
     notes.setAttribute("spellcheck", "true");
@@ -146,6 +146,102 @@ franceRef.on("value", (snapshot) => {
 }, (error) => {
   console.error("itinerary subscription failed:", error);
   showFranceError("can't reach the itinerary — check the connection (or the firebase rules)");
+});
+
+
+// ---- reservations: trains / hotels / restaurants, shared live ----
+const RESV_TYPES = ["train", "hotel", "restaurant"];
+const resvRef = franceRef.child("_resv");
+let reservations = {};
+
+function createResvCard(type, id, entry) {
+  const item = document.createElement("li");
+  item.className = "resv-card";
+
+  const body = document.createElement("div");
+  body.className = "resv-body";
+
+  const title = document.createElement("div");
+  title.className = "resv-name";
+  title.textContent = entry.title;
+  body.appendChild(title);
+
+  if (entry.when) {
+    const when = document.createElement("div");
+    when.className = "resv-when";
+    when.textContent = entry.when;
+    body.appendChild(when);
+  }
+  if (entry.code) {
+    const code = document.createElement("div");
+    code.className = "resv-code";
+    code.textContent = entry.code;
+    body.appendChild(code);
+  }
+
+  const removeButton = document.createElement("button");
+  removeButton.className = "resv-delete";
+  removeButton.type = "button";
+  removeButton.textContent = "×";
+  removeButton.setAttribute("aria-label", "delete reservation");
+  removeButton.addEventListener("click", () => {
+    resvRef.child(type).child(id).remove().catch((error) => {
+      console.error("reservation delete failed:", error);
+      showFranceError("couldn't delete that — check your connection");
+    });
+  });
+
+  item.append(body, removeButton);
+  return item;
+}
+
+function renderReservations() {
+  for (const type of RESV_TYPES) {
+    const list = document.getElementById("resv-" + type);
+    if (!list) continue;
+    const entries = Object.entries(reservations[type] || {})
+      .map(([id, entry]) =>
+        entry && typeof entry.title === "string" && entry.title.trim()
+          ? { id, title: entry.title.trim(), when: entry.when || "", code: entry.code || "", at: Number(entry.at) || 0 }
+          : null
+      )
+      .filter(Boolean)
+      .sort((first, second) => first.at - second.at);
+    list.replaceChildren(...entries.map((entry) => createResvCard(type, entry.id, entry)));
+  }
+}
+
+resvRef.on("value", (snapshot) => {
+  reservations = snapshot.val() || {};
+  renderReservations();
+}, (error) => {
+  console.error("reservations subscription failed:", error);
+  showFranceError("can't reach the reservations — check the connection");
+});
+
+document.querySelectorAll(".resv-form").forEach((form) => {
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const type = form.dataset.type;
+    const title = form.elements.title.value.trim();
+    if (!title || !RESV_TYPES.includes(type)) return;
+    resvRef
+      .child(type)
+      .push({
+        title,
+        when: form.elements.when.value.trim(),
+        code: form.elements.code.value.trim(),
+        at: firebase.database.ServerValue.TIMESTAMP,
+      })
+      .then(() => {
+        form.reset();
+        showFranceError("");
+      })
+      .catch((error) => {
+        console.error("reservation add failed:", error);
+        showFranceError("couldn't add that — check your connection");
+      });
+  });
 });
 
 buildDays();

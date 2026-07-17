@@ -305,6 +305,8 @@ startBtn.addEventListener("click", () => {
   showMain();
 });
 
+$("france-box").addEventListener("click", () => { location.href = "france.html?v=1"; });
+
 $("reset-btn").addEventListener("click", () => {
   localStorage.removeItem("ily:name");
   name = null;

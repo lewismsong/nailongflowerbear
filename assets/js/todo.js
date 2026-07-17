@@ -32,6 +32,18 @@ function flushQueuedRender() {
   renderTodos();
 }
 
+function cancelPendingSave(id) {
+  const timer = pendingSaves.get(id);
+  if (timer) clearTimeout(timer);
+  pendingSaves.delete(id);
+}
+
+function disableTodoForm(message) {
+  todoInput.disabled = true;
+  todoSubmit.disabled = true;
+  showTodoError(message);
+}
+
 async function updateTodo(id, changes) {
   try {
     await todosRef.child(id).update(changes);
@@ -110,9 +122,7 @@ function createTodoItem(todo) {
     }
   });
   text.addEventListener("blur", async () => {
-    const timer = pendingSaves.get(todo.id);
-    if (timer) clearTimeout(timer);
-    pendingSaves.delete(todo.id);
+    cancelPendingSave(todo.id);
     const newText = text.textContent.trim();
     if (!newText) {
       text.textContent = text.dataset.savedText;
@@ -135,9 +145,7 @@ function createTodoItem(todo) {
   removeButton.textContent = "×";
   removeButton.setAttribute("aria-label", "delete todo");
   removeButton.addEventListener("click", async () => {
-    const timer = pendingSaves.get(todo.id);
-    if (timer) clearTimeout(timer);
-    pendingSaves.delete(todo.id);
+    cancelPendingSave(todo.id);
     try {
       await todosRef.child(todo.id).remove();
       showTodoError("");
@@ -193,9 +201,7 @@ todoPerson.textContent = validTodoUser ? "writing as " + todoName : "not signed 
 myBear.textContent = todoBears[todoName] || "🐻";
 
 if (!validTodoUser) {
-  todoInput.disabled = true;
-  todoSubmit.disabled = true;
-  showTodoError("go back home and sign in first");
+  disableTodoForm("go back home and sign in first");
 }
 
 todoForm.addEventListener("submit", async (event) => {
@@ -230,12 +236,8 @@ if (firebaseConfig.databaseURL) {
     subscribeToTodos();
   } catch (error) {
     console.error("firebase initialization failed:", error);
-    todoInput.disabled = true;
-    todoSubmit.disabled = true;
-    showTodoError("couldn't connect to the todo database");
+    disableTodoForm("couldn't connect to the todo database");
   }
 } else {
-  todoInput.disabled = true;
-  todoSubmit.disabled = true;
-  showTodoError("Firebase isn't configured yet");
+  disableTodoForm("Firebase isn't configured yet");
 }

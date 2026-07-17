@@ -35,7 +35,8 @@ const daysList = document.getElementById("days");
 const franceCount = document.getElementById("france-count");
 const franceError = document.getElementById("france-error");
 const pendingDaySaves = new Map();
-const dayNotes = new Map(); // dayKey -> contentEditable element
+const dayNotes = new Map(); // day key to editable notes element
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function showFranceError(message) {
   franceError.textContent = message;
@@ -60,7 +61,7 @@ function tripDays() {
 function renderCountdown() {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const daysUntil = Math.round((FRANCE_DATE - today) / 86400000);
+  const daysUntil = Math.round((FRANCE_DATE - today) / MILLISECONDS_PER_DAY);
   if (daysUntil > 1) franceCount.textContent = daysUntil + " days to go";
   else if (daysUntil === 1) franceCount.textContent = "tomorrow!!";
   else if (today <= FRANCE_END) franceCount.textContent = "day " + (1 - daysUntil) + " 🥖";
@@ -149,10 +150,25 @@ franceRef.on("value", (snapshot) => {
 });
 
 
-// ---- reservations: trains / hotels / restaurants, shared live ----
-const RESV_TYPES = ["train", "hotel", "restaurant"];
+// reservations for trains, hotels, and restaurants are shared live
+const RESERVATION_TYPES = ["train", "hotel", "restaurant"];
 const resvRef = franceRef.child("_resv");
 let reservations = {};
+
+function createTextElement(tagName, className, text) {
+  const element = document.createElement(tagName);
+  element.className = className;
+  element.textContent = text;
+  return element;
+}
+
+function createExternalLink(className, text, href) {
+  const link = createTextElement("a", className, text);
+  link.href = href;
+  link.target = "_blank";
+  link.rel = "noopener";
+  return link;
+}
 
 function createResvCard(type, id, entry) {
   const item = document.createElement("li");
@@ -161,39 +177,28 @@ function createResvCard(type, id, entry) {
   const body = document.createElement("div");
   body.className = "resv-body";
 
-  const title = document.createElement("div");
-  title.className = "resv-name";
-  title.textContent = entry.title;
+  const title = createTextElement("div", "resv-name", entry.title);
   body.appendChild(title);
 
   if (entry.when) {
-    const when = document.createElement("div");
-    when.className = "resv-when";
-    when.textContent = entry.when;
+    const when = createTextElement("div", "resv-when", entry.when);
     body.appendChild(when);
   }
   if (entry.address) {
-    const address = document.createElement("a");
-    address.className = "resv-addr";
-    address.textContent = "📍 " + entry.address;
-    address.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(entry.address);
-    address.target = "_blank";
-    address.rel = "noopener";
+    const address = createExternalLink(
+      "resv-addr",
+      "📍 " + entry.address,
+      "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(entry.address)
+    );
     body.appendChild(address);
   }
   if (entry.link) {
-    const link = document.createElement("a");
-    link.className = "resv-link";
-    link.textContent = "📎 open pdf / link";
-    link.href = /^https?:\/\//i.test(entry.link) ? entry.link : "https://" + entry.link;
-    link.target = "_blank";
-    link.rel = "noopener";
+    const href = /^https?:\/\//i.test(entry.link) ? entry.link : "https://" + entry.link;
+    const link = createExternalLink("resv-link", "📎 open pdf / link", href);
     body.appendChild(link);
   }
   if (entry.code) {
-    const code = document.createElement("div");
-    code.className = "resv-code";
-    code.textContent = entry.code;
+    const code = createTextElement("div", "resv-code", entry.code);
     body.appendChild(code);
   }
 
@@ -213,16 +218,25 @@ function createResvCard(type, id, entry) {
   return item;
 }
 
+function normalizeReservation(id, entry) {
+  if (!entry || typeof entry.title !== "string" || !entry.title.trim()) return null;
+  return {
+    id,
+    title: entry.title.trim(),
+    when: entry.when || "",
+    address: entry.address || "",
+    link: entry.link || "",
+    code: entry.code || "",
+    at: Number(entry.at) || 0,
+  };
+}
+
 function renderReservations() {
-  for (const type of RESV_TYPES) {
+  for (const type of RESERVATION_TYPES) {
     const list = document.getElementById("resv-" + type);
     if (!list) continue;
     const entries = Object.entries(reservations[type] || {})
-      .map(([id, entry]) =>
-        entry && typeof entry.title === "string" && entry.title.trim()
-          ? { id, title: entry.title.trim(), when: entry.when || "", address: entry.address || "", link: entry.link || "", code: entry.code || "", at: Number(entry.at) || 0 }
-          : null
-      )
+      .map(([id, entry]) => normalizeReservation(id, entry))
       .filter(Boolean)
       .sort((first, second) => first.at - second.at);
     list.replaceChildren(...entries.map((entry) => createResvCard(type, entry.id, entry)));
@@ -242,7 +256,7 @@ document.querySelectorAll(".resv-form").forEach((form) => {
     event.preventDefault();
     const type = form.dataset.type;
     const title = form.elements.title.value.trim();
-    if (!title || !RESV_TYPES.includes(type)) return;
+    if (!title || !RESERVATION_TYPES.includes(type)) return;
     resvRef
       .child(type)
       .push({

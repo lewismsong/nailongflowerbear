@@ -68,6 +68,19 @@ function renderCountdown() {
   else franceCount.textContent = "we'll always have france";
 }
 
+const itineraryToggle = document.getElementById("itinerary-toggle");
+const itineraryToggleLabel = document.getElementById("itinerary-toggle-label");
+
+function setItineraryExpanded(expanded) {
+  daysList.hidden = !expanded;
+  itineraryToggle.setAttribute("aria-expanded", String(expanded));
+  itineraryToggleLabel.textContent = expanded ? "collapse" : "show itinerary";
+}
+
+itineraryToggle.addEventListener("click", () => {
+  setItineraryExpanded(itineraryToggle.getAttribute("aria-expanded") !== "true");
+});
+
 function buildDays() {
   const frag = document.createDocumentFragment();
   tripDays().forEach((date, index) => {
@@ -251,6 +264,32 @@ resvRef.on("value", (snapshot) => {
   showFranceError("can't reach the reservations: check the connection");
 });
 
+function setReservationFormExpanded(column, expanded) {
+  const form = column.querySelector(".resv-form");
+  const toggle = column.querySelector(".resv-toggle");
+  const type = column.dataset.type;
+  form.hidden = !expanded;
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggle.setAttribute("aria-label", expanded ? "close " + type + " reservation form" : "add " + type + " reservation");
+  if (expanded) form.elements.title.focus();
+}
+
+document.querySelectorAll(".resv-col").forEach((column) => {
+  const toggle = column.querySelector(".resv-toggle");
+  const cancel = column.querySelector(".resv-cancel");
+  const form = column.querySelector(".resv-form");
+
+  toggle.addEventListener("click", () => {
+    setReservationFormExpanded(column, toggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  cancel.addEventListener("click", () => {
+    form.reset();
+    setReservationFormExpanded(column, false);
+    toggle.focus();
+  });
+});
+
 document.querySelectorAll(".resv-form").forEach((form) => {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -269,6 +308,7 @@ document.querySelectorAll(".resv-form").forEach((form) => {
       })
       .then(() => {
         form.reset();
+        setReservationFormExpanded(form.closest(".resv-col"), false);
         showFranceError("");
       })
       .catch((error) => {

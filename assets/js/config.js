@@ -10,5 +10,3 @@ const TIME_ZONES = {
 const GAME_TZ = "America/Toronto";
 const FRANCE_DATE = new Date(2026, 7, 13); // trip start
 const FRANCE_END = new Date(2026, 7, 27); // trip end
-const CALL_BLOCK_MS = 45 * 60 * 1000;
-const CALL_BLOCK_PTS = 45;

@@ -74,8 +74,6 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
 #beacon.cooling .label { font-size: 26px; }
 #beacon .tiny { font-size: 11px; margin-top: 2px; }
 #err { color: var(--pink-deep); font-size: 13px; margin-top: 12px; min-height: 1em; }
-#bonus-note { color: var(--yellow-deep); font-size: 13px; font-weight: 700; margin: 4px 0 0; }
-.x2 { color: var(--yellow-deep); font-weight: 700; font-size: 12px; }
 
 /* tally */
 .tally { display: flex; gap: 10px; margin: 18px 0 26px; }
@@ -100,8 +98,6 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
 .trademark { -webkit-user-select: none; user-select: none; }
 bear-tab-nav[current="home"] .trademark { cursor: pointer; }
 .secret { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin: 2px 0 0; }
-.bonus-rule { font-size: 12px; color: var(--muted); text-align: center; margin: -8px 0 26px; padding: 11px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
-
 /* all-time total */
 .total-box { background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 14px; text-align: center; margin: -8px 0 26px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 .total-box .num { font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); }

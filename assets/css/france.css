@@ -426,16 +426,13 @@
   margin-top: 3px;
 }
 
-.resv-addr,
+.resv-addr {
   display: block;
   margin-top: 5px;
   font-size: 12px;
   font-weight: 700;
   overflow-wrap: anywhere;
   text-decoration: none;
-}
-
-.resv-addr {
   color: var(--blue-deep);
 }
 
@@ -443,7 +440,7 @@
   color: var(--resv-accent);
 }
 
-.resv-addr:hover,
+.resv-addr:hover {
   text-decoration: underline;
 }
 

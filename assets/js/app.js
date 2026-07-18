@@ -255,7 +255,7 @@ function renderCal() {
     if (sender === "khali") record.k++;
     if (sender === "lewis") record.l++;
   }
-  // dated adjustments (khaliwins bypass + on-call bonuses) count in the day they happened
+  // dated adjustments (khaliwins bypass) count in the day they happened
   for (const key in adjust) {
     const dayAdjustments = adjust[key];
     if (dayAdjustments && typeof dayAdjustments === "object") {
@@ -365,7 +365,7 @@ $("call-toggle").addEventListener("change", (e) => {
     return;
   }
   if (e.target.checked) {
-    db.ref("call").set({ on: true, since: firebase.database.ServerValue.TIMESTAMP, credited: 0 });
+    db.ref("call").set({ on: true, since: firebase.database.ServerValue.TIMESTAMP });
   } else {
     db.ref("call").set({ on: false });
   }

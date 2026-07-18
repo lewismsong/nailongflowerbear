@@ -205,15 +205,20 @@ function createResvCard(type, id, entry) {
     );
     body.appendChild(address);
   }
-  if (entry.link) {
-    const href = /^https?:\/\//i.test(entry.link) ? entry.link : "https://" + entry.link;
-    const link = createExternalLink("resv-link", "📎 open pdf / link", href);
-    body.appendChild(link);
-  }
   if (entry.code) {
     const code = createTextElement("div", "resv-code", entry.code);
     body.appendChild(code);
   }
+
+  const actions = document.createElement("div");
+  actions.className = "resv-actions";
+
+  const editButton = document.createElement("button");
+  editButton.className = "resv-edit";
+  editButton.type = "button";
+  editButton.textContent = "✎";
+  editButton.setAttribute("aria-label", "edit reservation");
+  editButton.addEventListener("click", () => startReservationEdit(type, id, entry));
 
   const removeButton = document.createElement("button");
   removeButton.className = "resv-delete";
@@ -221,13 +226,15 @@ function createResvCard(type, id, entry) {
   removeButton.textContent = "×";
   removeButton.setAttribute("aria-label", "delete reservation");
   removeButton.addEventListener("click", () => {
+    if (editingReservation.type === type && editingReservation.id === id) clearReservationEdit();
     resvRef.child(type).child(id).remove().catch((error) => {
       console.error("reservation delete failed:", error);
       showFranceError("couldn't delete that: check your connection");
     });
   });
 
-  item.append(body, removeButton);
+  actions.append(editButton, removeButton);
+  item.append(body, actions);
   return item;
 }
 
@@ -238,7 +245,6 @@ function normalizeReservation(id, entry) {
     title: entry.title.trim(),
     when: entry.when || "",
     address: entry.address || "",
-    link: entry.link || "",
     code: entry.code || "",
     at: Number(entry.at) || 0,
   };
@@ -274,6 +280,35 @@ function setReservationFormExpanded(column, expanded) {
   if (expanded) form.elements.title.focus();
 }
 
+let editingReservation = { type: null, id: null };
+
+function submitLabelFor(type) {
+  return type === "train" ? "add train/bus" : "add " + type;
+}
+
+function startReservationEdit(type, id, entry) {
+  const column = document.querySelector('.resv-col[data-type="' + type + '"]');
+  if (!column) return;
+  const form = column.querySelector(".resv-form");
+  editingReservation = { type, id };
+  form.elements.title.value = entry.title || "";
+  form.elements.when.value = entry.when || "";
+  form.elements.address.value = entry.address || "";
+  form.elements.code.value = entry.code || "";
+  form.querySelector(".resv-add").textContent = "save changes";
+  setReservationFormExpanded(column, true);
+}
+
+function clearReservationEdit() {
+  if (!editingReservation.type) return;
+  const column = document.querySelector('.resv-col[data-type="' + editingReservation.type + '"]');
+  if (column) {
+    const form = column.querySelector(".resv-form");
+    form.querySelector(".resv-add").textContent = submitLabelFor(editingReservation.type);
+  }
+  editingReservation = { type: null, id: null };
+}
+
 document.querySelectorAll(".resv-col").forEach((column) => {
   const toggle = column.querySelector(".resv-toggle");
   const cancel = column.querySelector(".resv-cancel");
@@ -285,6 +320,7 @@ document.querySelectorAll(".resv-col").forEach((column) => {
 
   cancel.addEventListener("click", () => {
     form.reset();
+    clearReservationEdit();
     setReservationFormExpanded(column, false);
     toggle.focus();
   });
@@ -296,24 +332,26 @@ document.querySelectorAll(".resv-form").forEach((form) => {
     const type = form.dataset.type;
     const title = form.elements.title.value.trim();
     if (!title || !RESERVATION_TYPES.includes(type)) return;
-    resvRef
-      .child(type)
-      .push({
-        title,
-        when: form.elements.when.value.trim(),
-        address: form.elements.address.value.trim(),
-        link: form.elements.link.value.trim(),
-        code: form.elements.code.value.trim(),
-        at: firebase.database.ServerValue.TIMESTAMP,
-      })
+    const fields = {
+      title,
+      when: form.elements.when.value.trim(),
+      address: form.elements.address.value.trim(),
+      code: form.elements.code.value.trim(),
+    };
+    const isEdit = editingReservation.type === type && editingReservation.id;
+    const write = isEdit
+      ? resvRef.child(type).child(editingReservation.id).update(fields)
+      : resvRef.child(type).push({ ...fields, at: firebase.database.ServerValue.TIMESTAMP });
+    write
       .then(() => {
         form.reset();
+        clearReservationEdit();
         setReservationFormExpanded(form.closest(".resv-col"), false);
         showFranceError("");
       })
       .catch((error) => {
-        console.error("reservation add failed:", error);
-        showFranceError("couldn't add that: check your connection");
+        console.error("reservation save failed:", error);
+        showFranceError("couldn't save that: check your connection");
       });
   });
 });

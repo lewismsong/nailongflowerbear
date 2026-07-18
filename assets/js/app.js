@@ -10,7 +10,6 @@ const beaconEmoji = $("beacon-emoji");
 const beaconLabel = $("beacon-label");
 const beaconTiny = $("beacon-tiny");
 const ringFg = $("ring-fg");
-const bonusNote = $("bonus-note");
 const partnerClock = $("partner-clock");
 const partnerClockLabel = $("pc-label");
 const partnerClockTime = $("pc-time");
@@ -56,24 +55,17 @@ function adjustTotal(person) {
   return sum;
 }
 
-// misses sent from midnight to 6am count double
-const pointsForEvent = (event) => (event.x2 ? 2 : 1);
-
 function personPoints(person) {
-  return events
-    .filter((event) => normalizeName(event.from) === person)
-    .reduce((sum, event) => sum + pointsForEvent(event), 0);
+  return events.filter((event) => normalizeName(event.from) === person).length;
 }
 
 function totalFor(person) {
   return personPoints(person) + adjustTotal(person);
 }
 
-// points for one toronto day (misses + that day's adjustments)
+// misses for one toronto day, including that day's adjustments
 function dayPoints(person, key) {
-  let total = events
-    .filter((event) => normalizeName(event.from) === person && torontoDayKey(event.at) === key)
-    .reduce((sum, event) => sum + pointsForEvent(event), 0);
+  let total = events.filter((event) => normalizeName(event.from) === person && torontoDayKey(event.at) === key).length;
   const dayAdjustments = adjust[key];
   if (dayAdjustments && typeof dayAdjustments === "object") {
     total += Number(dayAdjustments[person]) || 0;
@@ -140,22 +132,20 @@ function myLastAt() {
   return Math.max(fromFeed, fromLocal);
 }
 
-function renderBeacon(now, normalizedName) {
+function renderBeacon(now) {
   const remaining = Math.min(COOLDOWN_MS, Math.max(0, COOLDOWN_MS - (now - myLastAt())));
   const cooling = remaining > 0;
   const onCall = !!(call && call.on);
-  const bonusNow = hourFor(normalizedName) < 6;
 
   beacon.disabled = cooling || onCall || missSending;
   beacon.classList.toggle("cooling", cooling && !onCall);
   beacon.classList.toggle("on-call", onCall);
-  beaconEmoji.textContent = onCall ? "📞" : cooling ? "⏳" : (bonusNow ? "🤍🤍" : "🤍");
+  beaconEmoji.textContent = onCall ? "📞" : cooling ? "⏳" : "🤍";
   beaconLabel.textContent = onCall ? "on call" : cooling ? Math.ceil(remaining / 1000) + "s" : "I miss you";
   beaconTiny.textContent = onCall ? "misses paused" : "until your next miss";
   beaconTiny.classList.toggle("hidden", !cooling && !onCall);
   ringFg.style.display = cooling && !onCall ? "" : "none";
   ringFg.setAttribute("stroke-dashoffset", CIRCUMFERENCE * (1 - remaining / COOLDOWN_MS));
-  bonusNote.classList.toggle("hidden", !bonusNow);
 }
 
 function renderPartnerClock(normalizedName, now) {
@@ -195,7 +185,7 @@ function renderStats() {
 function render() {
   const now = serverNow();
   const normalizedName = normalizeName(name);
-  renderBeacon(now, normalizedName);
+  renderBeacon(now);
   renderPartnerClock(normalizedName, now);
   renderFranceCountdown(now);
   renderStats();
@@ -224,7 +214,6 @@ function renderFeed() {
   for (const group of items) {
     const latest = group.items[group.items.length - 1];
     const count = group.items.length;
-    const points = group.items.reduce((sum, event) => sum + pointsForEvent(event), 0);
     if (!whenCache[latest.at]) whenCache[latest.at] = ago(latest.at, serverNow());
     const normalizedSender = normalizeName(group.from);
     const mineItem = normalizedSender === normalizeName(name);
@@ -235,15 +224,6 @@ function renderFeed() {
     const what = document.createElement("span");
     what.className = "what";
     what.textContent = (mineItem ? "💌 you sent a miss" : "💌 " + group.from + " missed you") + (count > 1 ? " ×" + count : "");
-    if (points > count) {
-      const hasNight = group.items.some((event) => event.x2);
-      const labels = [];
-      if (hasNight) labels.push("🌙 ×2");
-      const badge = document.createElement("span");
-      badge.className = "x2";
-      badge.textContent = " " + labels.join(" ") + " · worth " + points;
-      what.appendChild(badge);
-    }
     const when = document.createElement("span");
     when.className = "when";
     when.textContent = whenCache[latest.at];
@@ -266,15 +246,14 @@ function timeLeftToronto() {
 
 function renderCal() {
   const grid = $("cal-grid");
-  // bucket points into toronto days (x2 misses worth 2)
+  // bucket misses into toronto days
   const days = {};
   for (const event of events) {
     const key = torontoDayKey(event.at);
     const record = days[key] || (days[key] = { k: 0, l: 0 });
-    const points = pointsForEvent(event);
     const sender = normalizeName(event.from);
-    if (sender === "khali") record.k += points;
-    if (sender === "lewis") record.l += points;
+    if (sender === "khali") record.k++;
+    if (sender === "lewis") record.l++;
   }
   // dated adjustments (khaliwins bypass + on-call bonuses) count in the day they happened
   for (const key in adjust) {
@@ -364,31 +343,6 @@ $("reset-btn").addEventListener("click", () => {
   startBtn.disabled = true;
   showSetup();
 });
-
-// ---- on-call crediting ----
-// every full 45 minutes of an active call adds +45 to both counters, exactly once,
-// no matter how many devices are open (the transaction claims blocks atomically)
-function creditCallBlocks(alsoEnd) {
-  if (!db) return;
-  let delta = 0;
-  db.ref("call").transaction((c) => {
-    if (!c || !c.on || typeof c.since !== "number") return alsoEnd ? { on: false } : c;
-    const blocks = Math.floor((serverNow() - c.since) / CALL_BLOCK_MS);
-    delta = Math.max(0, blocks - (c.credited || 0));
-    if (alsoEnd) return { on: false };
-    if (delta === 0) return; // nothing new — abort, no write
-    return { on: true, since: c.since, credited: blocks };
-  }, (error, committed) => {
-    if (error) {
-      console.error("call credit update failed:", error);
-      return;
-    }
-    if (committed && delta > 0) {
-      writeAdjust("khali", delta * CALL_BLOCK_PTS);
-      writeAdjust("lewis", delta * CALL_BLOCK_PTS);
-    }
-  });
-}
 
 function renderCall() {
   const callToggle = $("call-toggle");
@@ -480,10 +434,8 @@ beacon.addEventListener("click", async () => {
   try {
     if (!eventsRef) throw new Error("not connected");
     await serverClockReady;
-    const bonus = hourFor(normalizeName(name)) < 6;
     whenCache = {}; // recompute all "x min ago" times on every press
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
-    if (bonus) ev.x2 = true;
     await eventsRef.push(ev);
     localStorage.setItem("ily:lastSent", String(serverNow()));
     spawnHearts(7);

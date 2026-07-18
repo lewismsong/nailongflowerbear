@@ -227,8 +227,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.day-card:nth-child(4n + 2),
-.day-card:nth-child(4n + 3) {
+.day-card:nth-child(even) {
   background: rgba(255, 251, 236, 0.94);
 }
 

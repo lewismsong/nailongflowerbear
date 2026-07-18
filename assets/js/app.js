@@ -367,7 +367,7 @@ $("call-toggle").addEventListener("change", (e) => {
   if (e.target.checked) {
     db.ref("call").set({ on: true, since: firebase.database.ServerValue.TIMESTAMP, credited: 0 });
   } else {
-    creditCallBlocks(true); // pay out any earned blocks, then end the call
+    db.ref("call").set({ on: false });
   }
 });
 
@@ -511,7 +511,6 @@ setInterval(() => {
       }
       render();
       renderCall();
-      if (call && call.on) creditCallBlocks(false);
     } catch (error) {
       console.error("render failed:", error);
     }

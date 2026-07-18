@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#FFF4D6" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇫🇷</text></svg>" />
 <link rel="stylesheet" href="assets/css/styles.css?v=10" />
-<link rel="stylesheet" href="assets/css/france.css?v=4" />
+<link rel="stylesheet" href="assets/css/france.css?v=5" />
 </head>
 <body class="france-page">
 <main class="france-wrap">
@@ -50,19 +50,18 @@
     <div class="resv-grid">
       <div class="resv-col" data-type="train">
         <div class="resv-col-head">
-          <h3 class="resv-head">🚆 trains</h3>
-          <button class="resv-toggle" type="button" aria-expanded="false" aria-controls="resv-form-train" aria-label="add train reservation">+</button>
+          <h3 class="resv-head">🚆 trains/busses</h3>
+          <button class="resv-toggle" type="button" aria-expanded="false" aria-controls="resv-form-train" aria-label="add train/bus reservation">+</button>
         </div>
         <ul class="resv-list" id="resv-train"></ul>
         <form class="resv-form" id="resv-form-train" data-type="train" hidden>
           <input class="resv-input" name="title" placeholder="title: e.g. lyon to toulon" maxlength="80" required />
           <input class="resv-input" name="when" placeholder="date &amp; time: e.g. aug 21, 1:02pm" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
-          <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
           <div class="resv-form-actions">
             <button class="resv-cancel" type="button">cancel</button>
-            <button class="resv-add" type="submit">add train</button>
+            <button class="resv-add" type="submit">add train/bus</button>
           </div>
         </form>
       </div>
@@ -76,7 +75,6 @@
           <input class="resv-input" name="title" placeholder="title: e.g. hôtel alexandrine" maxlength="80" required />
           <input class="resv-input" name="when" placeholder="dates: e.g. aug 13-16" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
-          <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
           <div class="resv-form-actions">
             <button class="resv-cancel" type="button">cancel</button>
@@ -94,7 +92,6 @@
           <input class="resv-input" name="title" placeholder="title: e.g. bouillon pigalle" maxlength="80" required />
           <input class="resv-input" name="when" placeholder="date &amp; time: e.g. aug 14, 12pm" maxlength="60" />
           <input class="resv-input" name="address" placeholder="address (opens in maps)" maxlength="120" />
-          <input class="resv-input" name="link" placeholder="pdf / ticket link (optional)" maxlength="300" />
           <input class="resv-input" name="code" placeholder="confirmation # (optional)" maxlength="40" />
           <div class="resv-form-actions">
             <button class="resv-cancel" type="button">cancel</button>
@@ -113,7 +110,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="assets/js/config.js?v=1"></script>
-<script src="assets/js/france.js?v=4"></script>
+<script src="assets/js/france.js?v=6"></script>
 <script src="assets/js/navigation.js?v=11"></script>
 </body>
 </html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>our world 🐻‍❄️🐻</title>
+<meta name="theme-color" content="#FFF4D6" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>" />
+<link rel="stylesheet" href="assets/css/styles.css?v=11" />
+<link rel="stylesheet" href="assets/css/cities.css?v=6" />
+</head>
+<body class="cities-page">
+<main class="cities-wrap">
+  <header class="cities-header">
+    <p class="cities-eyebrow">🐻‍❄️ + 🐻 around the world</p>
+    <h1>places we've been</h1>
+    <p>add a city and scratch another country off our map</p>
+  </header>
+
+  <section class="city-search" aria-label="add a visited city">
+    <form class="city-search-form" id="city-search-form" autocomplete="off">
+      <div class="city-combobox">
+        <label class="sr-only" for="city-search">city name</label>
+        <input id="city-search" type="search" placeholder="try berlin or toronto" maxlength="80" role="combobox" aria-autocomplete="list" aria-controls="city-results" aria-expanded="false" />
+        <ul class="city-results" id="city-results" role="listbox" hidden></ul>
+      </div>
+      <button id="add-city" type="submit" aria-label="add selected city" title="add selected city" disabled>
+        <span aria-hidden="true">+</span>
+      </button>
+    </form>
+    <p class="city-search-status" id="city-search-status" role="status"></p>
+  </section>
+
+  <div class="travel-layout">
+    <section class="world-card" aria-labelledby="world-map-title">
+      <div class="world-card-heading">
+        <div>
+          <p class="section-kicker">scratch map</p>
+          <h2 id="world-map-title">the world</h2>
+        </div>
+        <p class="world-count" id="world-count">0 cities · 0 countries</p>
+      </div>
+      <div class="world-map" id="world-map" aria-label="world map showing countries we have visited">
+        <p class="map-loading">drawing the map...</p>
+      </div>
+      <p class="map-legend"><span aria-hidden="true"></span> somewhere we've been</p>
+    </section>
+
+    <section class="visits-card" aria-labelledby="visits-title">
+      <div class="visits-heading">
+        <div>
+          <p class="section-kicker">let's fill this up</p>
+          <h2 id="visits-title">visited cities</h2>
+        </div>
+        <span aria-hidden="true">🧳</span>
+      </div>
+      <p class="visits-empty" id="visits-empty">add some cities</p>
+      <ul class="visits-list" id="visits-list"></ul>
+      <p class="visits-error" id="visits-error" role="status"></p>
+    </section>
+  </div>
+</main>
+
+<bear-tab-nav current="cities"></bear-tab-nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cities.js?v=4"></script>
+<script src="assets/js/navigation.js?v=12"></script>
+</body>
+</html>

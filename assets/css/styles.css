@@ -178,6 +178,12 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
 .bear-tab:focus-visible { outline: 2px solid var(--yellow-deep); outline-offset: 2px; }
 .bear-tab-brand { margin: 0 auto 4px; }
 
+@media (max-width: 420px) {
+  .bear-tab-bar { width: 100%; gap: 5px; padding: 0 8px; }
+  .bear-tab { width: min(22vw, 78px); }
+  .bear-tab-icon, .bear-tab-image { width: min(22vw, 78px); height: min(20vw, 72px); }
+}
+
 /* floating hearts */
 #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .heart-float { position: absolute; bottom: 30%; animation: floatUp 2.6s ease-out forwards; filter: drop-shadow(0 2px 4px rgba(74,53,36,0.35)); }

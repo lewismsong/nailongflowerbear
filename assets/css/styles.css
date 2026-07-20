@@ -131,6 +131,8 @@ h2.feed-title { font-size: 13px; letter-spacing: 1.5px; color: var(--muted); mar
 .pc-time { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 
 /* france countdown */
+.total-box .num-time { font-size: 21px; }
+
 .france-box { cursor: pointer; -webkit-user-select: none; user-select: none; transition: transform 0.12s ease, box-shadow 0.12s ease; font-size: 13px; font-weight: 700; color: var(--text); text-align: center; margin: -8px 0 26px; padding: 12px 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
 
 /* on-call toggle */

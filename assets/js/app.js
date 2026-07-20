@@ -178,6 +178,16 @@ function renderStats() {
   $("my-count").textContent = Math.max(0, todayFor("lewis"));
   $("total-count").textContent = Math.max(0, totalFor("khali") + totalFor("lewis"));
 
+  // total time on call: banked hangups plus the live call, shown in hours
+  const bankedCallMs = Number(call && call.totalMs) || 0;
+  const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
+  const totalCallMs = bankedCallMs + liveCallMs;
+  const callMinutes = Math.floor(totalCallMs / 60000);
+  const callHours = totalCallMs / 3600000;
+  $("call-total").textContent = totalCallMs < 3600000
+    ? "📞 " + callMinutes + "m on call together"
+    : "📞 " + (callHours >= 100 ? Math.round(callHours) : callHours.toFixed(1)) + " hours on call together";
+
   const sends = (person) => events.filter((event) => normalizeName(event.from) === person).length;
   $("secret-stats").textContent = "🐻‍❄️ khali: " + sends("khali") + " sent (" + Math.max(0, totalFor("khali")) + " pts) · 🐻 lewis: " + sends("lewis") + " sent (" + Math.max(0, totalFor("lewis")) + " pts)";
 }
@@ -365,9 +375,17 @@ $("call-toggle").addEventListener("change", (e) => {
     return;
   }
   if (e.target.checked) {
-    db.ref("call").set({ on: true, since: firebase.database.ServerValue.TIMESTAMP });
+    db.ref("call").transaction((c) => ({
+      on: true,
+      since: serverNow(),
+      totalMs: Number(c && c.totalMs) || 0,
+    }));
   } else {
-    db.ref("call").set({ on: false });
+    db.ref("call").transaction((c) => {
+      const banked = Number(c && c.totalMs) || 0;
+      const active = c && c.on && typeof c.since === "number" ? Math.max(0, serverNow() - c.since) : 0;
+      return { on: false, totalMs: banked + active };
+    });
   }
 });
 

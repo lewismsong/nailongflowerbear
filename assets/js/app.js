@@ -178,15 +178,11 @@ function renderStats() {
   $("my-count").textContent = Math.max(0, todayFor("lewis"));
   $("total-count").textContent = Math.max(0, totalFor("khali") + totalFor("lewis"));
 
-  // total time on call: banked hangups plus the live call, shown in hours
+  // total time on call: banked hangups plus the live call, shown in minutes
   const bankedCallMs = Number(call && call.totalMs) || 0;
   const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
-  const totalCallMs = bankedCallMs + liveCallMs;
-  const callMinutes = Math.floor(totalCallMs / 60000);
-  const callHours = totalCallMs / 3600000;
-  $("call-total").textContent = totalCallMs < 3600000
-    ? "📞 " + callMinutes + "m on call together"
-    : "📞 " + (callHours >= 100 ? Math.round(callHours) : callHours.toFixed(1)) + " hours on call together";
+  const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
+  $("call-total").textContent = callMinutes.toLocaleString();
 
   const sends = (person) => events.filter((event) => normalizeName(event.from) === person).length;
   $("secret-stats").textContent = "🐻‍❄️ khali: " + sends("khali") + " sent (" + Math.max(0, totalFor("khali")) + " pts) · 🐻 lewis: " + sends("lewis") + " sent (" + Math.max(0, totalFor("lewis")) + " pts)";

@@ -182,7 +182,9 @@ function renderStats() {
   const bankedCallMs = Number(call && call.totalMs) || 0;
   const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
   const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
-  $("call-total").textContent = callMinutes.toLocaleString();
+  const callH = Math.floor(callMinutes / 60);
+  const callM = callMinutes % 60;
+  $("call-total").textContent = (callH ? callH + "h " : "") + callM + "m";
 
   const sends = (person) => events.filter((event) => normalizeName(event.from) === person).length;
   $("secret-stats").textContent = "🐻‍❄️ khali: " + sends("khali") + " sent (" + Math.max(0, totalFor("khali")) + " pts) · 🐻 lewis: " + sends("lewis") + " sent (" + Math.max(0, totalFor("lewis")) + " pts)";

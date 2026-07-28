@@ -50,10 +50,78 @@
 .todo-form button:active { transform: scale(0.97); }
 .todo-form button:disabled, .todo-form input:disabled { cursor: default; opacity: 0.55; }
 
-.todo-filters { display: inline-flex; gap: 3px; padding: 3px; margin-bottom: 14px; border-radius: 10px; background: rgba(74, 53, 36, 0.06); }
-.todo-filters button { min-height: 30px; padding: 5px 11px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; }
-.todo-filters button[aria-pressed="true"] { background: rgba(255, 255, 255, 0.92); color: var(--text); box-shadow: 0 2px 7px rgba(74, 53, 36, 0.08); }
-.todo-mobile-filters { display: none; }
+.todo-tab-row { display: flex; align-items: stretch; gap: 7px; }
+.todo-tabs {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(74, 53, 36, 0.06);
+  scrollbar-color: rgba(74, 53, 36, 0.2) transparent;
+  scrollbar-width: thin;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+.todo-tabs::-webkit-scrollbar { height: 4px; }
+.todo-tabs::-webkit-scrollbar-track { background: transparent; }
+.todo-tabs::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(74, 53, 36, 0.2); }
+.todo-tab, .todo-tab-add {
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+.todo-tab {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 5px 10px 5px 7px;
+  background: transparent;
+  color: var(--muted);
+  user-select: none;
+  white-space: nowrap;
+}
+.todo-tab[aria-selected="true"] { background: rgba(255, 255, 255, 0.92); color: var(--text); box-shadow: 0 2px 7px rgba(74, 53, 36, 0.08); }
+.todo-tab.dragging { opacity: 0.42; }
+.todo-tab.drop-before::before, .todo-tab.drop-after::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--blue-deep);
+}
+.todo-tab.drop-before::before { left: -3px; }
+.todo-tab.drop-after::after { right: -3px; }
+.todo-tab-grip { margin-right: 4px; color: rgba(74, 53, 36, 0.36); cursor: grab; font-size: 13px; line-height: 1; touch-action: none; }
+.todo-tab-grip:active { cursor: grabbing; }
+.todo-tab-name { pointer-events: none; }
+.todo-tab-input {
+  min-width: 48px;
+  max-width: 180px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  outline: 2px solid rgba(222, 155, 0, 0.35);
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+.todo-tab-add { flex: 0 0 40px; background: var(--yellow); color: var(--deep); font-size: 18px; }
+.todo-tab:focus-visible, .todo-tab-add:focus-visible, .todo-tab-actions button:focus-visible { outline: 2px solid var(--yellow-deep); outline-offset: 2px; }
+.todo-tab-actions { display: flex; justify-content: flex-end; gap: 10px; min-height: 28px; margin: 5px 3px 8px; }
+.todo-tab-actions button { border: 0; background: none; color: var(--muted); cursor: pointer; font: inherit; font-size: 10px; font-weight: 700; padding: 4px; }
+.todo-tab-actions button:hover { color: var(--text); }
+.todo-tab-actions button:disabled, .todo-tab-add:disabled { cursor: default; opacity: 0.45; }
 
 .todo-empty { color: var(--muted); font-size: 14px; text-align: center; margin: 52px 0; }
 .todo-list { display: flex; flex-direction: column; gap: 5px; list-style: none; margin: 0; padding: 0; }
@@ -84,10 +152,9 @@
   .my-bear { font-size: 21px; }
   .todo-form input { min-height: 42px; padding: 9px 10px; font-size: 16px; }
   .todo-form button { grid-column: auto; min-width: 56px; min-height: 42px; padding: 0 11px; }
-  .todo-filters { display: flex; width: 100%; margin-bottom: 12px; }
-  .todo-filters button { flex: 1; min-height: 34px; }
-  .todo-mobile-filters { display: flex; }
-  .todo-desktop-filters { display: none; }
+  .todo-tab-row { gap: 5px; }
+  .todo-tab { padding-inline: 10px; }
+  .todo-tab-actions { margin-bottom: 6px; }
   .todo-delete { opacity: 0.65; }
 }
 

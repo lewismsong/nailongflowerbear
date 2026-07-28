@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#FFF4D6" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" />
 <link rel="stylesheet" href="assets/css/styles.css?v=11" />
-<link rel="stylesheet" href="assets/css/todo.css?v=7" />
+<link rel="stylesheet" href="assets/css/todo.css?v=9" />
 </head>
 <body class="todo-page">
 <main class="todo-wrap">
@@ -22,16 +22,19 @@
     <div class="todo-person" id="todo-person"></div>
   </header>
 
-  <div class="todo-filters todo-mobile-filters" role="group" aria-label="filter list">
-    <button type="button" data-filter="all" aria-pressed="true">all</button>
-    <button type="button" data-filter="open" aria-pressed="false">open</button>
-    <button type="button" data-filter="done" aria-pressed="false">done</button>
+  <div class="todo-tab-row">
+    <div id="todo-tabs" class="todo-tabs" role="tablist" aria-label="lists"></div>
+    <button type="button" class="todo-tab-add" id="todo-list-add" aria-label="add a new list">+</button>
+  </div>
+  <div class="todo-tab-actions">
+    <button type="button" id="todo-list-rename">rename</button>
+    <button type="button" id="todo-list-delete">delete</button>
   </div>
 
-  <section class="scratchpad" aria-label="todo list">
+  <section class="scratchpad" id="todo-panel" role="tabpanel" aria-label="todo list">
     <div class="todo-progress">
       <div class="todo-progress-copy">
-        <span id="todo-count">0 open</span>
+        <span id="todo-count">choose a list</span>
         <span id="todo-progress-text">0 of 0 done</span>
       </div>
       <div class="todo-progress-track" aria-hidden="true">
@@ -45,12 +48,6 @@
       <button type="submit">add</button>
     </form>
 
-    <div class="todo-filters todo-desktop-filters" role="group" aria-label="filter list">
-      <button type="button" data-filter="all" aria-pressed="true">all</button>
-      <button type="button" data-filter="open" aria-pressed="false">open</button>
-      <button type="button" data-filter="done" aria-pressed="false">done</button>
-    </div>
-
     <p id="todo-empty" class="todo-empty">nothing here yet</p>
     <ul id="todo-list" class="todo-list"></ul>
     <p id="todo-error" class="todo-error" role="status"></p>
@@ -62,7 +59,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="assets/js/config.js"></script>
-<script src="assets/js/todo.js?v=5"></script>
+<script src="assets/js/todo.js?v=7"></script>
 <script src="assets/js/navigation.js?v=12"></script>
 </body>
 </html>

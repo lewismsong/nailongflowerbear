@@ -14,6 +14,10 @@ const partnerClock = $("partner-clock");
 const partnerClockLabel = $("pc-label");
 const partnerClockTime = $("pc-time");
 const franceBox = $("france-box");
+const callToggle = $("call-toggle");
+const callSubtitle = $("call-sub");
+const sleepBox = $("sleep-box");
+const sleepToggle = $("sleep-toggle");
 const CIRCUMFERENCE = 2 * Math.PI * 92;
 const RECENT_FEED_GROUPS = 5;
 const CALENDAR_DAYS = 28;
@@ -136,15 +140,17 @@ function renderBeacon(now) {
   const remaining = Math.min(COOLDOWN_MS, Math.max(0, COOLDOWN_MS - (now - myLastAt())));
   const cooling = remaining > 0;
   const onCall = !!(call && call.on);
+  const someoneSleeping = onCall && !!call.sleeping;
+  const missesPaused = onCall && !someoneSleeping;
 
-  beacon.disabled = cooling || onCall || missSending;
-  beacon.classList.toggle("cooling", cooling && !onCall);
-  beacon.classList.toggle("on-call", onCall);
-  beaconEmoji.textContent = onCall ? "📞" : cooling ? "⏳" : "🤍";
-  beaconLabel.textContent = onCall ? "on call" : cooling ? Math.ceil(remaining / 1000) + "s" : "I miss you";
-  beaconTiny.textContent = onCall ? "misses paused" : "until your next miss";
-  beaconTiny.classList.toggle("hidden", !cooling && !onCall);
-  ringFg.style.display = cooling && !onCall ? "" : "none";
+  beacon.disabled = cooling || missesPaused || missSending;
+  beacon.classList.toggle("cooling", cooling && !missesPaused);
+  beacon.classList.toggle("on-call", missesPaused);
+  beaconEmoji.textContent = missesPaused ? "📞" : cooling ? "⏳" : "🤍";
+  beaconLabel.textContent = missesPaused ? "on call" : cooling ? Math.ceil(remaining / 1000) + "s" : "I miss you";
+  beaconTiny.textContent = missesPaused ? "misses paused" : "until your next miss";
+  beaconTiny.classList.toggle("hidden", !cooling && !missesPaused);
+  ringFg.style.display = cooling && !missesPaused ? "" : "none";
   ringFg.setAttribute("stroke-dashoffset", CIRCUMFERENCE * (1 - remaining / COOLDOWN_MS));
 }
 
@@ -314,6 +320,7 @@ function showMain() {
   mainEl.classList.remove("hidden");
   $("who").textContent = name;
   render();
+  renderCall();
   renderFeed();
   renderCal();
 }
@@ -353,10 +360,12 @@ $("reset-btn").addEventListener("click", () => {
 });
 
 function renderCall() {
-  const callToggle = $("call-toggle");
-  const callSubtitle = $("call-sub");
   const on = !!(call && call.on);
+  const someoneSleeping = on && !!call.sleeping;
   if (callToggle.checked !== on) callToggle.checked = on;
+  sleepBox.classList.toggle("hidden", !on);
+  sleepToggle.disabled = !on;
+  if (sleepToggle.checked !== someoneSleeping) sleepToggle.checked = someoneSleeping;
   if (on && typeof call.since === "number") {
     const elapsed = Math.max(0, serverNow() - call.since);
     const hours = Math.floor(elapsed / (60 * 60 * 1000));
@@ -367,23 +376,50 @@ function renderCall() {
   }
 }
 
-$("call-toggle").addEventListener("change", (e) => {
+callToggle.addEventListener("change", async (event) => {
   if (!db) {
-    e.target.checked = false;
+    event.target.checked = false;
     return;
   }
-  if (e.target.checked) {
-    db.ref("call").transaction((c) => ({
-      on: true,
-      since: serverNow(),
-      totalMs: Number(c && c.totalMs) || 0,
-    }));
-  } else {
-    db.ref("call").transaction((c) => {
-      const banked = Number(c && c.totalMs) || 0;
-      const active = c && c.on && typeof c.since === "number" ? Math.max(0, serverNow() - c.since) : 0;
-      return { on: false, totalMs: banked + active };
+  try {
+    if (event.target.checked) {
+      await db.ref("call").transaction((currentCall) => ({
+        on: true,
+        since: serverNow(),
+        sleeping: false,
+        totalMs: Number(currentCall && currentCall.totalMs) || 0,
+      }));
+    } else {
+      await db.ref("call").transaction((currentCall) => {
+        const banked = Number(currentCall && currentCall.totalMs) || 0;
+        const active = currentCall && currentCall.on && typeof currentCall.since === "number"
+          ? Math.max(0, serverNow() - currentCall.since)
+          : 0;
+        return { on: false, sleeping: false, totalMs: banked + active };
+      });
+    }
+  } catch (error) {
+    console.error("call status update failed:", error);
+    $("err").textContent = "couldn't update the call — check your connection and try again";
+    renderCall();
+  }
+});
+
+sleepToggle.addEventListener("change", async (event) => {
+  if (!db || !(call && call.on)) {
+    event.target.checked = false;
+    return;
+  }
+  try {
+    const sleeping = event.target.checked;
+    await db.ref("call").transaction((currentCall) => {
+      if (!(currentCall && currentCall.on)) return currentCall;
+      return { ...currentCall, sleeping };
     });
+  } catch (error) {
+    console.error("sleep status update failed:", error);
+    $("err").textContent = "couldn't update sleep mode — check your connection and try again";
+    renderCall();
   }
 });
 

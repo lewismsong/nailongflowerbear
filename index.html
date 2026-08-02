@@ -120,7 +120,17 @@
     <ul id="feed"></ul>
     <button id="more-btn" class="hidden">see more</button>
 
-    <h2 class="feed-title cal-title">thinking of you</h2>
+    <div class="cal-head">
+      <h2 class="feed-title cal-title">thinking of you</h2>
+      <div class="cal-nav">
+        <button id="cal-prev" class="cal-arrow" type="button" aria-label="previous month">&#9664;</button>
+        <button id="cal-next" class="cal-arrow" type="button" aria-label="next month">&#9654;</button>
+      </div>
+    </div>
+    <p class="cal-month" id="cal-month"></p>
+    <div id="cal-dows">
+      <span>s</span><span>m</span><span>t</span><span>w</span><span>t</span><span>f</span><span>s</span>
+    </div>
     <div id="cal-grid"></div>
     <p class="cal-legend">
       <span class="dot dk"></span> khali won

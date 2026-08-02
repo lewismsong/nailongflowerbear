@@ -158,8 +158,6 @@ h2.feed-title.cal-title { margin: 0; }
 .cal-month { font-family: 'Fraunces', Georgia, serif; font-size: 15px; font-weight: 700; margin: 0 0 8px; }
 #cal-dows { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 5px; }
 #cal-dows span { text-align: center; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
-.dn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: 700; color: rgba(61,52,43,0.55); line-height: 1; }
-#cal-grid .day.k .dn, #cal-grid .day.l .dn, #cal-grid .day.b .dn { color: rgba(255,255,255,0.95); text-shadow: 0 1px 2px rgba(74,53,36,0.45); }
 #cal-grid .day.outside { opacity: 0.4; }
 #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 #cal-grid .day { aspect-ratio: 1; border-radius: 7px; background: var(--card); border: 1px solid var(--card-edge); position: relative; overflow: hidden; }

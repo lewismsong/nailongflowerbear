@@ -258,9 +258,21 @@ function timeLeftToronto() {
   return Math.floor(minutesLeft / 60) + "h " + (minutesLeft % 60) + "m";
 }
 
-function renderCal() {
-  const grid = $("cal-grid");
-  // bucket misses into toronto days
+let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
+
+function torontoParts(timestamp) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(new Date(timestamp));
+  const value = (type) => Number(parts.find((part) => part.type === type).value);
+  return { year: value("year"), month: value("month"), day: value("day") };
+}
+
+function dayKeyFromParts(year, month, day) {
+  return year + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+}
+
+function dayScores() {
   const days = {};
   for (const event of events) {
     const key = torontoDayKey(event.at);
@@ -278,17 +290,51 @@ function renderCal() {
       record.l += Number(dayAdjustments.lewis) || 0;
     }
   }
+  return days;
+}
+
+function renderCal() {
+  const grid = $("cal-grid");
+  const days = dayScores();
   const todayKey = torontoDayKey(serverNow());
+  const todayParts = torontoParts(serverNow());
+
+  // the month being viewed
+  const viewed = new Date(todayParts.year, todayParts.month - 1 + calMonthOffset, 1);
+  const viewYear = viewed.getFullYear();
+  const viewMonth = viewed.getMonth() + 1;
+  $("cal-month").textContent = viewed
+    .toLocaleDateString(undefined, { month: "long", year: "numeric" })
+    .toLowerCase();
+  // no peeking at months that haven't happened
+  $("cal-next").disabled = calMonthOffset >= 0;
+
+  // grid starts on the sunday of the week containing the 1st.
+  // 5 rows covers most months; a 6th only appears when the month genuinely spills over
+  const firstOfMonth = new Date(viewYear, viewMonth - 1, 1);
+  const gridStart = new Date(viewYear, viewMonth - 1, 1 - firstOfMonth.getDay());
+  const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
+  const cellCount = Math.ceil((firstOfMonth.getDay() + daysInMonth) / 7) * 7;
+
   grid.innerHTML = "";
-  for (let index = 0; index < CALENDAR_DAYS; index++) {
-    const key = torontoDayKey(serverNow() - index * MILLISECONDS_PER_DAY);
+  for (let index = 0; index < cellCount; index++) {
+    const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
+    const key = dayKeyFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const record = days[key] || { k: 0, l: 0 };
+
     const cell = document.createElement("div");
     cell.className = "day";
+    if (date.getMonth() + 1 !== viewMonth) cell.classList.add("outside");
     if (record.k > record.l) cell.classList.add("k");
     else if (record.l > record.k) cell.classList.add("l");
     else if (record.k > 0) cell.classList.add("b");
     if (key === todayKey) cell.classList.add("today");
+
+    const number = document.createElement("span");
+    number.className = "dn";
+    number.textContent = date.getDate();
+    cell.appendChild(number);
+
     if (record.k > 0 || record.l > 0) {
       const khaliScore = document.createElement("span");
       khaliScore.className = "ds ds-k";
@@ -301,6 +347,7 @@ function renderCal() {
     cell.title = key + " · khali " + record.k + " – " + record.l + " lewis";
     grid.appendChild(cell);
   }
+
   // trophy count: completed days only — today isn't decided yet
   let khaliWins = 0;
   let lewisWins = 0;
@@ -314,6 +361,17 @@ function renderCal() {
   const today = days[todayKey] || { k: 0, l: 0 };
   $("today-score").textContent = "today: khali " + today.k + " – " + today.l + " lewis · " + timeLeftToronto() + " left in the day";
 }
+
+$("cal-prev").addEventListener("click", () => {
+  calMonthOffset -= 1;
+  renderCal();
+});
+
+$("cal-next").addEventListener("click", () => {
+  if (calMonthOffset >= 0) return;
+  calMonthOffset += 1;
+  renderCal();
+});
 
 function showMain() {
   setupEl.classList.add("hidden");

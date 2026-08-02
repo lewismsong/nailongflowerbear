@@ -330,11 +330,6 @@ function renderCal() {
     else if (record.k > 0) cell.classList.add("b");
     if (key === todayKey) cell.classList.add("today");
 
-    const number = document.createElement("span");
-    number.className = "dn";
-    number.textContent = date.getDate();
-    cell.appendChild(number);
-
     if (record.k > 0 || record.l > 0) {
       const khaliScore = document.createElement("span");
       khaliScore.className = "ds ds-k";

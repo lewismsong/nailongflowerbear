@@ -259,6 +259,7 @@ function timeLeftToronto() {
 }
 
 let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
+const CAL_FIRST_MONTH = { year: 2026, month: 7 }; // nothing exists before july 2026
 
 function torontoParts(timestamp) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -306,8 +307,11 @@ function renderCal() {
   $("cal-month").textContent = viewed
     .toLocaleDateString(undefined, { month: "long", year: "numeric" })
     .toLowerCase();
-  // no peeking at months that haven't happened
+  // no peeking at months that haven't happened, or before the app existed
   $("cal-next").disabled = calMonthOffset >= 0;
+  $("cal-prev").disabled =
+    viewYear < CAL_FIRST_MONTH.year ||
+    (viewYear === CAL_FIRST_MONTH.year && viewMonth <= CAL_FIRST_MONTH.month);
 
   // grid starts on the sunday of the week containing the 1st.
   // 5 rows covers most months; a 6th only appears when the month genuinely spills over
@@ -358,6 +362,7 @@ function renderCal() {
 }
 
 $("cal-prev").addEventListener("click", () => {
+  if ($("cal-prev").disabled) return;
   calMonthOffset -= 1;
   renderCal();
 });

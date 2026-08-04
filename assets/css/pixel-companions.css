@@ -1,0 +1,144 @@
+.pixel-cat {
+  position: fixed;
+  z-index: 60;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: 92px;
+  height: 92px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pixel-cat.dragging { cursor: grabbing; }
+.pixel-cat.in-house { visibility: hidden; pointer-events: none; }
+.pixel-cat-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--cat-direction, 1)); }
+.pixel-cat-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("../images/cat-sprite-sheet-v3.png") 0 25% / 600% 500% no-repeat;
+  filter: drop-shadow(0 3px 2px rgba(74,53,36,0.16));
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+}
+.pixel-cat[data-behavior="walking"] .pixel-cat-sprite { background-position: 0 0; animation: pixelCatWalkFrames 0.64s steps(1, end) infinite, pixelCatWalkBounce 0.64s ease-in-out infinite; }
+.pixel-cat[data-behavior="idle"] .pixel-cat-sprite { background-position: 0 25%; animation: pixelCatIdleFrames 3.2s steps(1, end) infinite; }
+.pixel-cat[data-behavior="sitting"] .pixel-cat-sprite { background-position: 0 50%; animation: pixelCatSittingFrames 4.8s steps(1, end) infinite; }
+.pixel-cat[data-behavior="rolling"] .pixel-cat-sprite { background-position: 0 75%; animation: pixelCatRollingFrames 3.6s steps(1, end) infinite; }
+.pixel-cat[data-behavior="playing"] .pixel-cat-sprite { background-position: 0 100%; animation: pixelCatPlayingFrames 3s steps(1, end) infinite; }
+.pixel-cat.loved .pixel-cat-sprite { animation: pixelCatLove 0.5s steps(3, end); }
+.pixel-cat:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
+
+.pixel-house {
+  position: fixed;
+  z-index: 55;
+  width: 156px;
+  height: auto;
+  aspect-ratio: 512 / 395;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  cursor: grab;
+  filter: drop-shadow(0 4px 3px rgba(74,53,36,0.18));
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pixel-house.dragging { cursor: grabbing; }
+.pixel-house-image { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.pixel-house-zzz {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  top: -12px;
+  left: 70%;
+  color: var(--blue-deep);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  pointer-events: none;
+}
+.pixel-house.sleeping .pixel-house-zzz { display: flex; align-items: flex-end; gap: 1px; }
+.pixel-house-zzz span { opacity: 0; animation: pixelHouseZzz 2.1s steps(4, end) infinite; }
+.pixel-house-zzz span:nth-child(2) { font-size: 17px; animation-delay: 0.35s; }
+.pixel-house-zzz span:nth-child(3) { font-size: 20px; animation-delay: 0.7s; }
+.pixel-house.shaking { animation: pixelHouseShake 0.32s ease-in-out; }
+.pixel-house:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
+
+.pixel-cat-heart {
+  position: fixed;
+  z-index: 80;
+  width: 14px;
+  height: 12px;
+  color: var(--heart-color);
+  pointer-events: none;
+  animation: pixelCatHeartFloat 1.55s steps(12, end) var(--heart-delay) forwards;
+}
+.pixel-cat-heart svg { display: block; width: 100%; height: 100%; fill: currentColor; filter: drop-shadow(0 2px 1px rgba(74,53,36,0.12)); }
+
+@keyframes pixelCatWalkFrames {
+  0%, 16.5%, 100% { background-position: 0 0; }
+  16.6%, 33.2% { background-position: 20% 0; }
+  33.3%, 49.9% { background-position: 40% 0; }
+  50%, 66.5% { background-position: 60% 0; }
+  66.6%, 83.2% { background-position: 80% 0; }
+  83.3%, 99.9% { background-position: 100% 0; }
+}
+@keyframes pixelCatWalkBounce { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-1px); } }
+@keyframes pixelCatIdleFrames {
+  0%, 22%, 100% { background-position: 0 25%; }
+  22.1%, 32% { background-position: 20% 25%; }
+  32.1%, 48% { background-position: 40% 25%; }
+  48.1%, 64% { background-position: 60% 25%; }
+  64.1%, 80% { background-position: 80% 25%; }
+  80.1%, 99.9% { background-position: 100% 25%; }
+}
+@keyframes pixelCatSittingFrames {
+  0%, 19.9%, 100% { background-position: 0 50%; }
+  20%, 39.9% { background-position: 20% 50%; }
+  40%, 54.9% { background-position: 40% 50%; }
+  55%, 64.9% { background-position: 60% 50%; }
+  65%, 82.9% { background-position: 80% 50%; }
+  83%, 99.9% { background-position: 100% 50%; }
+}
+@keyframes pixelCatRollingFrames {
+  0%, 16.5%, 100% { background-position: 0 75%; }
+  16.6%, 33.2% { background-position: 20% 75%; }
+  33.3%, 49.9% { background-position: 40% 75%; }
+  50%, 66.5% { background-position: 60% 75%; }
+  66.6%, 83.2% { background-position: 80% 75%; }
+  83.3%, 99.9% { background-position: 100% 75%; }
+}
+@keyframes pixelCatPlayingFrames {
+  0%, 16.5%, 100% { background-position: 0 100%; }
+  16.6%, 33.2% { background-position: 20% 100%; }
+  33.3%, 49.9% { background-position: 40% 100%; }
+  50%, 66.5% { background-position: 60% 100%; }
+  66.6%, 83.2% { background-position: 40% 100%; }
+  83.3%, 99.9% { background-position: 20% 100%; }
+}
+@keyframes pixelCatLove { 0%, 100% { transform: translateY(0) scale(1); } 35% { transform: translateY(-7px) scale(1.04); } 65% { transform: translateY(-2px) scale(0.98); } }
+@keyframes pixelHouseShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-2px) rotate(-0.7deg); } 50% { transform: translateX(2px) rotate(0.7deg); } 75% { transform: translateX(-1px) rotate(-0.35deg); } }
+@keyframes pixelHouseZzz { 0%, 18% { opacity: 0; transform: translate(0, 3px); } 28%, 72% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -12px); } }
+@keyframes pixelCatHeartFloat {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--heart-drift)), -92px) scale(1.05); }
+}
+
+@media (max-width: 520px) {
+  .pixel-cat { width: 80px; height: 80px; }
+  .pixel-house { width: 132px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-cat-sprite, .pixel-house-zzz span { animation: none !important; }
+  .pixel-house.sleeping .pixel-house-zzz span { opacity: 1; }
+  .pixel-house.shaking { animation: pixelHouseShake 0.18s ease-in-out; }
+  .pixel-cat-heart { animation-duration: 0.7s; animation-timing-function: ease-out; }
+}

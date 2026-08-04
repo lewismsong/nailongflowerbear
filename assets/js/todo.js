@@ -8,7 +8,7 @@ const DEFAULT_TODO_LISTS = [
 ];
 const RESERVED_TODO_KEYS = new Set(["items", "lists", "meta"]);
 
-const todoName = (localStorage.getItem("ily:name") || "").trim().toLowerCase();
+const todoName = appStorage.get("ily:name", "").trim().toLowerCase();
 const todoBears = { khali: "🐻‍❄️", lewis: "🐻" };
 const todoList = document.getElementById("todo-list");
 const todoEmpty = document.getElementById("todo-empty");
@@ -33,7 +33,7 @@ const todoTimeFormatter = new Intl.DateTimeFormat([], { hour: "numeric", minute:
 
 let todoLists = [];
 let todos = [];
-let activeListId = localStorage.getItem(ACTIVE_LIST_STORAGE_KEY);
+let activeListId = appStorage.get(ACTIVE_LIST_STORAGE_KEY);
 let todoRootRef = null;
 let todoListsRef = null;
 let todoItemsRef = null;
@@ -74,12 +74,16 @@ function activeTodoList() {
   return todoLists.find((list) => list.id === activeListId) || null;
 }
 
+function persistActiveListId() {
+  if (activeListId) appStorage.set(ACTIVE_LIST_STORAGE_KEY, activeListId);
+  else appStorage.remove(ACTIVE_LIST_STORAGE_KEY);
+}
+
 function setActiveList(id) {
   if (activeListId === id && editingListId === null) return;
   editingListId = null;
   activeListId = id || null;
-  if (activeListId) localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
-  else localStorage.removeItem(ACTIVE_LIST_STORAGE_KEY);
+  persistActiveListId();
   renderTodos();
 }
 
@@ -87,8 +91,7 @@ function ensureActiveList() {
   if (activeTodoList()) return;
   const defaultList = todoLists.find((list) => list.id === "todos");
   activeListId = defaultList?.id || todoLists[0]?.id || null;
-  if (activeListId) localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
-  else localStorage.removeItem(ACTIVE_LIST_STORAGE_KEY);
+  persistActiveListId();
 }
 
 function syncTodoControls() {
@@ -561,7 +564,7 @@ async function addTodoList() {
 
   const listRef = todoListsRef.push();
   activeListId = listRef.key;
-  localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
+  persistActiveListId();
   try {
     await listRef.set({ name, order: Date.now() });
     showTodoError("");
@@ -576,7 +579,7 @@ async function addTodoList() {
 function startInlineListRename(list = activeTodoList()) {
   if (!todoListsRef || !list) return;
   activeListId = list.id;
-  localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
+  persistActiveListId();
   editingListId = list.id;
   renderTodos();
   requestAnimationFrame(() => {
@@ -623,8 +626,7 @@ async function deleteActiveTodoList() {
   }
   const nextList = todoLists.find((candidate) => candidate.id !== list.id);
   activeListId = nextList?.id || null;
-  if (activeListId) localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
-  else localStorage.removeItem(ACTIVE_LIST_STORAGE_KEY);
+  persistActiveListId();
 
   try {
     await todoRootRef.update(updates);
@@ -633,7 +635,7 @@ async function deleteActiveTodoList() {
     console.error("todo list deletion failed:", error);
     showTodoError("couldn't delete that list — check your connection and try again");
     activeListId = list.id;
-    localStorage.setItem(ACTIVE_LIST_STORAGE_KEY, activeListId);
+    persistActiveListId();
     renderTodos();
   }
 }
@@ -681,8 +683,7 @@ if (!validTodoUser) {
 
 if (firebaseConfig.databaseURL) {
   try {
-    firebase.initializeApp(firebaseConfig);
-    todoRootRef = firebase.database().ref(TODO_ROOT_PATH);
+    todoRootRef = initializeFirebaseDatabase().ref(TODO_ROOT_PATH);
     todoListsRef = todoRootRef.child("lists");
     todoItemsRef = todoRootRef.child("items");
     subscribeToTodos();

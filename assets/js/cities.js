@@ -471,7 +471,7 @@ cityForm.addEventListener("submit", async (event) => {
       longitude: Number(selectedCity.longitude),
       visitFrom: "",
       visitTo: "",
-      addedBy: localStorage.getItem("ily:name") || "unknown",
+      addedBy: appStorage.get("ily:name", "unknown"),
       createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
     cityInput.value = "";
@@ -490,8 +490,7 @@ renderVisits();
 
 if (firebaseConfig.databaseURL) {
   try {
-    firebase.initializeApp(firebaseConfig);
-    visitsRef = firebase.database().ref("visitedCities");
+    visitsRef = initializeFirebaseDatabase().ref("visitedCities");
     subscribeToVisits();
   } catch (error) {
     console.error("firebase initialization failed:", error);

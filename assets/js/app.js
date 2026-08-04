@@ -22,7 +22,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 92;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
-let name = localStorage.getItem("ily:name") || null;
+let name = appStorage.get("ily:name");
 let events = [];
 let db = null;
 let eventsRef = null;
@@ -56,6 +56,10 @@ function personPoints(person) {
 
 function totalFor(person) {
   return personPoints(person) + adjustTotal(person);
+}
+
+function allTimeAdjustment() {
+  return Number(adjust.allTime) || 0;
 }
 
 // misses for one toronto day, including that day's adjustments
@@ -119,7 +123,7 @@ function theirEvents() {
 function myLastAt() {
   const sentEvents = myEvents();
   const fromFeed = sentEvents.length ? sentEvents[sentEvents.length - 1].at : 0;
-  const fromLocal = Number(localStorage.getItem("ily:lastSent") || 0);
+  const fromLocal = Number(appStorage.get("ily:lastSent", "0"));
   return Math.max(fromFeed, fromLocal);
 }
 
@@ -172,7 +176,8 @@ function renderStats() {
   $("yesterday-khali-count").textContent = Math.max(0, dayPoints("khali", yesterdayKey));
   $("yesterday-lewis-count").textContent = Math.max(0, dayPoints("lewis", yesterdayKey));
   const completedMisses = totalFor("khali") + totalFor("lewis")
-    - dayPoints("khali", todayKey) - dayPoints("lewis", todayKey);
+    - dayPoints("khali", todayKey) - dayPoints("lewis", todayKey)
+    + allTimeAdjustment();
   $("total-count").textContent = Math.max(0, completedMisses);
   $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
 
@@ -228,21 +233,22 @@ function torontoDayKey(t) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(t));
 }
 
-function timeLeftToronto() {
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: GAME_TZ, hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date(serverNow()));
-  const hours = Number(parts.find((part) => part.type === "hour").value) % 24;
-  const minutes = Number(parts.find((part) => part.type === "minute").value);
-  const minutesLeft = 24 * 60 - (hours * 60 + minutes);
-  return Math.floor(minutesLeft / 60) + "h " + (minutesLeft % 60) + "m";
-}
-
-function revealCountdownToronto() {
+function secondsUntilTorontoMidnight() {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: GAME_TZ, hour: "numeric", minute: "numeric", second: "numeric", hour12: false,
   }).formatToParts(new Date(serverNow()));
   const value = (type) => Number(parts.find((part) => part.type === type).value);
   const secondsElapsed = (value("hour") % 24) * 3600 + value("minute") * 60 + value("second");
-  const secondsLeft = 24 * 3600 - secondsElapsed;
+  return 24 * 3600 - secondsElapsed;
+}
+
+function timeLeftToronto() {
+  const minutesLeft = Math.ceil(secondsUntilTorontoMidnight() / 60);
+  return Math.floor(minutesLeft / 60) + "h " + (minutesLeft % 60) + "m";
+}
+
+function revealCountdownToronto() {
+  const secondsLeft = secondsUntilTorontoMidnight();
   const hours = Math.floor(secondsLeft / 3600);
   const minutes = Math.floor((secondsLeft % 3600) / 60);
   const seconds = secondsLeft % 60;
@@ -279,7 +285,7 @@ function dayScores() {
     if (sender === "khali") record.k++;
     if (sender === "lewis") record.l++;
   }
-  // dated adjustments (khaliwins bypass) count in the day they happened
+  // preserve existing dated adjustments in their original day
   for (const key in adjust) {
     const dayAdjustments = adjust[key];
     if (dayAdjustments && typeof dayAdjustments === "object") {
@@ -402,7 +408,7 @@ startBtn.addEventListener("click", () => {
   }
   $("name-err").textContent = "";
   name = enteredName;
-  localStorage.setItem("ily:name", enteredName);
+  appStorage.set("ily:name", enteredName);
   prevIncoming = null;
   showMain();
 });
@@ -410,7 +416,7 @@ startBtn.addEventListener("click", () => {
 $("france-box").addEventListener("click", () => { location.href = "france.html?v=1"; });
 
 $("reset-btn").addEventListener("click", () => {
-  localStorage.removeItem("ily:name");
+  appStorage.remove("ily:name");
   name = null;
   nameIn.value = "";
   startBtn.disabled = true;
@@ -516,7 +522,7 @@ beacon.addEventListener("click", async () => {
     await serverClockReady;
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
     await eventsRef.push(ev);
-    localStorage.setItem("ily:lastSent", String(serverNow()));
+    appStorage.set("ily:lastSent", serverNow());
     spawnHearts(7);
     render();
     renderFeed();
@@ -532,8 +538,7 @@ beacon.addEventListener("click", async () => {
 // ---- firebase ----
 if (configured) {
   try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
+    db = initializeFirebaseDatabase();
     eventsRef = db.ref("misses");
     db.ref(".info/serverTimeOffset").on("value", (s) => {
       serverOffset = s.val() || 0;

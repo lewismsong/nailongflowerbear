@@ -1,3 +1,5 @@
+requireAuthenticatedUser();
+
 const CITY_SEARCH_ENDPOINT = "https://geocoding-api.open-meteo.com/v1/search";
 const CITY_SEARCH_DELAY = 350;
 const cityForm = document.getElementById("city-search-form");
@@ -471,7 +473,7 @@ cityForm.addEventListener("submit", async (event) => {
       longitude: Number(selectedCity.longitude),
       visitFrom: "",
       visitTo: "",
-      addedBy: localStorage.getItem("ily:name") || "unknown",
+      addedBy: appStorage.get("ily:name", "unknown"),
       createdAt: firebase.database.ServerValue.TIMESTAMP,
     });
     cityInput.value = "";
@@ -490,8 +492,7 @@ renderVisits();
 
 if (firebaseConfig.databaseURL) {
   try {
-    firebase.initializeApp(firebaseConfig);
-    visitsRef = firebase.database().ref("visitedCities");
+    visitsRef = initializeFirebaseDatabase().ref("visitedCities");
     subscribeToVisits();
   } catch (error) {
     console.error("firebase initialization failed:", error);

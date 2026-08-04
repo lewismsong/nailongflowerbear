@@ -1,5 +1,7 @@
-firebase.initializeApp(firebaseConfig);
-const franceRef = firebase.database().ref("france");
+requireAuthenticatedUser();
+
+const franceDatabase = initializeFirebaseDatabase();
+const franceRef = franceDatabase.ref("france");
 
 // the plan so far, written into the shared itinerary once, then freely editable
 const DEFAULT_PLANS = {

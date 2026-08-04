@@ -1,3 +1,5 @@
+requireAuthenticatedUser();
+
 const coinButton = document.getElementById("coin");
 const coin = coinButton.querySelector(".coin");
 const coinResult = document.getElementById("coin-result");

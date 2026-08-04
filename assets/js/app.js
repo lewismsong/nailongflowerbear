@@ -19,18 +19,15 @@ const callSubtitle = $("call-sub");
 const sleepBox = $("sleep-box");
 const sleepToggle = $("sleep-toggle");
 const CIRCUMFERENCE = 2 * Math.PI * 92;
-const RECENT_FEED_GROUPS = 5;
-const CALENDAR_DAYS = 28;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
-let name = localStorage.getItem("ily:name") || null;
+let name = currentAuthenticatedUser();
 let events = [];
 let db = null;
 let eventsRef = null;
 let prevIncoming = null;
 let adjust = {};
-let adminMode = false;
 let call = null;
 let missSending = false;
 let resolveServerClock;
@@ -39,13 +36,7 @@ const serverClockReady = new Promise((resolve) => {
 });
 
 const normalizeName = (value) => (value || "").trim().toLowerCase();
-let whenCache = {};
 
-// adjustments are stored per toronto day so they count in the daily battle too
-function writeAdjust(person, delta) {
-  if (!db) return;
-  db.ref("adjust/" + torontoDayKey(serverNow()) + "/" + person).transaction((v) => (v || 0) + delta);
-}
 function adjustTotal(person) {
   let sum = 0;
   for (const key in adjust) {
@@ -67,6 +58,10 @@ function totalFor(person) {
   return personPoints(person) + adjustTotal(person);
 }
 
+function allTimeAdjustment() {
+  return Number(adjust.allTime) || 0;
+}
+
 // misses for one toronto day, including that day's adjustments
 function dayPoints(person, key) {
   let total = events.filter((event) => normalizeName(event.from) === person && torontoDayKey(event.at) === key).length;
@@ -75,10 +70,6 @@ function dayPoints(person, key) {
     total += Number(dayAdjustments[person]) || 0;
   }
   return total;
-}
-
-function todayFor(person) {
-  return dayPoints(person, torontoDayKey(serverNow()));
 }
 
 // server-synced clock is immune to device clock changes
@@ -132,7 +123,7 @@ function theirEvents() {
 function myLastAt() {
   const sentEvents = myEvents();
   const fromFeed = sentEvents.length ? sentEvents[sentEvents.length - 1].at : 0;
-  const fromLocal = Number(localStorage.getItem("ily:lastSent") || 0);
+  const fromLocal = Number(appStorage.get("ily:lastSent", "0"));
   return Math.max(fromFeed, fromLocal);
 }
 
@@ -180,9 +171,15 @@ function renderFranceCountdown(now) {
 }
 
 function renderStats() {
-  $("their-count").textContent = Math.max(0, todayFor("khali"));
-  $("my-count").textContent = Math.max(0, todayFor("lewis"));
-  $("total-count").textContent = Math.max(0, totalFor("khali") + totalFor("lewis"));
+  const todayKey = torontoDayKey(serverNow());
+  const yesterdayKey = previousTorontoDayKey(serverNow());
+  $("yesterday-khali-count").textContent = Math.max(0, dayPoints("khali", yesterdayKey));
+  $("yesterday-lewis-count").textContent = Math.max(0, dayPoints("lewis", yesterdayKey));
+  const completedMisses = totalFor("khali") + totalFor("lewis")
+    - dayPoints("khali", todayKey) - dayPoints("lewis", todayKey)
+    + allTimeAdjustment();
+  $("total-count").textContent = Math.max(0, completedMisses);
+  $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
 
   // total time on call: banked hangups plus the live call, shown in minutes
   const bankedCallMs = Number(call && call.totalMs) || 0;
@@ -191,9 +188,6 @@ function renderStats() {
   const callH = Math.floor(callMinutes / 60);
   const callM = callMinutes % 60;
   $("call-total").textContent = (callH ? callH + "h " : "") + callM + "m";
-
-  const sends = (person) => events.filter((event) => normalizeName(event.from) === person).length;
-  $("secret-stats").textContent = "🐻‍❄️ khali: " + sends("khali") + " sent (" + Math.max(0, totalFor("khali")) + " pts) · 🐻 lewis: " + sends("lewis") + " sent (" + Math.max(0, totalFor("lewis")) + " pts)";
 }
 
 function render() {
@@ -205,57 +199,60 @@ function render() {
   renderStats();
 }
 
-let feedExpanded = false;
-
 function renderFeed() {
   const feedEl = $("feed");
-  // group consecutive misses from the same person
-  const groups = [];
-  for (const event of events) {
-    const last = groups[groups.length - 1];
-    if (last && normalizeName(last.from) === normalizeName(event.from)) {
-      last.items.push(event);
-    } else {
-      groups.push({ from: event.from, items: [event] });
-    }
-  }
-  const items = (feedExpanded ? groups.slice() : groups.slice(-RECENT_FEED_GROUPS)).reverse();
-  const moreBtn = $("more-btn");
-  moreBtn.classList.toggle("hidden", groups.length <= RECENT_FEED_GROUPS);
-  moreBtn.textContent = feedExpanded ? "see less" : "see more (" + groups.length + " total)";
-  $("empty").classList.toggle("hidden", items.length > 0);
+  const latest = events[events.length - 1];
+  $("empty").classList.toggle("hidden", Boolean(latest));
   feedEl.innerHTML = "";
-  for (const group of items) {
-    const latest = group.items[group.items.length - 1];
-    const count = group.items.length;
-    if (!whenCache[latest.at]) whenCache[latest.at] = ago(latest.at, serverNow());
-    const normalizedSender = normalizeName(group.from);
-    const mineItem = normalizedSender === normalizeName(name);
-    const li = document.createElement("li");
-    if (normalizedSender === "khali") li.classList.add("khali");
-    if (normalizedSender === "lewis") li.classList.add("lewis");
-    if (count > 1) li.classList.add("multi");
-    const what = document.createElement("span");
-    what.className = "what";
-    what.textContent = (mineItem ? "💌 you sent a miss" : "💌 " + group.from + " missed you") + (count > 1 ? " ×" + count : "");
-    const when = document.createElement("span");
-    when.className = "when";
-    when.textContent = whenCache[latest.at];
-    li.append(what, when);
-    feedEl.appendChild(li);
-  }
+  if (!latest) return;
+
+  const normalizedSender = normalizeName(latest.from);
+  const sender = normalizedSender === "khali" ? "khali" : normalizedSender === "lewis" ? "lewis" : latest.from;
+  const li = document.createElement("li");
+  if (normalizedSender === "khali") li.classList.add("khali");
+  if (normalizedSender === "lewis") li.classList.add("lewis");
+  const what = document.createElement("span");
+  what.className = "what";
+  what.textContent = "💌 last sent by " + sender;
+  const when = document.createElement("span");
+  when.className = "when";
+  when.dataset.timestamp = latest.at;
+  when.textContent = ago(latest.at, serverNow());
+  li.append(what, when);
+  feedEl.appendChild(li);
+}
+
+function refreshLatestMissTime() {
+  const when = $("feed").querySelector(".when");
+  if (!when) return;
+  const timestamp = Number(when.dataset.timestamp);
+  if (Number.isFinite(timestamp)) when.textContent = ago(timestamp, serverNow());
 }
 
 function torontoDayKey(t) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(t));
 }
 
+function secondsUntilTorontoMidnight() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: GAME_TZ, hour: "numeric", minute: "numeric", second: "numeric", hour12: false,
+  }).formatToParts(new Date(serverNow()));
+  const value = (type) => Number(parts.find((part) => part.type === type).value);
+  const secondsElapsed = (value("hour") % 24) * 3600 + value("minute") * 60 + value("second");
+  return 24 * 3600 - secondsElapsed;
+}
+
 function timeLeftToronto() {
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: GAME_TZ, hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date(serverNow()));
-  const hours = Number(parts.find((part) => part.type === "hour").value) % 24;
-  const minutes = Number(parts.find((part) => part.type === "minute").value);
-  const minutesLeft = 24 * 60 - (hours * 60 + minutes);
+  const minutesLeft = Math.ceil(secondsUntilTorontoMidnight() / 60);
   return Math.floor(minutesLeft / 60) + "h " + (minutesLeft % 60) + "m";
+}
+
+function revealCountdownToronto() {
+  const secondsLeft = secondsUntilTorontoMidnight();
+  const hours = Math.floor(secondsLeft / 3600);
+  const minutes = Math.floor((secondsLeft % 3600) / 60);
+  const seconds = secondsLeft % 60;
+  return hours + "h " + String(minutes).padStart(2, "0") + "m " + String(seconds).padStart(2, "0") + "s";
 }
 
 let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
@@ -273,6 +270,12 @@ function dayKeyFromParts(year, month, day) {
   return year + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
 }
 
+function previousTorontoDayKey(timestamp) {
+  const today = torontoParts(timestamp);
+  const yesterday = new Date(Date.UTC(today.year, today.month - 1, today.day - 1));
+  return dayKeyFromParts(yesterday.getUTCFullYear(), yesterday.getUTCMonth() + 1, yesterday.getUTCDate());
+}
+
 function dayScores() {
   const days = {};
   for (const event of events) {
@@ -282,7 +285,7 @@ function dayScores() {
     if (sender === "khali") record.k++;
     if (sender === "lewis") record.l++;
   }
-  // dated adjustments (khaliwins bypass) count in the day they happened
+  // preserve existing dated adjustments in their original day
   for (const key in adjust) {
     const dayAdjustments = adjust[key];
     if (dayAdjustments && typeof dayAdjustments === "object") {
@@ -313,28 +316,30 @@ function renderCal() {
     viewYear < CAL_FIRST_MONTH.year ||
     (viewYear === CAL_FIRST_MONTH.year && viewMonth <= CAL_FIRST_MONTH.month);
 
-  // grid starts on the sunday of the week containing the 1st.
+  // convert javascript's sunday-first index to a monday-first index
   // 5 rows covers most months; a 6th only appears when the month genuinely spills over
   const firstOfMonth = new Date(viewYear, viewMonth - 1, 1);
-  const gridStart = new Date(viewYear, viewMonth - 1, 1 - firstOfMonth.getDay());
+  const firstDayIndex = (firstOfMonth.getDay() + 6) % 7;
+  const gridStart = new Date(viewYear, viewMonth - 1, 1 - firstDayIndex);
   const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
-  const cellCount = Math.ceil((firstOfMonth.getDay() + daysInMonth) / 7) * 7;
+  const cellCount = Math.ceil((firstDayIndex + daysInMonth) / 7) * 7;
 
   grid.innerHTML = "";
   for (let index = 0; index < cellCount; index++) {
     const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
     const key = dayKeyFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const record = days[key] || { k: 0, l: 0 };
+    const isToday = key === todayKey;
 
     const cell = document.createElement("div");
     cell.className = "day";
     if (date.getMonth() + 1 !== viewMonth) cell.classList.add("outside");
-    if (record.k > record.l) cell.classList.add("k");
-    else if (record.l > record.k) cell.classList.add("l");
-    else if (record.k > 0) cell.classList.add("b");
-    if (key === todayKey) cell.classList.add("today");
+    if (!isToday && record.k > record.l) cell.classList.add("k");
+    else if (!isToday && record.l > record.k) cell.classList.add("l");
+    else if (!isToday && record.k > 0) cell.classList.add("b");
+    if (isToday) cell.classList.add("today");
 
-    if (record.k > 0 || record.l > 0) {
+    if (!isToday && (record.k > 0 || record.l > 0)) {
       const khaliScore = document.createElement("span");
       khaliScore.className = "ds ds-k";
       khaliScore.textContent = record.k;
@@ -343,7 +348,9 @@ function renderCal() {
       lewisScore.textContent = record.l;
       cell.append(khaliScore, lewisScore);
     }
-    cell.title = key + " · khali " + record.k + " – " + record.l + " lewis";
+    cell.title = isToday
+      ? "today · result hidden until the day ends"
+      : key + " · khali " + record.k + " – " + record.l + " lewis";
     grid.appendChild(cell);
   }
 
@@ -357,8 +364,7 @@ function renderCal() {
     else if (record.l > record.k) lewisWins++;
   }
   $("streak").textContent = "🏆 khali " + khaliWins + " – " + lewisWins + " lewis";
-  const today = days[todayKey] || { k: 0, l: 0 };
-  $("today-score").textContent = "today: khali " + today.k + " – " + today.l + " lewis · " + timeLeftToronto() + " left in the day";
+  $("today-score").textContent = "today's result is hidden · " + timeLeftToronto() + " left";
 }
 
 $("cal-prev").addEventListener("click", () => {
@@ -396,25 +402,27 @@ nameIn.addEventListener("keydown", (e) => { if (e.key === "Enter" && nameIn.valu
 startBtn.addEventListener("click", () => {
   const enteredName = nameIn.value.trim();
   if (!enteredName) return;
-  if (!["khali", "lewis"].includes(normalizeName(enteredName))) {
+  const normalizedEnteredName = normalizeName(enteredName);
+  if (!["khali", "lewis"].includes(normalizedEnteredName)) {
     $("name-err").textContent = "that's not khali, fix it.";
     return;
   }
   $("name-err").textContent = "";
-  name = enteredName;
-  localStorage.setItem("ily:name", enteredName);
-  prevIncoming = null;
-  showMain();
+  if (!appStorage.set("ily:name", normalizedEnteredName)) {
+    $("name-err").textContent = "couldn't save your login — check browser storage permissions.";
+    return;
+  }
+  window.location.reload();
 });
 
 $("france-box").addEventListener("click", () => { location.href = "france.html?v=1"; });
 
 $("reset-btn").addEventListener("click", () => {
-  localStorage.removeItem("ily:name");
-  name = null;
-  nameIn.value = "";
-  startBtn.disabled = true;
-  showSetup();
+  if (!appStorage.remove("ily:name")) {
+    $("err").textContent = "couldn't log out — check browser storage permissions.";
+    return;
+  }
+  window.location.reload();
 });
 
 function renderCall() {
@@ -481,36 +489,6 @@ sleepToggle.addEventListener("change", async (event) => {
   }
 });
 
-$("more-btn").addEventListener("click", () => {
-  feedExpanded = !feedExpanded;
-  renderFeed();
-});
-
-// hidden counter controls: tap the trademark, enter the password
-function setAdmin(on) {
-  adminMode = on;
-  document.querySelectorAll(".adj-btn").forEach((b) => b.classList.toggle("hidden", !on));
-  $("secret-stats").classList.toggle("hidden", !on);
-}
-document.querySelector(".trademark").addEventListener("click", () => {
-  if (adminMode) {
-    setAdmin(false);
-    return;
-  }
-  const pw = prompt("password?");
-  if (pw === "khaliwins") setAdmin(true);
-  else if (pw !== null) alert("no.");
-});
-document.querySelectorAll(".adj-btn").forEach((b) => {
-  b.addEventListener("click", () => {
-    if (!adminMode || !db) return;
-    const person = b.dataset.p;
-    const delta = Number(b.dataset.d);
-    if (delta < 0 && todayFor(person) <= 0) return; // counters can't go below zero
-    writeAdjust(person, delta);
-  });
-});
-
 $("refresh-btn").addEventListener("click", async () => {
   const sure = confirm("⚠️ warning: this erases TODAY's misses for both of you and resets today's counters to zero. past days and the total stay. continue?");
   if (!sure) return;
@@ -544,10 +522,9 @@ beacon.addEventListener("click", async () => {
   try {
     if (!eventsRef) throw new Error("not connected");
     await serverClockReady;
-    whenCache = {}; // recompute all "x min ago" times on every press
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
     await eventsRef.push(ev);
-    localStorage.setItem("ily:lastSent", String(serverNow()));
+    appStorage.set("ily:lastSent", serverNow());
     spawnHearts(7);
     render();
     renderFeed();
@@ -561,10 +538,10 @@ beacon.addEventListener("click", async () => {
 });
 
 // ---- firebase ----
-if (configured) {
+function connectFirebase() {
+  if (!configured || db) return;
   try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
+    db = initializeFirebaseDatabase();
     eventsRef = db.ref("misses");
     db.ref(".info/serverTimeOffset").on("value", (s) => {
       serverOffset = s.val() || 0;
@@ -615,10 +592,10 @@ setInterval(() => {
       const dk = torontoDayKey(serverNow());
       if (dk !== lastDayKey) {
         lastDayKey = dk;
-        whenCache = {}; // new day: refresh all feed timestamps + roll the calendar
         renderFeed();
         renderCal();
       }
+      refreshLatestMissTime();
       render();
       renderCall();
     } catch (error) {
@@ -637,4 +614,9 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // initial screen
-if (name && configured) showMain(); else showSetup();
+if (name) {
+  showMain();
+  connectFirebase();
+} else {
+  showSetup();
+}

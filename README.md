@@ -32,6 +32,7 @@ A small shared “I miss you” web app backed by Firebase Realtime Database.
     └── js
         ├── all-time-adjustments.js # shared all-time miss adjustment behavior
         ├── app.js          # main application state and interactions
+        ├── auth-guard.js   # blocks protected pages while logged out
         ├── cities.js       # city search, map state, and Firebase visits
         ├── coinflip.js     # coin flip state and interaction
         ├── config.js       # Firebase and game configuration

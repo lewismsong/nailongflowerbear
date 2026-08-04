@@ -1,3 +1,5 @@
+requireAuthenticatedUser();
+
 const CITY_SEARCH_ENDPOINT = "https://geocoding-api.open-meteo.com/v1/search";
 const CITY_SEARCH_DELAY = 350;
 const cityForm = document.getElementById("city-search-form");

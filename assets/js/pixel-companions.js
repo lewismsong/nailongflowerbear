@@ -457,5 +457,16 @@
     }
   }
 
-  if (!document.querySelector(".pixel-cat, .pixel-house")) new PixelCompanions();
+  let pixelCompanions = null;
+
+  function initializePixelCompanions() {
+    if (!isAppAuthenticated()) return null;
+    if (!pixelCompanions && !document.querySelector(".pixel-cat, .pixel-house")) {
+      pixelCompanions = new PixelCompanions();
+    }
+    return pixelCompanions;
+  }
+
+  window.initializePixelCompanions = initializePixelCompanions;
+  initializePixelCompanions();
 })();

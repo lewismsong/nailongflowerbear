@@ -43,7 +43,19 @@ function createBearTab(tab, currentTab) {
 
 class BearTabNavigation extends HTMLElement {
   connectedCallback() {
-    if (this.firstChild) return;
+    this.handleAuthenticationChange = () => this.render();
+    window.addEventListener("app-auth-changed", this.handleAuthenticationChange);
+    this.render();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("app-auth-changed", this.handleAuthenticationChange);
+  }
+
+  render() {
+    this.replaceChildren();
+    this.hidden = !isAppAuthenticated();
+    if (this.hidden) return;
 
     const navigation = document.createElement("nav");
     navigation.className = "bear-tab-bar";

@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  if (!isAppAuthenticated()) return;
+
   const ADMIN_PASSWORD = "khaliwins";
   const ADJUSTMENT_PATH = "adjust/allTime";
   const TRANSFER_AUTHORIZATION_KEY = "ily:allTimeAdjustmentAuthorized";

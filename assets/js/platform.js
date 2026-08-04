@@ -50,6 +50,22 @@ class SafeBrowserStorage {
 }
 
 const appStorage = new SafeBrowserStorage();
+const AUTHENTICATED_USERS = new Set(["khali", "lewis"]);
+
+function currentAuthenticatedUser() {
+  const storedName = appStorage.get("ily:name", "").trim().toLowerCase();
+  return AUTHENTICATED_USERS.has(storedName) ? storedName : null;
+}
+
+function isAppAuthenticated() {
+  return currentAuthenticatedUser() !== null;
+}
+
+function requireAuthenticatedUser() {
+  const authenticatedUser = currentAuthenticatedUser();
+  if (!authenticatedUser) throw new Error("authentication required");
+  return authenticatedUser;
+}
 
 function initializeFirebaseDatabase(config = firebaseConfig) {
   if (typeof firebase === "undefined") throw new Error("Firebase SDK is not loaded");

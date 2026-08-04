@@ -1,3 +1,5 @@
+requireAuthenticatedUser();
+
 const TODO_ROOT_PATH = "todos";
 const TODO_SCHEMA_VERSION = 2;
 const ACTIVE_LIST_STORAGE_KEY = "ily:activeTodoList";

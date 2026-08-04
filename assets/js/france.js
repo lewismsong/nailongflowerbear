@@ -1,3 +1,5 @@
+requireAuthenticatedUser();
+
 const franceDatabase = initializeFirebaseDatabase();
 const franceRef = franceDatabase.ref("france");
 

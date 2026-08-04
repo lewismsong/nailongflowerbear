@@ -22,7 +22,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 92;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
-let name = appStorage.get("ily:name");
+let name = currentAuthenticatedUser();
 let events = [];
 let db = null;
 let eventsRef = null;
@@ -402,25 +402,27 @@ nameIn.addEventListener("keydown", (e) => { if (e.key === "Enter" && nameIn.valu
 startBtn.addEventListener("click", () => {
   const enteredName = nameIn.value.trim();
   if (!enteredName) return;
-  if (!["khali", "lewis"].includes(normalizeName(enteredName))) {
+  const normalizedEnteredName = normalizeName(enteredName);
+  if (!["khali", "lewis"].includes(normalizedEnteredName)) {
     $("name-err").textContent = "that's not khali, fix it.";
     return;
   }
   $("name-err").textContent = "";
-  name = enteredName;
-  appStorage.set("ily:name", enteredName);
-  prevIncoming = null;
-  showMain();
+  if (!appStorage.set("ily:name", normalizedEnteredName)) {
+    $("name-err").textContent = "couldn't save your login — check browser storage permissions.";
+    return;
+  }
+  window.location.reload();
 });
 
 $("france-box").addEventListener("click", () => { location.href = "france.html?v=1"; });
 
 $("reset-btn").addEventListener("click", () => {
-  appStorage.remove("ily:name");
-  name = null;
-  nameIn.value = "";
-  startBtn.disabled = true;
-  showSetup();
+  if (!appStorage.remove("ily:name")) {
+    $("err").textContent = "couldn't log out — check browser storage permissions.";
+    return;
+  }
+  window.location.reload();
 });
 
 function renderCall() {
@@ -536,7 +538,8 @@ beacon.addEventListener("click", async () => {
 });
 
 // ---- firebase ----
-if (configured) {
+function connectFirebase() {
+  if (!configured || db) return;
   try {
     db = initializeFirebaseDatabase();
     eventsRef = db.ref("misses");
@@ -611,4 +614,9 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // initial screen
-if (name && configured) showMain(); else showSetup();
+if (name) {
+  showMain();
+  connectFirebase();
+} else {
+  showSetup();
+}

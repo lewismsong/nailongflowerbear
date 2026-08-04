@@ -63,9 +63,16 @@ customElements.define("bear-tab-nav", BearTabNavigation);
 
 const PIXEL_CAT_START_KEY = "ily:pixelCatStartedAt";
 const PIXEL_CAT_POSITION_KEY = "ily:pixelCatPosition";
+const PIXEL_HOUSE_POSITION_KEY = "ily:pixelHousePosition";
+const PIXEL_CAT_SLEEP_KEY = "ily:pixelCatSleep";
 const PIXEL_CAT_SPEED = 22;
+const PIXEL_CAT_HOME_SPEED = 72;
 const PIXEL_CAT_EDGE = 8;
 const PIXEL_CAT_SAVE_INTERVAL = 500;
+const PIXEL_CAT_MIN_SLEEP_DELAY = 30000;
+const PIXEL_CAT_MAX_SLEEP_DELAY = 90000;
+const PIXEL_CAT_MIN_SLEEP_DURATION = 16000;
+const PIXEL_CAT_MAX_SLEEP_DURATION = 32000;
 const PIXEL_HEART_COLORS = ["#E86A85", "#FF8FA5", "#FFC94D"];
 const PIXEL_CAT_BEHAVIORS = [
   { name: "walking", duration: 7000 },
@@ -76,7 +83,7 @@ const PIXEL_CAT_BEHAVIORS = [
   { name: "idle", duration: 1800 },
   { name: "walking", duration: 8400 },
   { name: "playing", duration: 3000 },
-  { name: "sleeping", duration: 5200 },
+  { name: "idle", duration: 5200 },
 ];
 const PIXEL_CAT_CYCLE_DURATION = PIXEL_CAT_BEHAVIORS.reduce(
   (total, behavior) => total + behavior.duration,
@@ -90,6 +97,9 @@ const PIXEL_CAT_MARKUP = `
   <span class="pixel-cat-direction" aria-hidden="true">
     <span class="pixel-cat-sprite"></span>
   </span>`;
+const PIXEL_HOUSE_MARKUP = `
+  <span class="pixel-house-zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
+  <img class="pixel-house-image" src="assets/images/cat-house.png" alt="" draggable="false" />`;
 const PIXEL_HEART_MARKUP = `
   <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
     <path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" />
@@ -129,6 +139,50 @@ function savePixelCatPosition(position) {
   } catch (error) {
     console.warn("pixel cat position could not be saved:", error);
   }
+}
+
+function loadPixelHousePosition() {
+  try {
+    const storedPosition = JSON.parse(localStorage.getItem(PIXEL_HOUSE_POSITION_KEY));
+    if (!Number.isFinite(storedPosition?.x) || !Number.isFinite(storedPosition?.bottom)) return null;
+    return { x: storedPosition.x, bottom: storedPosition.bottom };
+  } catch (error) {
+    console.warn("pixel house position could not be loaded:", error);
+    return null;
+  }
+}
+
+function savePixelHousePosition(position) {
+  try {
+    localStorage.setItem(PIXEL_HOUSE_POSITION_KEY, JSON.stringify(position));
+  } catch (error) {
+    console.warn("pixel house position could not be saved:", error);
+  }
+}
+
+function loadPixelCatSleep() {
+  try {
+    const storedSleep = JSON.parse(localStorage.getItem(PIXEL_CAT_SLEEP_KEY));
+    return {
+      nextSleepAt: Number.isFinite(storedSleep?.nextSleepAt) ? storedSleep.nextSleepAt : 0,
+      sleepUntil: Number.isFinite(storedSleep?.sleepUntil) ? storedSleep.sleepUntil : 0,
+    };
+  } catch (error) {
+    console.warn("pixel cat sleep state could not be loaded:", error);
+    return { nextSleepAt: 0, sleepUntil: 0 };
+  }
+}
+
+function savePixelCatSleep(sleepState) {
+  try {
+    localStorage.setItem(PIXEL_CAT_SLEEP_KEY, JSON.stringify(sleepState));
+  } catch (error) {
+    console.warn("pixel cat sleep state could not be saved:", error);
+  }
+}
+
+function randomDuration(minimum, maximum) {
+  return Math.round(minimum + Math.random() * (maximum - minimum));
 }
 
 function getPixelCatBehavior(elapsedTime) {
@@ -173,19 +227,27 @@ function releasePixelHearts(cat) {
   setTimeout(() => cat.classList.remove("loved"), 550);
 }
 
-function initializePixelCat() {
-  if (document.querySelector(".pixel-cat")) return;
+function initializePixelCompanions() {
+  if (document.querySelector(".pixel-cat, .pixel-house")) return;
+
+  const house = document.createElement("button");
+  house.className = "pixel-house";
+  house.type = "button";
+  house.setAttribute("aria-label", "drag the pixel house or select it to make it shake");
+  house.innerHTML = PIXEL_HOUSE_MARKUP;
 
   const cat = document.createElement("button");
   cat.className = "pixel-cat";
   cat.type = "button";
   cat.setAttribute("aria-label", "drag the pixel cat or select it to send some love");
   cat.innerHTML = PIXEL_CAT_MARKUP;
-  document.body.appendChild(cat);
+  document.body.append(house, cat);
 
   const startedAt = pixelCatStartedAt();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const storedPosition = loadPixelCatPosition();
+  const storedHousePosition = loadPixelHousePosition();
+  const storedSleep = loadPixelCatSleep();
   const initialBehavior = getPixelCatBehavior(Date.now() - startedAt);
   const initialMaximumX = Math.max(PIXEL_CAT_EDGE, window.innerWidth - cat.offsetWidth - PIXEL_CAT_EDGE);
   const initialTravelWidth = initialMaximumX - PIXEL_CAT_EDGE;
@@ -197,6 +259,15 @@ function initializePixelCat() {
     ? PIXEL_CAT_EDGE + initialCyclePosition
     : initialMaximumX - (initialCyclePosition - initialTravelWidth));
   let bottom = storedPosition?.bottom ?? PIXEL_CAT_EDGE;
+  let houseX = storedHousePosition?.x
+    ?? Math.max(PIXEL_CAT_EDGE, window.innerWidth - house.offsetWidth - 18);
+  let houseBottom = storedHousePosition?.bottom ?? PIXEL_CAT_EDGE;
+  let sleepState = storedSleep.sleepUntil > Date.now() ? "sleeping" : "awake";
+  let sleepUntil = sleepState === "sleeping" ? storedSleep.sleepUntil : 0;
+  let nextSleepAt = storedSleep.nextSleepAt > Date.now()
+    ? storedSleep.nextSleepAt
+    : Date.now() + randomDuration(PIXEL_CAT_MIN_SLEEP_DELAY, PIXEL_CAT_MAX_SLEEP_DELAY);
+  let wakeTapCount = 0;
   let previousBehavior = "";
   let previousFrameTime = performance.now();
   let lastSavedAt = 0;
@@ -208,6 +279,13 @@ function initializePixelCat() {
   let dragStartY = 0;
   let dragged = false;
   let suppressClick = false;
+  let housePointerId = null;
+  let houseDragOffsetX = 0;
+  let houseDragOffsetY = 0;
+  let houseDragStartX = 0;
+  let houseDragStartY = 0;
+  let houseDragged = false;
+  let suppressHouseClick = false;
 
   function clampPosition() {
     const previousX = x;
@@ -226,19 +304,110 @@ function initializePixelCat() {
     cat.style.setProperty("--cat-direction", String(direction));
   }
 
+  function clampHousePosition() {
+    const maximumX = Math.max(PIXEL_CAT_EDGE, window.innerWidth - house.offsetWidth - PIXEL_CAT_EDGE);
+    const maximumBottom = Math.max(PIXEL_CAT_EDGE, window.innerHeight - house.offsetHeight - PIXEL_CAT_EDGE);
+    houseX = Math.min(Math.max(houseX, PIXEL_CAT_EDGE), maximumX);
+    houseBottom = Math.min(Math.max(houseBottom, PIXEL_CAT_EDGE), maximumBottom);
+  }
+
+  function renderHousePosition() {
+    house.style.left = houseX + "px";
+    house.style.bottom = houseBottom + "px";
+  }
+
+  function persistHousePosition() {
+    savePixelHousePosition({ x: houseX, bottom: houseBottom });
+  }
+
   function persistPosition() {
     savePixelCatPosition({ x, bottom, direction });
     positionChanged = false;
   }
 
+  function scheduleNextSleep() {
+    sleepState = "awake";
+    sleepUntil = 0;
+    nextSleepAt = Date.now() + randomDuration(PIXEL_CAT_MIN_SLEEP_DELAY, PIXEL_CAT_MAX_SLEEP_DELAY);
+    savePixelCatSleep({ nextSleepAt, sleepUntil: 0 });
+  }
+
+  function enterHouse() {
+    sleepState = "sleeping";
+    sleepUntil = Date.now() + randomDuration(PIXEL_CAT_MIN_SLEEP_DURATION, PIXEL_CAT_MAX_SLEEP_DURATION);
+    wakeTapCount = 0;
+    cat.classList.add("in-house");
+    house.classList.add("sleeping");
+    house.setAttribute("aria-label", "the pixel cat is sleeping; select the house twice to wake it or drag the house");
+    savePixelCatSleep({ nextSleepAt: 0, sleepUntil });
+  }
+
+  function wakeCat() {
+    if (sleepState !== "sleeping") return;
+    house.classList.remove("sleeping");
+    cat.classList.remove("in-house");
+    house.setAttribute("aria-label", "drag the pixel house or select it to make it shake");
+    wakeTapCount = 0;
+    x = houseX + house.offsetWidth * 0.72 - cat.offsetWidth / 2;
+    bottom = houseBottom;
+    direction = 1;
+    positionChanged = true;
+    clampPosition();
+    renderPosition();
+    persistPosition();
+    scheduleNextSleep();
+  }
+
+  function shakeHouse() {
+    house.classList.remove("shaking");
+    requestAnimationFrame(() => house.classList.add("shaking"));
+  }
+
+  function isCatOverHouse() {
+    const catBounds = cat.getBoundingClientRect();
+    const houseBounds = house.getBoundingClientRect();
+    const catCenterX = catBounds.left + catBounds.width / 2;
+    const catCenterY = catBounds.top + catBounds.height / 2;
+    return catCenterX >= houseBounds.left
+      && catCenterX <= houseBounds.right
+      && catCenterY >= houseBounds.top
+      && catCenterY <= houseBounds.bottom;
+  }
+
   function positionCat(frameTime) {
     const maximumX = clampPosition();
-    const elapsedTime = Date.now() - startedAt;
-    const behavior = getPixelCatBehavior(elapsedTime);
+    const now = Date.now();
+    const elapsedTime = now - startedAt;
+    let behavior = getPixelCatBehavior(elapsedTime);
     const frameDuration = Math.min(Math.max(frameTime - previousFrameTime, 0), 50) / 1000;
     previousFrameTime = frameTime;
 
-    if (behavior.name === "walking" && activePointerId === null && !reducedMotion.matches) {
+    if (sleepState === "awake" && now >= nextSleepAt && activePointerId === null) {
+      sleepState = "going-home";
+      wakeTapCount = 0;
+    }
+
+    if (sleepState === "sleeping") {
+      if (now >= sleepUntil) wakeCat();
+    } else if (sleepState === "going-home" && activePointerId === null) {
+      behavior = { name: "walking" };
+      const targetX = houseX + house.offsetWidth * 0.72 - cat.offsetWidth / 2;
+      const targetBottom = houseBottom;
+      const deltaX = targetX - x;
+      const deltaBottom = targetBottom - bottom;
+      const distance = Math.hypot(deltaX, deltaBottom);
+      if (distance <= 3 || reducedMotion.matches) {
+        x = targetX;
+        bottom = targetBottom;
+        enterHouse();
+      } else {
+        const travel = Math.min(distance, PIXEL_CAT_HOME_SPEED * frameDuration);
+        x += deltaX / distance * travel;
+        bottom += deltaBottom / distance * travel;
+        if (Math.abs(deltaX) > 1) direction = deltaX > 0 ? 1 : -1;
+        positionChanged = true;
+      }
+    } else if (behavior.name === "walking" && activePointerId === null && !reducedMotion.matches) {
       x += direction * PIXEL_CAT_SPEED * frameDuration;
       positionChanged = true;
       if (x >= maximumX) {
@@ -259,16 +428,19 @@ function initializePixelCat() {
       persistPosition();
       lastSavedAt = frameTime;
     }
-    if (!reducedMotion.matches) requestAnimationFrame(positionCat);
+    requestAnimationFrame(positionCat);
   }
 
   function finishDragging(event) {
     if (event.pointerId !== activePointerId) return;
+    const droppedOnHouse = event.type === "pointerup" && isCatOverHouse();
     if (cat.hasPointerCapture(event.pointerId)) cat.releasePointerCapture(event.pointerId);
     activePointerId = null;
     cat.classList.remove("dragging");
-    suppressClick = dragged;
+    suppressClick = dragged || droppedOnHouse;
+    setTimeout(() => { suppressClick = false; }, 0);
     persistPosition();
+    if (droppedOnHouse) enterHouse();
   }
 
   cat.addEventListener("pointerdown", (event) => {
@@ -280,6 +452,7 @@ function initializePixelCat() {
     dragStartX = event.clientX;
     dragStartY = event.clientY;
     dragged = false;
+    if (sleepState === "going-home") scheduleNextSleep();
     cat.classList.add("dragging");
     cat.setPointerCapture(event.pointerId);
   });
@@ -304,16 +477,79 @@ function initializePixelCat() {
     }
     releasePixelHearts(cat);
   });
+
+  function finishHouseDragging(event) {
+    if (event.pointerId !== housePointerId) return;
+    if (house.hasPointerCapture(event.pointerId)) house.releasePointerCapture(event.pointerId);
+    housePointerId = null;
+    house.classList.remove("dragging");
+    suppressHouseClick = houseDragged;
+    persistHousePosition();
+  }
+
+  house.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    const bounds = house.getBoundingClientRect();
+    housePointerId = event.pointerId;
+    houseDragOffsetX = event.clientX - bounds.left;
+    houseDragOffsetY = event.clientY - bounds.top;
+    houseDragStartX = event.clientX;
+    houseDragStartY = event.clientY;
+    houseDragged = false;
+    house.classList.add("dragging");
+    house.setPointerCapture(event.pointerId);
+  });
+
+  house.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== housePointerId) return;
+    houseX = event.clientX - houseDragOffsetX;
+    houseBottom = window.innerHeight - (event.clientY - houseDragOffsetY) - house.offsetHeight;
+    houseDragged ||= Math.hypot(event.clientX - houseDragStartX, event.clientY - houseDragStartY) > 4;
+    clampHousePosition();
+    renderHousePosition();
+    event.preventDefault();
+  });
+
+  house.addEventListener("pointerup", finishHouseDragging);
+  house.addEventListener("pointercancel", finishHouseDragging);
+  house.addEventListener("animationend", (event) => {
+    if (event.animationName === "pixelHouseShake") house.classList.remove("shaking");
+  });
+  house.addEventListener("click", () => {
+    if (suppressHouseClick) {
+      suppressHouseClick = false;
+      return;
+    }
+    shakeHouse();
+    if (sleepState !== "sleeping") return;
+    wakeTapCount++;
+    if (wakeTapCount === 2) setTimeout(wakeCat, 180);
+  });
   window.addEventListener("resize", () => {
     clampPosition();
+    clampHousePosition();
     renderPosition();
+    renderHousePosition();
     persistPosition();
+    persistHousePosition();
   });
-  window.addEventListener("pagehide", persistPosition);
+  window.addEventListener("pagehide", () => {
+    persistPosition();
+    persistHousePosition();
+  });
 
+  clampHousePosition();
   clampPosition();
+  renderHousePosition();
   renderPosition();
+  if (sleepState === "sleeping") {
+    cat.classList.add("in-house");
+    house.classList.add("sleeping");
+    house.setAttribute("aria-label", "the pixel cat is sleeping; select the house twice to wake it or drag the house");
+  } else {
+    savePixelCatSleep({ nextSleepAt, sleepUntil: 0 });
+  }
   positionCat(performance.now());
 }
 
-initializePixelCat();
+initializePixelCompanions();

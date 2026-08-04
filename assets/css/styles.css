@@ -186,7 +186,7 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
 #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .heart-float { position: absolute; bottom: 30%; animation: floatUp 2.6s ease-out forwards; filter: drop-shadow(0 2px 4px rgba(74,53,36,0.35)); }
 
-/* persistent pixel cat */
+/* persistent pixel companions */
 .pixel-cat {
   position: fixed;
   z-index: 60;
@@ -202,6 +202,7 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
   -webkit-tap-highlight-color: transparent;
 }
 .pixel-cat.dragging { cursor: grabbing; }
+.pixel-cat.in-house { visibility: hidden; pointer-events: none; }
 .pixel-cat-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--cat-direction, 1)); }
 .pixel-cat-sprite {
   display: block;
@@ -217,9 +218,28 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
 .pixel-cat[data-behavior="sitting"] .pixel-cat-sprite { background-position: 0 50%; animation: pixelCatSittingFrames 4.8s steps(1, end) infinite; }
 .pixel-cat[data-behavior="rolling"] .pixel-cat-sprite { background-position: 0 75%; animation: pixelCatRollingFrames 3.6s steps(1, end) infinite; }
 .pixel-cat[data-behavior="playing"] .pixel-cat-sprite { background-position: 0 100%; animation: pixelCatPlayingFrames 3s steps(1, end) infinite; }
-.pixel-cat[data-behavior="sleeping"] .pixel-cat-sprite { background-position: 80% 100%; animation: pixelCatSleepingFrames 2.6s steps(1, end) infinite; }
 .pixel-cat.loved .pixel-cat-sprite { animation: pixelCatLove 0.5s steps(3, end); }
 .pixel-cat:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
+
+.pixel-house {
+  position: fixed; z-index: 55; width: 156px; height: auto; aspect-ratio: 512 / 395;
+  padding: 0; border: 0; background: transparent; cursor: grab; touch-action: none;
+  user-select: none; -webkit-tap-highlight-color: transparent; overflow: visible;
+  filter: drop-shadow(0 4px 3px rgba(74,53,36,0.18));
+}
+.pixel-house.dragging { cursor: grabbing; }
+.pixel-house-image { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.pixel-house-zzz {
+  display: none; position: absolute; z-index: 2; left: 70%; top: -12px;
+  color: var(--blue-deep); font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px; font-weight: 700; letter-spacing: -2px; pointer-events: none;
+}
+.pixel-house.sleeping .pixel-house-zzz { display: flex; align-items: flex-end; gap: 1px; }
+.pixel-house-zzz span { opacity: 0; animation: pixelHouseZzz 2.1s steps(4, end) infinite; }
+.pixel-house-zzz span:nth-child(2) { font-size: 17px; animation-delay: 0.35s; }
+.pixel-house-zzz span:nth-child(3) { font-size: 20px; animation-delay: 0.7s; }
+.pixel-house.shaking { animation: pixelHouseShake 0.32s ease-in-out; }
+.pixel-house:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
 
 .pixel-cat-heart {
   position: fixed;
@@ -278,8 +298,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--yellow-deep
   66.6%, 83.2% { background-position: 40% 100%; }
   83.3%, 99.9% { background-position: 20% 100%; }
 }
-@keyframes pixelCatSleepingFrames { 0%, 62%, 100% { background-position: 80% 100%; } 62.1%, 99.9% { background-position: 100% 100%; } }
 @keyframes pixelCatLove { 0%, 100% { transform: translateY(0) scale(1); } 35% { transform: translateY(-7px) scale(1.04); } 65% { transform: translateY(-2px) scale(0.98); } }
+@keyframes pixelHouseShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-2px) rotate(-0.7deg); } 50% { transform: translateX(2px) rotate(0.7deg); } 75% { transform: translateX(-1px) rotate(-0.35deg); } }
+@keyframes pixelHouseZzz { 0%, 18% { opacity: 0; transform: translate(0, 3px); } 28%, 72% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -12px); } }
 @keyframes pixelCatHeartFloat {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
   12% { opacity: 1; }
@@ -288,9 +309,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--yellow-deep
 
 @media (max-width: 520px) {
   .pixel-cat { width: 80px; height: 80px; }
+  .pixel-house { width: 132px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #beacon, .heart-float, #feed li, .pixel-cat-sprite { animation: none !important; }
+  #beacon, .heart-float, #feed li, .pixel-cat-sprite, .pixel-house-zzz span { animation: none !important; }
+  .pixel-house.sleeping .pixel-house-zzz span { opacity: 1; }
+  .pixel-house.shaking { animation: pixelHouseShake 0.18s ease-in-out; }
   .pixel-cat-heart { animation-duration: 0.7s; animation-timing-function: ease-out; }
 }

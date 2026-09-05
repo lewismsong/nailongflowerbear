@@ -1,7 +1,7 @@
 requireAuthenticatedUser();
 
 const franceDatabase = initializeFirebaseDatabase();
-const franceRef = franceDatabase.ref("shanghai");
+const franceRef = franceDatabase.ref("berlin");
 
 // the plan so far, written into the shared itinerary once, then freely editable
 const DEFAULT_PLANS = {}; // no seeded plan yet, dates are still up in the air
@@ -40,7 +40,7 @@ function tripDays() {
 }
 
 function renderCountdown() {
-  franceCount.textContent = "🥟";
+  franceCount.textContent = "🥨";
 }
 
 // the dates line is shared and editable, since shanghai has no fixed dates yet

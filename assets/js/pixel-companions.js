@@ -361,6 +361,7 @@
       this.house.addEventListener("click", () => {
         if (this.houseDrag.consumeSuppressedClick()) return;
         this.shakeHouse();
+        releasePixelHearts(this.house);
         if (this.sleepState !== "sleeping") return;
         this.wakeTapCount++;
         if (this.wakeTapCount === 2) setTimeout(() => this.wakeCat(), 180);

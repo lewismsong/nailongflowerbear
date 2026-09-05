@@ -13,7 +13,6 @@ const ringFg = $("ring-fg");
 const partnerClock = $("partner-clock");
 const partnerClockLabel = $("pc-label");
 const partnerClockTime = $("pc-time");
-const franceBox = $("france-box");
 const callToggle = $("call-toggle");
 const callSubtitle = $("call-sub");
 const sleepBox = $("sleep-box");
@@ -163,13 +162,6 @@ function renderPartnerClock(normalizedName, now) {
   }
 }
 
-function renderFranceCountdown(now) {
-  const franceDays = Math.ceil((FRANCE_DATE - new Date(now)) / MILLISECONDS_PER_DAY);
-  franceBox.textContent = franceDays > 1 ? "🇫🇷 " + franceDays + " days until france"
-    : franceDays === 1 ? "🇫🇷 1 day until france!!"
-    : franceDays > -15 ? "🇫🇷 it's france time 🥖"
-    : "🧳 our trips";
-}
 
 function renderStats() {
   const todayKey = torontoDayKey(serverNow());
@@ -196,7 +188,6 @@ function render() {
   const normalizedName = normalizeName(name);
   renderBeacon(now);
   renderPartnerClock(normalizedName, now);
-  renderFranceCountdown(now);
   renderStats();
 }
 
@@ -416,7 +407,6 @@ startBtn.addEventListener("click", () => {
   window.location.reload();
 });
 
-$("france-box").addEventListener("click", () => { location.href = "trips.html"; });
 
 $("reset-btn").addEventListener("click", () => {
   if (!appStorage.remove("ily:name")) {

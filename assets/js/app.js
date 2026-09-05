@@ -167,7 +167,8 @@ function renderFranceCountdown(now) {
   const franceDays = Math.ceil((FRANCE_DATE - new Date(now)) / MILLISECONDS_PER_DAY);
   franceBox.textContent = franceDays > 1 ? "🇫🇷 " + franceDays + " days until france"
     : franceDays === 1 ? "🇫🇷 1 day until france!!"
-    : "🇫🇷 it's france time 🥖";
+    : franceDays > -15 ? "🇫🇷 it's france time 🥖"
+    : "🧳 our trips";
 }
 
 function renderStats() {
@@ -415,7 +416,7 @@ startBtn.addEventListener("click", () => {
   window.location.reload();
 });
 
-$("france-box").addEventListener("click", () => { location.href = "france.html?v=1"; });
+$("france-box").addEventListener("click", () => { location.href = "trips.html"; });
 
 $("reset-btn").addEventListener("click", () => {
   if (!appStorage.remove("ily:name")) {

@@ -362,3 +362,44 @@ buildDays();
 renderCountdown();
 seedDefaultsOnce();
 setInterval(renderCountdown, 60 * 1000);
+
+// the dates line is shared and editable, since shanghai has no fixed dates yet
+const tripDates = document.getElementById("trip-dates");
+const tripDatesRef = franceRef.child("_dates");
+let tripDatesTimer = null;
+
+function saveTripDates() {
+  const text = tripDates.innerText.replace(/\u00a0/g, " ").trim();
+  const write = text ? tripDatesRef.set(text) : tripDatesRef.remove();
+  write.catch((error) => {
+    console.error("trip dates save failed:", error);
+    showFranceError("couldn't save the dates, check your connection");
+  });
+}
+
+tripDates.addEventListener("input", () => {
+  if (tripDatesTimer) clearTimeout(tripDatesTimer);
+  tripDatesTimer = setTimeout(saveTripDates, 400);
+});
+
+tripDates.addEventListener("blur", () => {
+  if (tripDatesTimer) clearTimeout(tripDatesTimer);
+  saveTripDates();
+});
+
+tripDates.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    tripDates.blur();
+  }
+});
+
+const tripDatesFallback = tripDates.innerText.trim();
+
+tripDatesRef.on("value", (snapshot) => {
+  if (document.activeElement === tripDates) return; // don't yank the cursor mid-edit
+  const stored = snapshot.val();
+  const text = typeof stored === "string" && stored.trim() ? stored.trim() : tripDatesFallback;
+  if (tripDates.innerText !== text) tripDates.innerText = text;
+});
+

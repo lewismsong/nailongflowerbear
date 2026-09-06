@@ -2,16 +2,16 @@
 
 :root {
   --bg-top: #FFFFFF;
-  --bg-bottom: #FFF4D6;
-  --deep: #4A3524;
+  --bg-bottom: #FFE0DC;
+  --deep: #4A2724;
   --card: rgba(0,0,0,0.04);
   --card-edge: rgba(0,0,0,0.08);
-  --yellow: #FFC94D;
-  --yellow-deep: #DE9B00;
+  --yellow: #FF9E93;
+  --yellow-deep: #D2503F;
   --blue: #8ED4F5;
   --blue-deep: #3E97C9;
-  --text: #3D342B;
-  --muted: #9C8D7A;
+  --text: #3B2B28;
+  --muted: #A4877F;
   --pink-deep: #E86A85;
 }
 

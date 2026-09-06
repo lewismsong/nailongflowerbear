@@ -2,7 +2,7 @@
   padding: 0 0 48px;
   background:
     radial-gradient(circle at 8% 12%, rgba(142, 212, 245, 0.24), transparent 26rem),
-    radial-gradient(circle at 92% 28%, rgba(255, 201, 77, 0.25), transparent 30rem),
+    radial-gradient(circle at 92% 28%, rgba(255, 158, 147, 0.25), transparent 30rem),
     linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
 }
 
@@ -74,7 +74,7 @@
   height: 210px;
   right: -80px;
   bottom: -120px;
-  background: rgba(255, 201, 77, 0.34);
+  background: rgba(255, 158, 147, 0.34);
 }
 
 .france-heading,
@@ -115,7 +115,7 @@
   flex-shrink: 0;
   min-width: 132px;
   padding: 13px 18px;
-  border: 1px solid rgba(222, 155, 0, 0.28);
+  border: 1px solid rgba(210, 80, 63, 0.28);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
   color: var(--yellow-deep);
@@ -228,12 +228,12 @@
 }
 
 .day-card:nth-child(even) {
-  background: rgba(255, 251, 236, 0.94);
+  background: rgba(255, 245, 243, 0.94);
 }
 
 .day-card:hover,
 .day-card:focus-within {
-  border-color: rgba(222, 155, 0, 0.34);
+  border-color: rgba(210, 80, 63, 0.34);
   box-shadow: 0 14px 36px rgba(74, 53, 36, 0.11);
   transform: translateY(-1px);
 }
@@ -273,7 +273,7 @@
 
 .day-notes:focus {
   background: #fffdf7;
-  box-shadow: 0 0 0 2px rgba(222, 155, 0, 0.22);
+  box-shadow: 0 0 0 2px rgba(210, 80, 63, 0.22);
 }
 
 .day-notes:empty::before {
@@ -314,8 +314,8 @@
 
 .resv-col[data-type="hotel"] {
   --resv-accent: var(--yellow-deep);
-  --resv-tint: rgba(255, 201, 77, 0.16);
-  border-color: rgba(222, 155, 0, 0.2);
+  --resv-tint: rgba(255, 158, 147, 0.16);
+  border-color: rgba(210, 80, 63, 0.2);
 }
 
 .resv-col[data-type="restaurant"] {

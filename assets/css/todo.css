@@ -111,7 +111,7 @@
   padding: 2px 4px;
   border: 0;
   border-radius: 4px;
-  outline: 2px solid rgba(222, 155, 0, 0.35);
+  outline: 2px solid rgba(210, 80, 63, 0.35);
   background: #fff;
   color: var(--text);
   font: inherit;
@@ -126,7 +126,7 @@
 .todo-empty { color: var(--muted); font-size: 14px; text-align: center; margin: 52px 0; }
 .todo-list { display: flex; flex-direction: column; gap: 5px; list-style: none; margin: 0; padding: 0; }
 .todo-item { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; align-items: start; gap: 10px; border-radius: 12px; padding: 9px 8px; transition: background 0.15s ease; }
-.todo-item:hover, .todo-item:focus-within { background: rgba(255, 201, 77, 0.1); }
+.todo-item:hover, .todo-item:focus-within { background: rgba(255, 158, 147, 0.1); }
 .todo-item.done { opacity: 0.58; }
 .todo-item.done .todo-text { text-decoration: line-through; }
 .todo-check { appearance: none; width: 19px; height: 19px; margin: 2px 0 0; border: 1.5px solid rgba(74, 53, 36, 0.28); border-radius: 6px; background: #fff; cursor: pointer; }
@@ -134,7 +134,7 @@
 .todo-check:checked::after { content: "✓"; display: block; color: var(--deep); font-size: 13px; font-weight: 800; line-height: 17px; text-align: center; }
 .todo-bear { font-size: 20px; line-height: 1.15; }
 .todo-text { min-height: 24px; overflow-wrap: anywhere; border-radius: 5px; font-size: 15px; line-height: 1.5; outline: none; padding: 0 3px; }
-.todo-text:focus { background: rgba(255, 255, 255, 0.82); box-shadow: 0 0 0 2px rgba(222, 155, 0, 0.25); }
+.todo-text:focus { background: rgba(255, 255, 255, 0.82); box-shadow: 0 0 0 2px rgba(210, 80, 63, 0.25); }
 .todo-stamp { align-self: center; display: flex; flex-direction: column; color: var(--muted); font-size: 9px; font-weight: 400; line-height: 1.25; text-align: right; white-space: nowrap; }
 .todo-delete { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; opacity: 0; padding: 2px 4px; }
 .todo-item:hover .todo-delete, .todo-item:focus-within .todo-delete { opacity: 1; }

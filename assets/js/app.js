@@ -15,8 +15,6 @@ const partnerClockLabel = $("pc-label");
 const partnerClockTime = $("pc-time");
 const callToggle = $("call-toggle");
 const callSubtitle = $("call-sub");
-const sleepBox = $("sleep-box");
-const sleepToggle = $("sleep-toggle");
 const CIRCUMFERENCE = 2 * Math.PI * 92;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
@@ -180,7 +178,7 @@ function renderStats() {
   const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
   const callH = Math.floor(callMinutes / 60);
   const callM = callMinutes % 60;
-  $("call-total").textContent = (callH ? callH + "h " : "") + callM + "m";
+  $("call-total").textContent = callH + "h";
 }
 
 function render() {
@@ -377,6 +375,7 @@ function showMain() {
   $("who").textContent = name;
   render();
   renderCall();
+  renderHibernation();
   renderFeed();
   renderCal();
 }
@@ -416,13 +415,69 @@ $("reset-btn").addEventListener("click", () => {
   window.location.reload();
 });
 
+// ---- hibernation: each bear can be marked asleep, time is banked per person ----
+const HIBERNATORS = { lewis: "hib-lewis", khali: "hib-khali" };
+let hibernation = {};
+
+function hibernationElapsed(person) {
+  const record = hibernation[person] || {};
+  const banked = Number(record.totalMs) || 0;
+  const active = record.on && typeof record.since === "number" ? Math.max(0, serverNow() - record.since) : 0;
+  return { banked, active, total: banked + active, sleeping: !!record.on };
+}
+
+function formatSpan(ms) {
+  const minutes = Math.floor(ms / 60000);
+  const hours = Math.floor(minutes / 60);
+  return (hours ? hours + "h " : "") + (minutes % 60) + "m";
+}
+
+function renderHibernation() {
+  let combined = 0;
+  for (const person in HIBERNATORS) {
+    const state = hibernationElapsed(person);
+    combined += state.total;
+    const toggle = $(HIBERNATORS[person]);
+    if (toggle && toggle.checked !== state.sleeping) toggle.checked = state.sleeping;
+    const subtitle = $(HIBERNATORS[person] + "-sub");
+    if (subtitle) {
+      subtitle.textContent = state.sleeping
+        ? "asleep for " + formatSpan(state.active)
+        : "flip this when " + person + " goes to sleep";
+    }
+  }
+  $("hib-total").textContent = formatSpan(combined);
+}
+
+for (const person in HIBERNATORS) {
+  const toggle = $(HIBERNATORS[person]);
+  if (!toggle) continue;
+  toggle.addEventListener("change", async (event) => {
+    if (!db) {
+      event.target.checked = false;
+      return;
+    }
+    const goingToSleep = event.target.checked;
+    try {
+      await db.ref("hibernation/" + person).transaction((record) => {
+        const banked = Number(record && record.totalMs) || 0;
+        if (goingToSleep) return { on: true, since: serverNow(), totalMs: banked };
+        const active = record && record.on && typeof record.since === "number"
+          ? Math.max(0, serverNow() - record.since)
+          : 0;
+        return { on: false, totalMs: banked + active };
+      });
+    } catch (error) {
+      console.error("hibernation update failed:", error);
+      $("err").textContent = "couldn't update hibernation — check your connection and try again";
+      renderHibernation();
+    }
+  });
+}
+
 function renderCall() {
   const on = !!(call && call.on);
-  const someoneSleeping = on && !!call.sleeping;
   if (callToggle.checked !== on) callToggle.checked = on;
-  sleepBox.classList.toggle("hidden", !on);
-  sleepToggle.disabled = !on;
-  if (sleepToggle.checked !== someoneSleeping) sleepToggle.checked = someoneSleeping;
   if (on && typeof call.since === "number") {
     const elapsed = Math.max(0, serverNow() - call.since);
     const hours = Math.floor(elapsed / (60 * 60 * 1000));
@@ -462,23 +517,6 @@ callToggle.addEventListener("change", async (event) => {
   }
 });
 
-sleepToggle.addEventListener("change", async (event) => {
-  if (!db || !(call && call.on)) {
-    event.target.checked = false;
-    return;
-  }
-  try {
-    const sleeping = event.target.checked;
-    await db.ref("call").transaction((currentCall) => {
-      if (!(currentCall && currentCall.on)) return currentCall;
-      return { ...currentCall, sleeping };
-    });
-  } catch (error) {
-    console.error("sleep status update failed:", error);
-    $("err").textContent = "couldn't update sleep mode — check your connection and try again";
-    renderCall();
-  }
-});
 
 $("refresh-btn").addEventListener("click", async () => {
   const sure = confirm("⚠️ warning: this erases TODAY's misses for both of you and resets today's counters to zero. past days and the total stay. continue?");
@@ -540,6 +578,7 @@ function connectFirebase() {
     });
     db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
     db.ref("call").on("value", (s) => { call = s.val(); renderCall(); if (name) render(); });
+    db.ref("hibernation").on("value", (s) => { hibernation = s.val() || {}; renderHibernation(); });
     eventsRef.on("value", (snap) => {
       try {
         const val = snap.val() || {};
@@ -589,6 +628,7 @@ setInterval(() => {
       refreshLatestMissTime();
       render();
       renderCall();
+      renderHibernation();
     } catch (error) {
       console.error("render failed:", error);
     }

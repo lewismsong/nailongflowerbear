@@ -64,14 +64,17 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
 .tally > div.k { background: rgba(255, 158, 147,0.18); border-color: rgba(210, 80, 63,0.35); }
 .tally > div.l { background: rgba(142,212,245,0.22); border-color: rgba(84,172,221,0.4); }
 .tally .num { font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; }
-.tally .k-num { color: #DE9B00; }
+/* original yellow: #DE9B00 */
+.tally .k-num { color: var(--yellow-deep); }
 .tally .l-num { color: var(--blue-deep); }
 .tally .cap { font-size: 12px; color: var(--muted); }
 /* completed-days total */
 .total-box { background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 14px; text-align: center; margin: -8px 0 26px; box-shadow: 0 2px 10px rgba(74,53,36,0.07); }
-.total-box .num { font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); }
+.total-box .num { font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 700; color: var(--text); }
 .hib-total-box { position: relative; }
-.called-note { position: absolute; right: 12px; bottom: 8px; font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.hib-box { display: block; }
+.hib-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.hib-row + .hib-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-edge); }
 .total-box .cap { font-size: 12px; color: var(--muted); }
 
 /* feed */

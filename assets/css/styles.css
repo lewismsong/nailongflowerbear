@@ -74,7 +74,7 @@ header .who { font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-wei
 .hib-total-box { position: relative; }
 .hib-box { display: block; }
 .hib-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.hib-row + .hib-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-edge); }
+.hib-row + .hib-row { margin-top: 14px; }
 .total-box .cap { font-size: 12px; color: var(--muted); }
 
 /* feed */

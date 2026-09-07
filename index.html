@@ -48,7 +48,7 @@
       <div class="beacon-wrap">
         <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true">
           <circle cx="110" cy="110" r="92" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="6"/>
-          <circle id="ring-fg" cx="110" cy="110" r="92" fill="none" stroke="#D2503F" stroke-width="6"
+          <circle id="ring-fg" cx="110" cy="110" r="92" fill="none" stroke="#DE9B00" stroke-width="6"
                   stroke-linecap="round" stroke-dasharray="578" stroke-dashoffset="578"/>
         </svg>
         <button id="beacon" aria-label="Send an I miss you">
@@ -87,10 +87,6 @@
       </div>
       <button class="all-time-adjust-button" type="button" data-all-time-delta="1" aria-label="add one all-time miss" hidden>+</button>
     </div>
-    <div class="total-box">
-      <div class="num num-time" id="call-total">0m</div>
-      <div class="cap">on call together</div>
-    </div>
     <div class="call-box">
       <div>
         <div class="call-title">📞 on call</div>
@@ -101,15 +97,30 @@
         <span class="slider"></span>
       </label>
     </div>
-    <div class="call-box hidden" id="sleep-box">
+    <div class="call-box">
       <div>
-        <div class="call-title">💤 someone is sleeping</div>
-        <div class="call-sub">allow misses while on call</div>
+        <div class="call-title">🐻 brown bear is hibernating</div>
+        <div class="call-sub" id="hib-lewis-sub">flip this when lewis goes to sleep</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="sleep-toggle" disabled />
+        <input type="checkbox" id="hib-lewis" />
         <span class="slider"></span>
       </label>
+    </div>
+    <div class="call-box">
+      <div>
+        <div class="call-title">🐻‍❄️ white bear is hibernating</div>
+        <div class="call-sub" id="hib-khali-sub">flip this when khali goes to sleep</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="hib-khali" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="total-box hib-total-box">
+      <div class="num num-time" id="hib-total">0m</div>
+      <div class="cap">total hours hibernated</div>
+      <div class="called-note">total hours called ~~ <span id="call-total">0h</span></div>
     </div>
       </div>
 
@@ -157,6 +168,6 @@
 <script src="assets/js/navigation.js?v=18"></script>
 <script src="assets/js/all-time-adjustments.js?v=4"></script>
 <script src="assets/js/pixel-companions.js?v=4"></script>
-<script src="assets/js/app.js?v=21"></script>
+<script src="assets/js/app.js?v=23"></script>
 </body>
 </html>

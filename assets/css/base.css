@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
+  /* --- seasonal palette --- currently RED (khali's china season)
+     original cream/yellow set:
+       --bg-bottom: #FFF4D6;  --deep: #4A3524;
+       --yellow: #FFC94D;     --yellow-deep: #DE9B00;
+       --text: #3D342B;       --muted: #9C8D7A;
+     swap those six values back in to return to the cream theme. */
   --bg-top: #FFFFFF;
   --bg-bottom: #FFE0DC;
   --deep: #4A2724;

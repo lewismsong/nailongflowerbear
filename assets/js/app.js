@@ -444,9 +444,8 @@ function renderHibernation() {
     if (toggle && toggle.checked !== state.sleeping) toggle.checked = state.sleeping;
     const subtitle = $(HIBERNATORS[person] + "-sub");
     if (subtitle) {
-      subtitle.textContent = state.sleeping
-        ? "asleep for " + formatSpan(state.active)
-        : "flip this when " + person + " goes to sleep";
+      // lifetime hibernation for this bear, banked plus any nap in progress
+      subtitle.textContent = formatSpan(state.total);
     }
   }
   $("hib-total").textContent = formatSpan(combined); // "Xh Ym", climbs while either bear sleeps

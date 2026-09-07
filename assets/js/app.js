@@ -173,12 +173,15 @@ function renderStats() {
   $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
 
   // total time on call: banked hangups plus the live call, shown in minutes
-  const bankedCallMs = Number(call && call.totalMs) || 0;
-  const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
-  const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
-  const callH = Math.floor(callMinutes / 60);
-  const callM = callMinutes % 60;
-  $("call-total").textContent = callH + "h";
+
+  /* the call timer is retired for now, but the data is still in the database under
+     call/totalMs. to bring it back, restore this block and an element with id call-total:
+       const bankedCallMs = Number(call && call.totalMs) || 0;
+       const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
+       const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
+       $("call-total").textContent = Math.floor(callMinutes / 60) + "h " + (callMinutes % 60) + "m";
+  */
+
 }
 
 function render() {
@@ -446,7 +449,7 @@ function renderHibernation() {
         : "flip this when " + person + " goes to sleep";
     }
   }
-  $("hib-total").textContent = formatSpan(combined);
+  $("hib-total").textContent = formatSpan(combined); // "Xh Ym", climbs while either bear sleeps
 }
 
 for (const person in HIBERNATORS) {
@@ -476,6 +479,7 @@ for (const person in HIBERNATORS) {
 }
 
 function renderCall() {
+  if (!callToggle) return; // call card retired; state still lives in the database
   const on = !!(call && call.on);
   if (callToggle.checked !== on) callToggle.checked = on;
   if (on && typeof call.since === "number") {
@@ -488,7 +492,7 @@ function renderCall() {
   }
 }
 
-callToggle.addEventListener("change", async (event) => {
+if (callToggle) callToggle.addEventListener("change", async (event) => {
   if (!db) {
     event.target.checked = false;
     return;

@@ -213,7 +213,7 @@
   class PixelCompanions {
     constructor() {
       this.house = createButton("pixel-house", "drag the pixel temple or select it to make it shake", HOUSE_MARKUP);
-      this.cat = createButton("pixel-cat", "drag the pixel cat or select it to send some love", CAT_MARKUP);
+      this.cat = createButton("pixel-cat", "drag Pakku or select him to send some love", CAT_MARKUP);
       document.body.append(this.house, this.cat);
 
       this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -310,7 +310,7 @@
       this.house.setAttribute(
         "aria-label",
         sleeping
-          ? "the pixel cat is sleeping; select the temple twice to wake it or drag the temple"
+          ? "Pakku is sleeping; select the temple twice to wake him or drag the temple"
           : "drag the pixel temple or select it to make it shake",
       );
     }

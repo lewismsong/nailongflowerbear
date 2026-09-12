@@ -18,7 +18,7 @@ A small shared “I miss you” web app backed by Firebase Realtime Database.
     │   ├── cities.css      # responsive scratch-map layout
     │   ├── coinflip.css    # coin flip layout and animation
     │   ├── france.css      # itinerary and reservation components
-    │   ├── pixel-companions.css # draggable cat and house animation
+    │   ├── pixel-companions.css # draggable Pakku and house animation
     │   ├── styles.css      # home-page layout and components
     │   └── todo.css        # scratchpad layout and components
     ├── images
@@ -38,7 +38,7 @@ A small shared “I miss you” web app backed by Firebase Realtime Database.
         ├── config.js       # Firebase and game configuration
         ├── france.js       # itinerary and reservation state
         ├── navigation.js   # shared bottom tab navigation
-        ├── pixel-companions.js # draggable cat and house behavior
+        ├── pixel-companions.js # draggable Pakku and house behavior
         ├── platform.js     # safe storage and Firebase initialization
         └── todo.js         # shared todo state and interactions
 ```

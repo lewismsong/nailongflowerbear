@@ -241,8 +241,8 @@
       const t = progress * progress;
       const r = this.slide.getBoundingClientRect();
       // Follow the chute in the generated sprite, from its top to the right-hand exit.
-      const x = r.left + r.width * (.44 + .43 * t);
-      const y = r.top + r.height * (.28 + .49 * t);
+      const x = r.left + r.width * (.40 + .46 * t);
+      const y = r.top + r.height * (.29 + .47 * t);
       this.placeAt(x - this.pet.cat.offsetWidth / 2, y - this.pet.cat.offsetHeight * .78);
       if (progress === 1) {
         this.rememberPosition();

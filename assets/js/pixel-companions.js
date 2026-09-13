@@ -36,7 +36,7 @@
     </span>`;
   const HOUSE_MARKUP = `
     <span class="pixel-house-zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
-    <img class="pixel-house-image" src="assets/images/temple.png" alt="" draggable="false" />`;
+    <img class="pixel-house-image" src="assets/images/chinese-temple.png" alt="" draggable="false" />`;
   const HEART_MARKUP = `
     <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
       <path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" />
@@ -267,6 +267,10 @@
         },
         onCancel: () => this.sandbox?.cancelDrag(),
         onDrop: () => {
+          if (this.catDrag.dragged && this.isCatOverHouse()) {
+            this.sendToPlayroom();
+            return true;
+          }
           if (this.sandbox && this.catDrag.dragged && this.sandbox.drop()) return true;
           if (!this.isCatOverHouse()) return false;
           this.enterHouse();
@@ -281,6 +285,24 @@
           bottom: EDGE,
         },
       });
+    }
+
+    sendToPlayroom() {
+      this.setSleepingAppearance(false);
+      this.scheduleNextSleep();
+      if (this.sandbox) {
+        this.sandbox.beginDrag();
+        this.sandbox.inside = true;
+        this.sandbox.x = .2;
+        this.sandbox.y = .8;
+        this.sandbox.activate();
+        this.sandbox.place();
+        this.sandbox.save();
+        this.sandbox.announce();
+      } else {
+        appStorage.setJson("ily:pakkuSandbox", { inside: true, x: .2, y: .8 });
+        window.location.assign("pakku.html");
+      }
     }
 
     restoreSleepState() {

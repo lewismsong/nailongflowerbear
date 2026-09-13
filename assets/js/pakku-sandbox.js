@@ -12,7 +12,6 @@
       this.yarnX = .78;
       this.yarnRun = null;
       this.status = document.getElementById('sandbox-status');
-      this.transfer = document.getElementById('sandbox-transfer');
       const saved = appStorage.getJson(KEY, {});
       this.inside = saved.inside === true;
       this.x = Number.isFinite(saved.x) ? clamp(saved.x, 0, 1) : .2;
@@ -32,16 +31,6 @@
       document.getElementById('slide-option').addEventListener('click', ride);
       this.yarn.addEventListener('click', () => this.startYarn());
       document.getElementById('yarn-option').addEventListener('click', () => this.startYarn());
-      this.transfer.addEventListener('click', () => {
-        if (this.inside) this.leave();
-        else {
-          this.inside = true;
-          this.activate();
-          this.place();
-          this.save();
-          this.announce();
-        }
-      });
       window.addEventListener('pagehide', () => this.save());
     }
 
@@ -76,7 +65,6 @@
       this.status.textContent = this.inside
         ? 'Pakku is home. a slide or a little yarn chase?'
         : 'Pakku is out exploring.';
-      this.transfer.textContent = this.inside ? 'let Pakku roam outside' : 'bring Pakku home';
     }
 
     beginDrag() {
@@ -87,13 +75,11 @@
     }
 
     cancelDrag() {
-      this.area.classList.remove('drag-over');
       if (this.inside) this.place();
     }
 
     drop() {
       const point = this.center();
-      this.area.classList.remove('drag-over');
       if (!this.contains(this.bounds(), point.x, point.y)) {
         if (this.inside) {
           this.leave(true);
@@ -238,8 +224,6 @@
     update(time, dt, behavior) {
       this.renderYarn();
       if (this.pet.catDrag.isDragging) {
-        const c = this.center();
-        this.area.classList.toggle('drag-over', this.contains(this.bounds(), c.x, c.y));
         return this.inside;
       }
       if (!this.inside) return false;

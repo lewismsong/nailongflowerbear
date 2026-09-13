@@ -41,8 +41,9 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .pakku-sandbox::before { left: 3px; }
 .pakku-sandbox::after { right: 3px; transform: scaleX(-1); }
  .sandbox-suitcase { position: absolute; left: 5%; bottom: 24px; width: min(42%, 145px); aspect-ratio: 96 / 80; height: auto; border: 0; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
-.suitcase-art { display: block; width: 100%; height: 100%; background: url('../images/pakku-suitcase.svg') center / contain no-repeat; image-rendering: pixelated; pointer-events: none; }
+.suitcase-art { display: block; width: 100%; height: 100%; background: url('../images/pakku-suitcase.png') center / contain no-repeat; image-rendering: pixelated; pointer-events: none; }
 .suitcase-art > span { display: none; }
 .toy-slot .suitcase-art { width: 54px; height: 45px; margin: 3px 0; }
 .sandbox-suitcase:focus-visible { outline: 2px solid #9380b2; outline-offset: 8px; border-radius: 12px; }
 @media (max-width: 440px) { .sandbox-suitcase { height: auto; bottom: 24px; } .pakku-sandbox::before, .pakku-sandbox::after { top: -25px; height: 26px; width: 32px; } .toy-slot .suitcase-art { width: 42px; height: 35px; } }
+

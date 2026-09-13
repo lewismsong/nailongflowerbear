@@ -182,8 +182,8 @@
     suitcaseFrame() {
       const r = this.suitcase.getBoundingClientRect();
       this.pet.cat.dataset.behavior = 'sitting';
-      const rim = r.top + r.height * .65;
-      this.placeAt(r.left + r.width * .58 - this.pet.cat.offsetWidth / 2,
+      const rim = r.top + r.height * .70;
+      this.placeAt(r.left + r.width * .50 - this.pet.cat.offsetWidth / 2,
         rim - this.pet.cat.offsetHeight * .52);
       // Match the front rim, hiding the body below it while keeping the head draggable.
       const cat = this.pet.cat.getBoundingClientRect();
@@ -278,3 +278,4 @@
     }
   };
 })();
+

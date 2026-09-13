@@ -10,36 +10,42 @@
 <script src="assets/js/auth-guard.js?v=1"></script>
 <link rel="stylesheet" href="assets/css/base.css?v=4" />
 <link rel="stylesheet" href="assets/css/pixel-companions.css?v=4" />
-<link rel="stylesheet" href="assets/css/pakku-sandbox.css?v=1" />
+<link rel="stylesheet" href="assets/css/pakku-sandbox.css?v=2" />
 </head>
-<body>
+<body class="pakku-house-page">
 <main class="pakku-home">
   <h1>pakku’s house 🤍</h1>
-  <p class="pakku-instructions" id="sandbox-help">drag Pakku into the sand to play. drag him out to roam again.</p>
-  <section class="pakku-playroom" aria-label="Pakku’s sandbox">
-    <div id="pakku-sandbox" class="pakku-sandbox" aria-label="Sand play area" aria-describedby="sandbox-help" tabindex="0">
-      <span class="sandbox-caption" aria-hidden="true">a little place to play</span>
+  <p class="pakku-instructions" id="sandbox-help">drag Pakku into his home to play. drag him out to roam again.</p>
+  <section class="pakku-playroom" aria-label="Pakku’s playroom">
+    <div id="pakku-sandbox" class="pakku-sandbox" aria-label="Pakku’s play area" aria-describedby="sandbox-help" tabindex="0">
+      <span class="sandbox-caption" aria-hidden="true">Pakku’s little home</span>
       <button id="sandbox-slide" class="sandbox-slide" type="button" aria-label="Let Pakku ride the slide">
         <img src="assets/images/pakku-slide.png" alt="A pink slide with a wooden ladder" draggable="false" />
       </button>
+      <button id="sandbox-yarn" class="sandbox-yarn" type="button" aria-label="Roll the yarn ball for Pakku">
+        <img src="assets/images/pakku-yarn.png" alt="A mint-green ball of yarn" draggable="false" />
+      </button>
     </div>
-    <div class="sandbox-toys" role="group" aria-label="Sandbox toys">
+    <div class="sandbox-toys" role="group" aria-label="Pakku’s toys">
       <button id="slide-option" class="toy-slot selected" type="button" aria-label="Play on the slide">
         <img src="assets/images/pakku-slide.png" alt="" draggable="false" />
         <span>slide</span>
       </button>
-      <div class="toy-slot empty" aria-label="Empty toy slot 2"></div>
+      <button id="yarn-option" class="toy-slot" type="button" aria-label="Play with the yarn ball">
+        <img src="assets/images/pakku-yarn.png" alt="" draggable="false" />
+        <span>yarn</span>
+      </button>
       <div class="toy-slot empty" aria-label="Empty toy slot 3"></div>
       <div class="toy-slot empty" aria-label="Empty toy slot 4"></div>
     </div>
   </section>
   <p class="sandbox-status" id="sandbox-status" role="status">Pakku is out exploring.</p>
-  <button class="sandbox-transfer" id="sandbox-transfer" type="button">bring Pakku into the sandbox</button>
+  <button class="sandbox-transfer" id="sandbox-transfer" type="button">bring Pakku home</button>
 </main>
 <bear-tab-nav current="pakku"></bear-tab-nav>
 <script src="assets/js/navigation.js?v=19"></script>
 <script src="assets/js/all-time-adjustments.js?v=4"></script>
-<script src="assets/js/pakku-sandbox.js?v=1"></script>
-<script src="assets/js/pixel-companions.js?v=6"></script>
+<script src="assets/js/pakku-sandbox.js?v=2"></script>
+<script src="assets/js/pixel-companions.js?v=7"></script>
 </body>
 </html>

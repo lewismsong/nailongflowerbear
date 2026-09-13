@@ -9,6 +9,8 @@
       this.area = document.getElementById('pakku-sandbox');
       this.slide = document.getElementById('sandbox-slide');
       this.yarn = document.getElementById('sandbox-yarn');
+      this.suitcase = document.getElementById('sandbox-suitcase');
+      this.inSuitcase = false;
       this.yarnX = .78;
       this.yarnRun = null;
       this.status = document.getElementById('sandbox-status');
@@ -22,7 +24,7 @@
       this.announce();
       const ride = () => {
         if (!this.inside) {
-          this.status.textContent = 'bring Pakku home first.';
+          this.announce();
           return;
         }
         this.startSlide();
@@ -31,6 +33,8 @@
       document.getElementById('slide-option').addEventListener('click', ride);
       this.yarn.addEventListener('click', () => this.startYarn());
       document.getElementById('yarn-option').addEventListener('click', () => this.startYarn());
+      this.suitcase.addEventListener('click', () => this.startSuitcase());
+      document.getElementById('suitcase-option').addEventListener('click', () => this.startSuitcase());
       window.addEventListener('pagehide', () => this.save());
     }
 
@@ -62,12 +66,12 @@
     }
 
     announce() {
-      this.status.textContent = this.inside
-        ? 'Pakku is home. a slide or a little yarn chase?'
-        : 'Pakku is out exploring.';
+      this.status.textContent = this.inside ? 'play with pakku!' : 'pakku is out exploring.';
     }
 
     beginDrag() {
+      this.inSuitcase = false;
+      this.announce();
       this.ride = null;
       this.yarnRun = null;
       this.pet.cat.classList.remove('is-sliding');
@@ -95,13 +99,15 @@
       this.place();
       this.save();
       this.announce();
-      if (this.contains(this.yarn.getBoundingClientRect(), point.x, point.y)) this.startYarn();
+      if (this.contains(this.suitcase.getBoundingClientRect(), point.x, point.y)) this.startSuitcase();
+      else if (this.contains(this.yarn.getBoundingClientRect(), point.x, point.y)) this.startYarn();
       else if (this.contains(this.slide.getBoundingClientRect(), point.x, point.y)) this.startSlide();
       return true;
     }
 
     leave(keepDropPosition = false) {
       this.inside = false;
+      this.inSuitcase = false;
       this.ride = null;
       this.yarnRun = null;
       this.pet.cat.classList.remove('in-sandbox', 'is-sliding');
@@ -138,26 +144,47 @@
     startSlide() {
       if (!this.inside || this.pet.catDrag.isDragging || this.ride) return;
       this.yarnRun = null;
+      this.inSuitcase = false;
       this.selectToy('slide');
       this.ride = { elapsed: 0 };
       this.pet.direction = 1;
       this.pet.cat.classList.add('is-sliding');
-      this.status.textContent = 'wheee!';
+      this.status.textContent = 'pakku on the slide?';
     }
 
     selectToy(name) {
       document.getElementById('slide-option').classList.toggle('selected', name === 'slide');
       document.getElementById('yarn-option').classList.toggle('selected', name === 'yarn');
+      document.getElementById('suitcase-option').classList.toggle('selected', name === 'suitcase');
     }
 
     startYarn() {
-      if (!this.inside) { this.status.textContent = 'bring Pakku home first.'; return; }
+      if (!this.inside) { this.announce(); return; }
       if (this.pet.catDrag.isDragging) return;
       this.ride = null;
       this.pet.cat.classList.remove('is-sliding');
+      this.inSuitcase = false;
       this.selectToy('yarn');
       this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .12 : .82, caught: 0 };
-      this.status.textContent = 'get the yarn, Pakku!';
+      this.status.textContent = 'go fetch!';
+    }
+
+    startSuitcase() {
+      if (!this.inside || this.pet.catDrag.isDragging) return;
+      this.beginDrag();
+      this.inSuitcase = true;
+      this.selectToy('suitcase');
+      this.status.textContent = "pakku's home.";
+      this.suitcaseFrame();
+      this.save();
+    }
+
+    suitcaseFrame() {
+      const r = this.suitcase.getBoundingClientRect();
+      this.pet.cat.dataset.behavior = 'sitting';
+      this.placeAt(r.left + r.width * .27 - this.pet.cat.offsetWidth / 2,
+        r.top + r.height * .72 - this.pet.cat.offsetHeight * .85);
+      this.rememberPosition();
     }
 
     yarnFrame(dt) {
@@ -184,7 +211,7 @@
         this.pet.cat.dataset.behavior = 'playing';
         if (run.caught >= (reduced ? .15 : 1.8)) {
           this.yarnRun = null;
-          this.status.textContent = 'caught it! tap the yarn for another chase.';
+          this.announce();
         }
       }
       this.rememberPosition();
@@ -217,7 +244,7 @@
         this.ride = null;
         this.pet.cat.classList.remove('is-sliding');
         this.save();
-        this.status.textContent = 'again? drop Pakku on the slide for another ride.';
+        this.announce();
       }
     }
 
@@ -229,6 +256,7 @@
       if (!this.inside) return false;
       if (this.ride) this.slideFrame(dt);
       else if (this.yarnRun) this.yarnFrame(dt);
+      else if (this.inSuitcase) this.suitcaseFrame();
       else {
         const travel = Math.max(1, this.bounds().width - this.pet.cat.offsetWidth);
         if (behavior.name === 'walking' && !this.pet.reducedMotion.matches) {

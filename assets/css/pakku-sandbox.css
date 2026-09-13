@@ -35,3 +35,18 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .toy-slot:nth-child(2) { background-color: #edf8ef; }
 .toy-slot:nth-child(3) { background-color: #fff9e5; }
 .toy-slot:nth-child(4) { background-color: #eaf3fc; }
+
+/* Small ears grow directly out of the lavender border. */
+.pakku-sandbox::before, .pakku-sandbox::after { content: ''; position: absolute; top: -29px; width: 39px; height: 30px; background: #c8bddf; clip-path: polygon(0 100%, 12% 9%, 24% 0, 100% 100%); pointer-events: none; }
+.pakku-sandbox::before { left: 3px; }
+.pakku-sandbox::after { right: 3px; transform: scaleX(-1); }
+.sandbox-suitcase { position: absolute; left: 5%; bottom: 35px; width: min(46%, 160px); height: 65px; border: 0; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.suitcase-art { position: relative; display: flex; gap: 3px; width: 100%; height: 100%; transform: skewY(-4deg); pointer-events: none; }
+.suitcase-art > span { flex: 1; border: 5px solid #29282e; border-radius: 10px; background: #55515e; box-shadow: inset 0 0 0 2px #77717f, 0 4px 0 #19181e; }
+.suitcase-art > span:last-child { background: repeating-linear-gradient(90deg, #46434d 0 16px, #514d58 16px 19px); }
+.suitcase-art::after { content: ''; position: absolute; width: 19px; height: 7px; border: 3px solid #29282e; border-top: 0; border-radius: 0 0 5px 5px; bottom: -10px; left: 15%; }
+.toy-slot .suitcase-art { width: 54px; height: 29px; margin: 12px 0; }
+.toy-slot .suitcase-art > span { border-width: 3px; border-radius: 5px; }
+.toy-slot .suitcase-art::after { width: 9px; height: 4px; bottom: -7px; }
+.sandbox-suitcase:focus-visible { outline: 2px solid #9380b2; outline-offset: 8px; border-radius: 12px; }
+@media (max-width: 440px) { .sandbox-suitcase { height: 48px; bottom: 32px; } .pakku-sandbox::before, .pakku-sandbox::after { top: -25px; height: 26px; width: 32px; } .toy-slot .suitcase-art { width: 42px; height: 25px; } }

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" shape-rendering="crispEdges">
+<!-- Raised lid, recessed lining, and silver hinges. -->
+<path fill="#17171e" d="M12 6h62v4h6v31H8V12h4z"/>
+<path fill="#555562" d="M14 10h58v3h4v25H12V14h2z"/>
+<path fill="#24242d" d="M18 15h52v19H18z"/>
+<path fill="#393944" d="M20 17h48v3H20z"/>
+<path fill="#aaa8ba" d="M23 36h9v6h-9zm29 0h9v6h-9z"/>
+<!-- Open base with a shallow dark interior. -->
+<path fill="#17171e" d="M16 40h64l10 12v22H22V70h-6z"/>
+<path fill="#656572" d="M20 42h57l8 11H26z"/>
+<path fill="#202029" d="M26 45h47l4 7H30z"/>
+<!-- Front wall conceals Pakku's lower half. -->
+<path fill="#111118" d="M24 52h66v22H24z"/>
+<path fill="#363640" d="M28 56h58v14H28z"/>
+<path fill="#51515e" d="M28 54h58v3H28z"/>
+<path fill="#747480" d="M32 54h4v17h-4zm45 0h4v17h-4z"/>
+<path fill="#bdb9c9" d="M52 55h12v4h-3v-2h-6v2h-3z"/>
+<path fill="#17171e" d="M32 74h8v3h-8zm38 0h8v3h-8z"/>
+</svg>

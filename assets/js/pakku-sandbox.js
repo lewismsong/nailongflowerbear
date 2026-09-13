@@ -182,8 +182,13 @@
     suitcaseFrame() {
       const r = this.suitcase.getBoundingClientRect();
       this.pet.cat.dataset.behavior = 'sitting';
-      this.placeAt(r.left + r.width * .27 - this.pet.cat.offsetWidth / 2,
-        r.top + r.height * .72 - this.pet.cat.offsetHeight * .85);
+      const rim = r.top + r.height * .65;
+      this.placeAt(r.left + r.width * .58 - this.pet.cat.offsetWidth / 2,
+        rim - this.pet.cat.offsetHeight * .52);
+      // Match the front rim, hiding the body below it while keeping the head draggable.
+      const cat = this.pet.cat.getBoundingClientRect();
+      const bottom = Math.max(cat.height * .48, cat.top + cat.height - window.innerHeight);
+      this.pet.cat.style.clipPath = `inset(${Math.max(0, -cat.top)}px 0 ${bottom}px 0)`;
       this.rememberPosition();
     }
 

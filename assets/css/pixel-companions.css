@@ -133,7 +133,7 @@
 
 @media (max-width: 520px) {
   .pixel-cat { width: 80px; height: 80px; }
-  .pixel-house { width: 190px; }
+  .pixel-house { width: 150px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -142,3 +142,7 @@
   .pixel-house.shaking { animation: pixelHouseShake 0.18s ease-in-out; }
   .pixel-cat-heart { animation-duration: 0.7s; animation-timing-function: ease-out; }
 }
+
+.pixel-house { aspect-ratio: 75 / 60; }
+
+@media (max-width: 600px) { .pixel-house { width: 150px; } }

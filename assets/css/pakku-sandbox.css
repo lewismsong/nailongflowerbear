@@ -47,3 +47,17 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .sandbox-suitcase:focus-visible { outline: 2px solid #9380b2; outline-offset: 8px; border-radius: 12px; }
 @media (max-width: 440px) { .sandbox-suitcase { height: auto; bottom: 24px; } .pakku-sandbox::before, .pakku-sandbox::after { top: -25px; height: 26px; width: 32px; } .toy-slot .suitcase-art { width: 42px; height: 35px; } }
 
+
+
+/* A back wall and converging floorboards give the toys a shared room. */
+.pakku-sandbox { background: #f8f1fb url('../images/pakku-room.svg') center / 100% 100% no-repeat; }
+.sandbox-caption { position: relative; margin-top: 19px; }
+.sandbox-slide { left: 7%; top: 20%; width: min(62%, 210px); transform: none; }
+.sandbox-suitcase { left: auto; right: 8%; bottom: 16%; width: min(30%, 100px); }
+.sandbox-yarn { bottom: 5%; }
+.sandbox-slide::before, .sandbox-suitcase::before, .sandbox-yarn::before { content: ''; position: absolute; pointer-events: none; border-radius: 50%; background: #8e789324; filter: blur(2px); z-index: 0; }
+.sandbox-slide::before { left: 9%; right: 5%; bottom: 12%; height: 5%; }
+.sandbox-suitcase::before { left: 5%; right: 4%; bottom: 1%; height: 9%; }
+.sandbox-yarn::before { left: 17%; right: 12%; bottom: 9%; height: 14%; }
+.sandbox-slide img, .sandbox-yarn img, .sandbox-suitcase .suitcase-art { position: relative; }
+@media (max-width: 440px) { .sandbox-slide { top: 29%; left: 4%; width: 68%; } .sandbox-suitcase { bottom: 16%; right: 7%; } }

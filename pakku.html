@@ -10,21 +10,36 @@
 <script src="assets/js/auth-guard.js?v=1"></script>
 <link rel="stylesheet" href="assets/css/base.css?v=4" />
 <link rel="stylesheet" href="assets/css/pixel-companions.css?v=4" />
-<style>
-.pakku-home { width: min(100% - 32px, 620px); margin: 48px auto 0; text-align: center; }
-.pakku-home h1 { font: 700 clamp(28px, 6vw, 42px) 'Fraunces', Georgia, serif; margin: 0 0 24px; }
-.pakku-portrait { display: block; width: 100%; height: auto; border-radius: 24px; border: 1px solid var(--card-edge); box-shadow: 0 8px 30px rgba(74,53,36,.12); }
-body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
-</style>
+<link rel="stylesheet" href="assets/css/pakku-sandbox.css?v=1" />
 </head>
 <body>
 <main class="pakku-home">
   <h1>pakku’s house 🤍</h1>
-  <img class="pakku-portrait" src="assets/images/pakku.png" alt="Pakku, a fluffy white cat, being held" width="1138" height="782" />
+  <p class="pakku-instructions" id="sandbox-help">drag Pakku into the sand to play. drag him out to roam again.</p>
+  <section class="pakku-playroom" aria-label="Pakku’s sandbox">
+    <div id="pakku-sandbox" class="pakku-sandbox" aria-label="Sand play area" aria-describedby="sandbox-help" tabindex="0">
+      <span class="sandbox-caption" aria-hidden="true">a little place to play</span>
+      <button id="sandbox-slide" class="sandbox-slide" type="button" aria-label="Let Pakku ride the slide">
+        <img src="assets/images/pakku-slide.png" alt="A pink slide with a wooden ladder" draggable="false" />
+      </button>
+    </div>
+    <div class="sandbox-toys" role="group" aria-label="Sandbox toys">
+      <button id="slide-option" class="toy-slot selected" type="button" aria-label="Play on the slide">
+        <img src="assets/images/pakku-slide.png" alt="" draggable="false" />
+        <span>slide</span>
+      </button>
+      <div class="toy-slot empty" aria-label="Empty toy slot 2"></div>
+      <div class="toy-slot empty" aria-label="Empty toy slot 3"></div>
+      <div class="toy-slot empty" aria-label="Empty toy slot 4"></div>
+    </div>
+  </section>
+  <p class="sandbox-status" id="sandbox-status" role="status">Pakku is out exploring.</p>
+  <button class="sandbox-transfer" id="sandbox-transfer" type="button">bring Pakku into the sandbox</button>
 </main>
 <bear-tab-nav current="pakku"></bear-tab-nav>
 <script src="assets/js/navigation.js?v=19"></script>
 <script src="assets/js/all-time-adjustments.js?v=4"></script>
-<script src="assets/js/pixel-companions.js?v=5"></script>
+<script src="assets/js/pakku-sandbox.js?v=1"></script>
+<script src="assets/js/pixel-companions.js?v=6"></script>
 </body>
 </html>

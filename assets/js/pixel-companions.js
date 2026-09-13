@@ -118,6 +118,7 @@
       this.getExtraState = options.getExtraState ?? (() => ({}));
       this.onDragStart = options.onDragStart ?? (() => {});
       this.onDrop = options.onDrop ?? (() => false);
+      this.onCancel = options.onCancel ?? (() => {});
 
       const storedPosition = options.storedPosition ?? readStoredPosition(this.storageKey);
       this.x = storedPosition?.x ?? options.initialPosition.x;
@@ -198,6 +199,7 @@
         if (event.pointerId !== this.activePointerId) return;
         if (this.element.hasPointerCapture(event.pointerId)) this.element.releasePointerCapture(event.pointerId);
         this.activePointerId = null;
+        if (event.type === "pointercancel") this.onCancel();
         this.element.classList.remove("dragging");
         const acceptedDrop = event.type === "pointerup" && Boolean(this.onDrop());
         this.suppressClick = this.dragged || acceptedDrop;
@@ -235,6 +237,9 @@
       this.restoreSleepState();
       this.attachEvents();
       this.clampAndRender();
+      this.sandbox = window.PakkuSandbox ? new window.PakkuSandbox(this) : null;
+      this.parkedInSandbox = !this.sandbox && appStorage.getJson("ily:pakkuSandbox", {}).inside === true;
+      this.cat.hidden = this.parkedInSandbox;
       requestAnimationFrame((frameTime) => this.update(frameTime));
     }
 
@@ -257,9 +262,12 @@
         initialPosition: this.initialCatState,
         getExtraState: () => ({ direction: this.direction }),
         onDragStart: () => {
+          this.sandbox?.beginDrag();
           if (this.sleepState === "going-home") this.scheduleNextSleep();
         },
+        onCancel: () => this.sandbox?.cancelDrag(),
         onDrop: () => {
+          if (this.sandbox && this.catDrag.dragged && this.sandbox.drop()) return true;
           if (!this.isCatOverHouse()) return false;
           this.enterHouse();
           return true;
@@ -430,6 +438,11 @@
       const frameDuration = Math.min(Math.max(frameTime - this.previousFrameTime, 0), 50) / 1000;
       this.previousFrameTime = frameTime;
       let behavior = getPixelCatBehavior(now - this.startedAt);
+
+      if (this.parkedInSandbox || this.sandbox?.update(frameTime, frameDuration, behavior)) {
+        requestAnimationFrame((nextFrameTime) => this.update(nextFrameTime));
+        return;
+      }
 
       if (this.sleepState === "awake" && now >= this.nextSleepAt && !this.catDrag.isDragging) {
         this.sleepState = "going-home";

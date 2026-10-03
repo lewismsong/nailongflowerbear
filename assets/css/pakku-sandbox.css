@@ -61,3 +61,9 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .sandbox-yarn::before { left: 17%; right: 12%; bottom: 9%; height: 14%; }
 .sandbox-slide img, .sandbox-yarn img, .sandbox-suitcase .suitcase-art { position: relative; }
 @media (max-width: 440px) { .sandbox-slide { top: 29%; left: 4%; width: 68%; } .sandbox-suitcase { bottom: 16%; right: 7%; } }
+
+
+.sandbox-trampoline { position: absolute; left: 12%; bottom: 6%; width: min(38%, 150px); aspect-ratio: 2; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.sandbox-trampoline img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.sandbox-trampoline:focus-visible { outline: 2px solid #9380b2; outline-offset: 3px; border-radius: 50%; }
+#trampoline-option span { font-size: 11px; }

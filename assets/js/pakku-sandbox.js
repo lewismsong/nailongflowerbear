@@ -10,6 +10,8 @@
       this.slide = document.getElementById('sandbox-slide');
       this.yarn = document.getElementById('sandbox-yarn');
       this.suitcase = document.getElementById('sandbox-suitcase');
+      this.trampoline = document.getElementById('sandbox-trampoline');
+      this.bounce = null;
       this.inSuitcase = false;
       this.yarnX = .78;
       this.yarnRun = null;
@@ -35,6 +37,8 @@
       document.getElementById('yarn-option').addEventListener('click', () => this.startYarn());
       this.suitcase.addEventListener('click', () => this.startSuitcase());
       document.getElementById('suitcase-option').addEventListener('click', () => this.startSuitcase());
+      this.trampoline.addEventListener('click', () => this.startBounce());
+      document.getElementById('trampoline-option').addEventListener('click', () => this.startBounce());
       window.addEventListener('pagehide', () => this.save());
     }
 
@@ -70,6 +74,7 @@
     }
 
     beginDrag() {
+      this.bounce = null;
       this.inSuitcase = false;
       this.announce();
       this.ride = null;
@@ -99,7 +104,8 @@
       this.place();
       this.save();
       this.announce();
-      if (this.contains(this.suitcase.getBoundingClientRect(), point.x, point.y)) this.startSuitcase();
+      if (this.contains(this.trampoline.getBoundingClientRect(), point.x, point.y)) this.startBounce();
+      else if (this.contains(this.suitcase.getBoundingClientRect(), point.x, point.y)) this.startSuitcase();
       else if (this.contains(this.yarn.getBoundingClientRect(), point.x, point.y)) this.startYarn();
       else if (this.contains(this.slide.getBoundingClientRect(), point.x, point.y)) this.startSlide();
       return true;
@@ -107,6 +113,7 @@
 
     leave(keepDropPosition = false) {
       this.inside = false;
+      this.bounce = null;
       this.inSuitcase = false;
       this.ride = null;
       this.yarnRun = null;
@@ -144,6 +151,7 @@
     startSlide() {
       if (!this.inside || this.pet.catDrag.isDragging || this.ride) return;
       this.yarnRun = null;
+      this.bounce = null;
       this.inSuitcase = false;
       this.selectToy('slide');
       this.ride = { elapsed: 0 };
@@ -153,6 +161,7 @@
     }
 
     selectToy(name) {
+      document.getElementById('trampoline-option').classList.toggle('selected', name === 'trampoline');
       document.getElementById('slide-option').classList.toggle('selected', name === 'slide');
       document.getElementById('yarn-option').classList.toggle('selected', name === 'yarn');
       document.getElementById('suitcase-option').classList.toggle('selected', name === 'suitcase');
@@ -163,6 +172,7 @@
       if (this.pet.catDrag.isDragging) return;
       this.ride = null;
       this.pet.cat.classList.remove('is-sliding');
+      this.bounce = null;
       this.inSuitcase = false;
       this.selectToy('yarn');
       this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .12 : .82, caught: 0 };
@@ -177,6 +187,39 @@
       this.status.textContent = "pakku's home.";
       this.suitcaseFrame();
       this.save();
+    }
+
+    startBounce() {
+      if (!this.inside || this.pet.catDrag.isDragging) return;
+      this.beginDrag();
+      this.selectToy('trampoline');
+      this.bounce = { elapsed: 0 };
+      this.status.textContent = 'boing, boing, boing!';
+      this.bounceFrame(0);
+    }
+
+    bounceFrame(dt) {
+      const run = this.bounce;
+      run.elapsed += dt;
+      const durations = [1.05, .75, .42];
+      const heights = [1, .48, .10];
+      let phase = run.elapsed, index = 0;
+      while (index < 3 && phase >= durations[index]) phase -= durations[index++];
+      const r = this.trampoline.getBoundingClientRect();
+      const cat = this.pet.cat;
+      const base = r.top + r.height * .40 - cat.offsetHeight * .85;
+      const available = Math.max(0, base - this.bounds().top - 4);
+      const maximum = this.pet.reducedMotion.matches ? Math.min(8, available) : Math.min(120, available);
+      const progress = index < 3 ? phase / durations[index] : 0;
+      const lift = index < 3 ? 4 * progress * (1 - progress) * maximum * heights[index] : 0;
+      cat.dataset.behavior = 'sitting';
+      this.placeAt(r.left + r.width / 2 - cat.offsetWidth / 2, base - lift);
+      this.rememberPosition();
+      if (index === 3) {
+        this.bounce = null;
+        this.save();
+        this.announce();
+      }
     }
 
     suitcaseFrame() {
@@ -259,7 +302,8 @@
         return this.inside;
       }
       if (!this.inside) return false;
-      if (this.ride) this.slideFrame(dt);
+      if (this.bounce) this.bounceFrame(dt);
+      else if (this.ride) this.slideFrame(dt);
       else if (this.yarnRun) this.yarnFrame(dt);
       else if (this.inSuitcase) this.suitcaseFrame();
       else {
@@ -278,4 +322,5 @@
     }
   };
 })();
+
 

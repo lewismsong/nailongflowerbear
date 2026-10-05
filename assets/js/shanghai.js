@@ -331,8 +331,42 @@ document.querySelectorAll(".resv-form").forEach((form) => {
   });
 });
 
+
+function addChongqingBookingsOnce() {
+  return franceRef.transaction((current) => {
+    const trip = current || {};
+    if (trip._chongqingBookings20261005) return;
+    const additions = {
+      "day-14": "✈️ Shanghai (SHA) → Chongqing (CKG)\nThu 3 Dec 2026 · 16:05–19:05 (China time)\nBooked via Booking.com.\n🏨 ARISTON AIRESTON HOTEL — 3–7 Dec, 4 nights.\nCheck-in available after 15:00 on 3 Dec; arrive after the flight and transfer.\nHotel booked via BOOKING.COM.",
+      "day-15": "📍 Chongqing\n🏨 Staying at ARISTON AIRESTON HOTEL — booked via BOOKING.COM.",
+      "day-16": "📍 Chongqing\n🏨 Staying at ARISTON AIRESTON HOTEL — booked via BOOKING.COM.",
+      "day-17": "📍 Chongqing\n🏨 Staying at ARISTON AIRESTON HOTEL — booked via BOOKING.COM.",
+      "day-18": "🏨 Check out of ARISTON AIRESTON HOTEL by 12:00 on Mon 7 Dec 2026.\nHotel booked via BOOKING.COM.\n✈️ Chongqing (CKG) → Shanghai (SHA)\nMon 7 Dec 2026 · 20:10–22:25 (China time)\nBooked via Booking.com."
+    };
+    for (const [key, notes] of Object.entries(additions)) {
+      const existing = typeof trip[key] === "string" ? trip[key].trimEnd() : "";
+      trip[key] = existing ? existing + "\n\n" + notes : notes;
+    }
+    trip._resv = trip._resv || {};
+    trip._resv.hotel = trip._resv.hotel || {};
+    if (!trip._resv.hotel["chongqing-ariston-20261203"]) {
+      trip._resv.hotel["chongqing-ariston-20261203"] = {
+        title: "ARISTON AIRESTON HOTEL · booked via BOOKING.COM",
+        when: "Chongqing · 3 Dec 2026 after 15:00 → 7 Dec 2026 at 12:00 · 4 nights · China time",
+        address: "", code: "", at: 1791158400000
+      };
+    }
+    trip._chongqingBookings20261005 = true;
+    return trip;
+  }).catch((error) => {
+    console.error("Chongqing booking update failed:", error);
+    showFranceError("couldn't add the Chongqing bookings — refresh to try again");
+  });
+}
+
 buildDays();
 renderCountdown();
 seedDefaultsOnce();
+addChongqingBookingsOnce();
 setInterval(renderCountdown, 1000);
 

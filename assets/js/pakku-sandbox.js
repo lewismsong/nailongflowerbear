@@ -267,7 +267,9 @@
     }
 
     renderYarn() {
-      this.yarn.style.left = `${this.yarnX * Math.max(0, this.bounds().width - this.yarn.offsetWidth)}px`;
+      if (this.renderedYarnX === this.yarnX) return;
+      this.renderedYarnX = this.yarnX;
+      this.yarn.style.left = `calc(${this.yarnX * 100}% - ${this.yarnX * this.yarn.offsetWidth}px)`;
     }
 
     rememberPosition() {

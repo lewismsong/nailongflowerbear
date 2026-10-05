@@ -119,6 +119,7 @@ async function searchCities(query) {
     const response = await fetch(CITY_SEARCH_ENDPOINT + "?" + parameters, { signal: searchRequest.signal });
     if (!response.ok) throw new Error("city search returned " + response.status);
     const data = await response.json();
+    if (cityInput.value.trim() !== query) return;
     renderSearchResults(Array.isArray(data.results) ? data.results : []);
   } catch (error) {
     if (error.name === "AbortError") return;
@@ -429,6 +430,8 @@ function subscribeToVisits() {
 
 cityInput.addEventListener("input", () => {
   selectedCity = null;
+  searchRequest?.abort();
+  closeResults();
   updateAddButton();
   window.clearTimeout(searchTimer);
   const query = cityInput.value.trim();

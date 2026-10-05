@@ -13,10 +13,7 @@ const ringFg = $("ring-fg");
 const partnerClock = $("partner-clock");
 const partnerClockLabel = $("pc-label");
 const partnerClockTime = $("pc-time");
-const callToggle = $("call-toggle");
-const callSubtitle = $("call-sub");
 const CIRCUMFERENCE = 2 * Math.PI * 92;
-const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
 let name = currentAuthenticatedUser();
@@ -161,8 +158,10 @@ function renderPartnerClock(normalizedName, now) {
 }
 
 
+let statsCache = null;
 function renderStats() {
   const todayKey = torontoDayKey(serverNow());
+  if (!statsCache || statsCache.events !== events || statsCache.adjust !== adjust || statsCache.day !== todayKey) {
   const yesterdayKey = previousTorontoDayKey(serverNow());
   $("yesterday-khali-count").textContent = Math.max(0, dayPoints("khali", yesterdayKey));
   $("yesterday-lewis-count").textContent = Math.max(0, dayPoints("lewis", yesterdayKey));
@@ -170,17 +169,10 @@ function renderStats() {
     - dayPoints("khali", todayKey) - dayPoints("lewis", todayKey)
     + allTimeAdjustment();
   $("total-count").textContent = Math.max(0, completedMisses);
+  statsCache = { events, adjust, day: todayKey };
+  }
   $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
 
-  // total time on call: banked hangups plus the live call, shown in minutes
-
-  /* the call timer is retired for now, but the data is still in the database under
-     call/totalMs. to bring it back, restore this block and an element with id call-total:
-       const bankedCallMs = Number(call && call.totalMs) || 0;
-       const liveCallMs = call && call.on && typeof call.since === "number" ? Math.max(0, serverNow() - call.since) : 0;
-       const callMinutes = Math.floor((bankedCallMs + liveCallMs) / 60000);
-       $("call-total").textContent = Math.floor(callMinutes / 60) + "h " + (callMinutes % 60) + "m";
-  */
 
 }
 
@@ -222,8 +214,9 @@ function refreshLatestMissTime() {
   if (Number.isFinite(timestamp)) when.textContent = ago(timestamp, serverNow());
 }
 
+const torontoDateFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit" });
 function torontoDayKey(t) {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(t));
+  return torontoDateFormatter.format(new Date(t));
 }
 
 function secondsUntilTorontoMidnight() {
@@ -377,7 +370,7 @@ function showMain() {
   mainEl.classList.remove("hidden");
   $("who").textContent = name;
   render();
-  renderCall();
+  
   renderHibernation();
   renderFeed();
   renderCal();
@@ -477,50 +470,6 @@ for (const person in HIBERNATORS) {
   });
 }
 
-function renderCall() {
-  if (!callToggle) return; // call card retired; state still lives in the database
-  const on = !!(call && call.on);
-  if (callToggle.checked !== on) callToggle.checked = on;
-  if (on && typeof call.since === "number") {
-    const elapsed = Math.max(0, serverNow() - call.since);
-    const hours = Math.floor(elapsed / (60 * 60 * 1000));
-    const minutes = Math.floor((elapsed % (60 * 60 * 1000)) / (60 * 1000));
-    callSubtitle.textContent = "on call for " + (hours ? hours + "h " : "") + minutes + "m";
-  } else {
-    callSubtitle.textContent = "flip this when you're on a call.";
-  }
-}
-
-if (callToggle) callToggle.addEventListener("change", async (event) => {
-  if (!db) {
-    event.target.checked = false;
-    return;
-  }
-  try {
-    if (event.target.checked) {
-      await db.ref("call").transaction((currentCall) => ({
-        on: true,
-        since: serverNow(),
-        sleeping: false,
-        totalMs: Number(currentCall && currentCall.totalMs) || 0,
-      }));
-    } else {
-      await db.ref("call").transaction((currentCall) => {
-        const banked = Number(currentCall && currentCall.totalMs) || 0;
-        const active = currentCall && currentCall.on && typeof currentCall.since === "number"
-          ? Math.max(0, serverNow() - currentCall.since)
-          : 0;
-        return { on: false, sleeping: false, totalMs: banked + active };
-      });
-    }
-  } catch (error) {
-    console.error("call status update failed:", error);
-    $("err").textContent = "couldn't update the call — check your connection and try again";
-    renderCall();
-  }
-});
-
-
 $("refresh-btn").addEventListener("click", async () => {
   const sure = confirm("⚠️ warning: this erases TODAY's misses for both of you and resets today's counters to zero. past days and the total stay. continue?");
   if (!sure) return;
@@ -580,7 +529,7 @@ function connectFirebase() {
       resolveServerClock();
     });
     db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
-    db.ref("call").on("value", (s) => { call = s.val(); renderCall(); if (name) render(); });
+    db.ref("call").on("value", (s) => { call = s.val();  if (name) render(); });
     db.ref("hibernation").on("value", (s) => { hibernation = s.val() || {}; renderHibernation(); });
     eventsRef.on("value", (snap) => {
       try {
@@ -620,7 +569,7 @@ function connectFirebase() {
 // tick every second for cooldown and relative times
 let lastDayKey = null;
 setInterval(() => {
-  if (name && !mainEl.classList.contains("hidden")) {
+  if (name && !document.hidden && !mainEl.classList.contains("hidden")) {
     try {
       const dk = torontoDayKey(serverNow());
       if (dk !== lastDayKey) {
@@ -630,7 +579,7 @@ setInterval(() => {
       }
       refreshLatestMissTime();
       render();
-      renderCall();
+      
       renderHibernation();
     } catch (error) {
       console.error("render failed:", error);

@@ -4,7 +4,7 @@ const franceDatabase = initializeFirebaseDatabase();
 const franceRef = franceDatabase.ref("shanghai");
 
 // the plan so far, written into the shared itinerary once, then freely editable
-const DEFAULT_PLANS = {}; // no seeded plan yet, dates are still up in the air
+const DEFAULT_PLANS = {}; // Existing day-1 ... day-10 notes retain their original keys.
 
 // write the defaults exactly once (a flag in the database guards against re-seeding,
 // so nothing you edit or delete later will ever come back on its own)
@@ -33,52 +33,16 @@ function showFranceError(message) {
 }
 
 
-const SHANGHAI_DAY_COUNT = 10; // placeholder days until we pick real dates
+const SHANGHAI_DAY_COUNT = window.shanghaiTrip.dayCount;
 
 function tripDays() {
   return Array.from({ length: SHANGHAI_DAY_COUNT }, (unused, index) => index + 1);
 }
 
 function renderCountdown() {
-  franceCount.textContent = "🥟";
+  franceCount.textContent = window.shanghaiTrip.countdown();
 }
-
-// the dates line is shared and editable, since shanghai has no fixed dates yet
-const tripDates = document.getElementById("trip-dates");
-const tripDatesRef = franceRef.child("_dates");
-let tripDatesTimer = null;
-
-function saveTripDates() {
-  const text = tripDates.innerText.replace(/\u00a0/g, " ").trim();
-  const write = text ? tripDatesRef.set(text) : tripDatesRef.remove();
-  write.catch((error) => {
-    console.error("trip dates save failed:", error);
-    showFranceError("couldn't save the dates, check your connection");
-  });
-}
-
-tripDates.addEventListener("input", () => {
-  if (tripDatesTimer) clearTimeout(tripDatesTimer);
-  tripDatesTimer = setTimeout(saveTripDates, 400);
-});
-
-tripDates.addEventListener("blur", () => {
-  if (tripDatesTimer) clearTimeout(tripDatesTimer);
-  saveTripDates();
-});
-
-tripDates.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    tripDates.blur();
-  }
-});
-
-tripDatesRef.on("value", (snapshot) => {
-  if (document.activeElement === tripDates) return; // don't yank the cursor mid-edit
-  const text = typeof snapshot.val() === "string" ? snapshot.val() : "";
-  if (tripDates.innerText !== text) tripDates.innerText = text;
-});
+document.getElementById('trip-dates').textContent = window.shanghaiTrip.label;
 
 const itineraryToggle = document.getElementById("itinerary-toggle");
 const itineraryToggleLabel = document.getElementById("itinerary-toggle-label");
@@ -109,7 +73,12 @@ function buildDays() {
     number.className = "day-number";
     number.textContent = "day " + (index + 1);
 
-    head.append(number);
+    const label = document.createElement('span');
+    label.className = 'day-date';
+    label.textContent = window.shanghaiTrip.dateForDay(index).toLocaleDateString('en-US', {
+      timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric'
+    }).toLowerCase();
+    head.append(number, label);
 
     const notes = document.createElement("div");
     notes.className = "day-notes";
@@ -365,4 +334,5 @@ document.querySelectorAll(".resv-form").forEach((form) => {
 buildDays();
 renderCountdown();
 seedDefaultsOnce();
-setInterval(renderCountdown, 60 * 1000);
+setInterval(renderCountdown, 1000);
+

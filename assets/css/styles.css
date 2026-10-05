@@ -165,3 +165,7 @@ h2.feed-title.cal-title { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   #beacon, .heart-float, #feed li { animation: none !important; }
 }
+
+
+.shanghai-countdown-link { display: block; text-decoration: none; font-variant-numeric: tabular-nums; }
+.shanghai-countdown-link small { display: block; margin-top: 5px; font-weight: 400; color: var(--muted); }

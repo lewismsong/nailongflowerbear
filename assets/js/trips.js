@@ -3,6 +3,7 @@ const tripsDatabase = initializeFirebaseDatabase();
 
 document.querySelectorAll(".trip-when[data-trip]").forEach((element) => {
   const trip = element.dataset.trip;
+  if (trip === 'shanghai') { element.textContent = 'nov 20 – dec 13, 2026'; return; }
   const fallback = element.textContent;
   tripsDatabase.ref(trip).child("_dates").on(
     "value",
@@ -15,3 +16,4 @@ document.querySelectorAll(".trip-when[data-trip]").forEach((element) => {
     }
   );
 });
+

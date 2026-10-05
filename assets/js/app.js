@@ -171,7 +171,6 @@ function renderStats() {
   $("total-count").textContent = Math.max(0, completedMisses);
   statsCache = { events, adjust, day: todayKey };
   }
-  $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
 
 
 }
@@ -234,12 +233,19 @@ function timeLeftToronto() {
 }
 
 function revealCountdownToronto() {
-  const secondsLeft = secondsUntilTorontoMidnight();
-  const hours = Math.floor(secondsLeft / 3600);
-  const minutes = Math.floor((secondsLeft % 3600) / 60);
-  const seconds = secondsLeft % 60;
-  return hours + "h " + String(minutes).padStart(2, "0") + "m " + String(seconds).padStart(2, "0") + "s";
+  const minutes = Math.ceil(secondsUntilTorontoMidnight() / 60);
+  return Math.floor(minutes / 60) + "h " + String(minutes % 60).padStart(2, "0") + "m";
 }
+
+function renderRevealCountdown() {
+  if (name && !document.hidden && !mainEl.classList.contains("hidden")) {
+    $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
+  }
+}
+setInterval(renderRevealCountdown, 60000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) renderRevealCountdown();
+});
 
 let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
 const CAL_FIRST_MONTH = { year: 2026, month: 7 }; // nothing exists before july 2026
@@ -369,6 +375,7 @@ function showMain() {
   setupEl.classList.add("hidden");
   mainEl.classList.remove("hidden");
   $("who").textContent = name;
+  renderRevealCountdown();
   render();
   
   renderHibernation();

@@ -157,5 +157,5 @@ function addChongqingBookingsOnce() {
 buildDays();
 renderCountdown();
 addChongqingBookingsOnce();
-setInterval(renderCountdown, 1000);
+setInterval(renderCountdown, 60000);
 

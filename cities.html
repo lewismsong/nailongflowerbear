@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/css/base.css?v=4" />
 <link rel="stylesheet" href="assets/css/pixel-companions.css?v=5" />
 <link rel="stylesheet" href="assets/css/cities.css?v=6" />
+<link rel="stylesheet" href="assets/css/trips.css?v=3" />
 </head>
 <body class="cities-page">
 <main class="cities-wrap">
@@ -18,6 +19,7 @@
     <p class="cities-eyebrow">🐻‍❄️ + 🐻 around the world</p>
     <h1>places we've been</h1>
     <p>add a city and scratch another country off our map</p>
+    <a class="trips-jump" href="#trips">our trips ↓</a>
   </header>
 
   <section class="city-search" aria-label="add a visited city">
@@ -62,6 +64,49 @@
       <p class="visits-error" id="visits-error" role="status"></p>
     </section>
   </div>
+  <section class="world-trips" id="trips" aria-labelledby="trips-title">
+    <header class="world-trips-heading">
+      <p class="section-kicker">🐻‍❄️ + 🐻 go to</p>
+      <h2 id="trips-title">our trips</h2>
+    </header>
+  <p class="trips-kicker">next trip</p>
+  <a class="trip-card trip-next" href="shanghai.html">
+    <span class="trip-flag" aria-hidden="true">🇨🇳</span>
+    <span class="trip-body">
+      <span class="trip-name">shanghai</span>
+      <span class="trip-when" data-trip="shanghai">nov 20 – dec 13, 2026</span>
+    </span>
+    <span class="trip-go" aria-hidden="true">→</span>
+  </a>
+
+  <p class="trips-kicker">more trips</p>
+  <div class="trip-grid">
+  <a class="trip-card" href="france.html">
+    <span class="trip-flag" aria-hidden="true">🇫🇷</span>
+    <span class="trip-body">
+      <span class="trip-name">france</span>
+      <span class="trip-when" data-trip="france">aug 13 - aug 27, 2026</span>
+    </span>
+    <span class="trip-go" aria-hidden="true">→</span>
+  </a>
+  <a class="trip-card" href="berlin.html">
+    <span class="trip-flag" aria-hidden="true">🇩🇪</span>
+    <span class="trip-body">
+      <span class="trip-name">berlin</span>
+      <span class="trip-when" data-trip="berlin">2026</span>
+    </span>
+    <span class="trip-go" aria-hidden="true">→</span>
+  </a>
+  <a class="trip-card" href="toronto.html">
+    <span class="trip-flag" aria-hidden="true">🇨🇦</span>
+    <span class="trip-body">
+      <span class="trip-name">toronto</span>
+      <span class="trip-when" data-trip="toronto">dates tbd</span>
+    </span>
+    <span class="trip-go" aria-hidden="true">→</span>
+  </a>
+  </div>
+  </section>
 </main>
 
 <bear-tab-nav current="cities"></bear-tab-nav>
@@ -70,7 +115,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="assets/js/config.js"></script>
 <script src="assets/js/cities.js?v=11"></script>
-<script src="assets/js/navigation.js?v=20"></script>
+<script src="assets/js/trips.js?v=2"></script>
+<script src="assets/js/navigation.js?v=21"></script>
 <script src="assets/js/all-time-adjustments.js?v=4"></script>
 <script src="assets/js/pixel-companions.js?v=10"></script>
 </body>

@@ -3,7 +3,6 @@ const bearTabs = [
   { id: "todo", label: "our list", href: "todo.html", image: "assets/images/bears.jpg" },
   { id: "coinflip", label: "coinflip", href: "coinflip.html?v=5", image: "assets/images/bear-with-flower.webp" },
   { id: "cities", label: "world map", href: "cities.html", image: "assets/images/bears-sitting-lake.webp" },
-  { id: "trips", label: "trips", href: "trips.html", image: "assets/images/bears-airport.webp" },
   { id: "pakku", label: "pakku’s house", href: "pakku.html", image: "assets/images/pakku.webp" },
 ];
 

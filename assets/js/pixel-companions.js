@@ -36,7 +36,7 @@
     </span>`;
   const HOUSE_MARKUP = `
     <span class="pixel-house-zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
-    <img class="pixel-house-image" src="assets/images/chinese-temple.webp" alt="" draggable="false" />`;
+    <img class="pixel-house-image" src="assets/images/koala-tree.webp" alt="" draggable="false" />`;
   const HEART_MARKUP = `
     <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
       <path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" />
@@ -214,7 +214,7 @@
 
   class PixelCompanions {
     constructor() {
-      this.house = createButton("pixel-house", "drag the pixel temple or select it to make it shake", HOUSE_MARKUP);
+      this.house = createButton("pixel-house", "drag the koala tree or select it to make it shake", HOUSE_MARKUP);
       this.cat = createButton("pixel-cat", "drag Pakku or select him to send some love", CAT_MARKUP);
       document.body.append(this.house, this.cat);
 
@@ -340,8 +340,8 @@
       this.house.setAttribute(
         "aria-label",
         sleeping
-          ? "Pakku is sleeping; select the temple twice to wake him or drag the temple"
-          : "drag the pixel temple or select it to make it shake",
+          ? "Pakku is sleeping; select the koala tree twice to wake him or drag the tree"
+          : "drag the koala tree or select it to make it shake",
       );
     }
 

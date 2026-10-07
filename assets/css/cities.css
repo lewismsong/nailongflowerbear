@@ -32,7 +32,7 @@
 .world-card, .visits-card { padding: 20px; }
 .world-card-heading, .visits-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .world-count { color: var(--muted); font-size: 12px; white-space: nowrap; margin: 0; }
-.world-map { width: 100%; min-height: 390px; display: grid; place-items: center; margin-top: 10px; overflow: hidden; border-radius: 16px; background: radial-gradient(circle at 50% 45%, rgba(142, 212, 245,0.2), rgba(142, 212, 245,0.08) 55%, transparent 75%); }
+.world-map { width: 100%; min-height: 390px; display: grid; place-items: center; margin-top: 10px; overflow: hidden; border-radius: 16px; background: radial-gradient(circle at 50% 45%, rgba(188, 211, 226,0.2), rgba(188, 211, 226,0.08) 55%, transparent 75%); }
 .world-map svg { width: 100%; height: auto; display: block; overflow: visible; }
 .world-map path { fill: #eadfc9; stroke: #fffdf7; stroke-width: 0.7; vector-effect: non-scaling-stroke; transition: fill 0.3s ease, filter 0.3s ease; }
 .world-map path.visited { fill: var(--yellow); stroke: #fff7de; filter: drop-shadow(0 1px 1px rgba(74,53,36,0.18)); }

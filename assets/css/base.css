@@ -1,24 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-  /* --- seasonal palette --- currently RED (khali's china season)
-     original cream/yellow set:
-       --bg-bottom: #FFF4D6;  --deep: #4A3524;
-       --yellow: #FFC94D;     --yellow-deep: #DE9B00;
-       --text: #3D342B;       --muted: #9C8D7A;
-     swap those six values back in to return to the cream theme. */
-  --bg-top: #FFFFFF;
-  --bg-bottom: #FFE0DC;
-  --deep: #4A2724;
-  --card: rgba(0,0,0,0.04);
-  --card-edge: rgba(0,0,0,0.08);
-  --yellow: #FF9E93;
-  --yellow-deep: #D2503F;
-  --blue: #8ED4F5;
-  --blue-deep: #3E97C9;
-  --text: #3B2B28;
-  --muted: #A4877F;
-  --pink-deep: #E86A85;
+  /* Soft sage & cream. Original yellow: bg-bottom #FFF4D6, deep #4A3524,
+     yellow #FFC94D, yellow-deep #DE9B00, text #3D342B, muted #9C8D7A. */
+  --bg-top: #FBFCF7;
+  --bg-bottom: #DCE9DC;
+  --deep: #344B3D;
+  --card: rgba(67, 96, 77, 0.045);
+  --card-edge: rgba(67, 96, 77, 0.14);
+  --yellow: #B4CEAE;
+  --yellow-deep: #527357;
+  --blue: #BCD3E2;
+  --blue-deep: #496D87;
+  --text: #33483C;
+  --muted: #56665A;
+  --pink-deep: #B14F67;
 }
 
 * { box-sizing: border-box; }
@@ -51,7 +47,7 @@ bear-tab-nav { display: flex; flex-direction: column; align-items: center; gap: 
 .bear-tab:focus-visible { outline: 2px solid var(--yellow-deep); outline-offset: 2px; }
 .bear-tab-brand { margin: 0 auto 4px; }
 
-/* Keep all six picture links reachable on narrow screens. */
+/* Keep all picture links reachable on narrow screens. */
 .bear-tab-bar { width: min(100%, 620px); padding-inline: 8px; }
 .bear-tab { flex: 1 1 0; min-width: 0; max-width: 88px; }
 .bear-tab-icon, .bear-tab-image { width: 100%; height: auto; aspect-ratio: 88 / 82; }

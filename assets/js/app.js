@@ -89,18 +89,24 @@ function ago(timestamp, now) {
   return new Date(timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function spawnHearts(count) {
+function spawnLeaves(count) {
   const sky = $("sky");
+  if (!sky || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  sky.replaceChildren();
+  const colors = ["#D47738", "#E8B647", "#B9533B", "#C58D46", "#D99B59"];
   for (let index = 0; index < count; index++) {
-    const heart = document.createElement("div");
-    heart.className = "heart-float";
-    heart.textContent = "🤍";
-    heart.style.left = (12 + Math.random() * 76) + "%";
-    heart.style.fontSize = (14 + Math.random() * 16) + "px";
-    heart.style.animationDelay = (Math.random() * 0.5) + "s";
-    heart.style.setProperty("--drift", ((Math.random() - 0.5) * 60) + "px");
-    sky.appendChild(heart);
-    setTimeout(() => heart.remove(), 3200);
+    const leaf = document.createElement("div");
+    leaf.className = "miss-leaf";
+    leaf.style.left = (3 + Math.random() * 94) + "%";
+    leaf.style.setProperty("--leaf-size", (16 + Math.random() * 17) + "px");
+    leaf.style.setProperty("--leaf-color", colors[index % colors.length]);
+    leaf.style.setProperty("--drift", ((Math.random() - 0.5) * 140) + "px");
+    leaf.style.setProperty("--spin", ((Math.random() - 0.5) * 540) + "deg");
+    leaf.style.animationDuration = (3.2 + Math.random() * 1.8) + "s";
+    leaf.style.animationDelay = (Math.random() * 1.1) + "s";
+    sky.appendChild(leaf);
+    leaf.addEventListener("animationend", () => leaf.remove(), { once: true });
+    setTimeout(() => leaf.remove(), 6500);
   }
 }
 
@@ -513,7 +519,7 @@ beacon.addEventListener("click", async () => {
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
     await eventsRef.push(ev);
     appStorage.set("ily:lastSent", serverNow());
-    spawnHearts(7);
+    spawnLeaves(36);
     render();
     renderFeed();
   } catch (error) {
@@ -548,7 +554,7 @@ function connectFirebase() {
           .sort((a, b) => a.at - b.at);
         const incoming = theirEvents().length;
         if (name && prevIncoming !== null && incoming > prevIncoming) {
-          spawnHearts(10);
+          spawnLeaves(44);
           try {
             if (navigator.vibrate) navigator.vibrate([90, 50, 90]);
           } catch (error) {

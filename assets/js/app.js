@@ -364,8 +364,6 @@ function showMain() {
   $("who").textContent = name;
   renderRevealCountdown();
   render();
-  
-  renderHibernation();
   renderFeed();
   renderCal();
 }
@@ -404,65 +402,6 @@ $("reset-btn").addEventListener("click", () => {
   }
   window.location.reload();
 });
-
-// ---- hibernation: each bear can be marked asleep, time is banked per person ----
-const HIBERNATORS = { lewis: "hib-lewis", khali: "hib-khali" };
-let hibernation = {};
-
-function hibernationElapsed(person) {
-  const record = hibernation[person] || {};
-  const banked = Number(record.totalMs) || 0;
-  const active = record.on && typeof record.since === "number" ? Math.max(0, serverNow() - record.since) : 0;
-  return { banked, active, total: banked + active, sleeping: !!record.on };
-}
-
-function formatSpan(ms) {
-  const minutes = Math.floor(ms / 60000);
-  const hours = Math.floor(minutes / 60);
-  return (hours ? hours + "h " : "") + (minutes % 60) + "m";
-}
-
-function renderHibernation() {
-  let combined = 0;
-  for (const person in HIBERNATORS) {
-    const state = hibernationElapsed(person);
-    combined += state.total;
-    const toggle = $(HIBERNATORS[person]);
-    if (toggle && toggle.checked !== state.sleeping) toggle.checked = state.sleeping;
-    const subtitle = $(HIBERNATORS[person] + "-sub");
-    if (subtitle) {
-      // lifetime hibernation for this bear, banked plus any nap in progress
-      subtitle.textContent = formatSpan(state.total);
-    }
-  }
-  $("hib-total").textContent = formatSpan(combined); // "Xh Ym", climbs while either bear sleeps
-}
-
-for (const person in HIBERNATORS) {
-  const toggle = $(HIBERNATORS[person]);
-  if (!toggle) continue;
-  toggle.addEventListener("change", async (event) => {
-    if (!db) {
-      event.target.checked = false;
-      return;
-    }
-    const goingToSleep = event.target.checked;
-    try {
-      await db.ref("hibernation/" + person).transaction((record) => {
-        const banked = Number(record && record.totalMs) || 0;
-        if (goingToSleep) return { on: true, since: serverNow(), totalMs: banked };
-        const active = record && record.on && typeof record.since === "number"
-          ? Math.max(0, serverNow() - record.since)
-          : 0;
-        return { on: false, totalMs: banked + active };
-      });
-    } catch (error) {
-      console.error("hibernation update failed:", error);
-      $("err").textContent = "couldn't update hibernation — check your connection and try again";
-      renderHibernation();
-    }
-  });
-}
 
 $("refresh-btn").addEventListener("click", async () => {
   const sure = confirm("⚠️ warning: this erases TODAY's misses for both of you and resets today's counters to zero. past days and the total stay. continue?");
@@ -527,7 +466,6 @@ function connectFirebase() {
     }, showSubscriptionError);
     db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) { render(); renderCal(); } }, showSubscriptionError);
     db.ref("call").on("value", (s) => { call = s.val();  if (name) render(); }, showSubscriptionError);
-    db.ref("hibernation").on("value", (s) => { hibernation = s.val() || {}; renderHibernation(); }, showSubscriptionError);
     const updateMiss = (snapshot, removed = false) => {
       const previous = missHistory.records.get(snapshot.key);
       if (removed) missHistory.remove(snapshot.key);
@@ -575,8 +513,6 @@ setInterval(() => {
       }
       refreshLatestMissTime();
       render();
-      
-      renderHibernation();
     } catch (error) {
       console.error("render failed:", error);
     }

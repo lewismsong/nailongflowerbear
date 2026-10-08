@@ -19,7 +19,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: url("../images/optimized/cat-sprite-sheet-v3.webp") 0 25% / 600% 500% no-repeat;
+  background: url("../images/cat-matching-samoyed.png") 0 25% / 600% 500% no-repeat;
   filter: drop-shadow(0 3px 2px rgba(74,53,36,0.16));
   image-rendering: pixelated;
   transform-origin: center bottom;
@@ -31,6 +31,36 @@
 .pixel-cat[data-behavior="playing"] .pixel-cat-sprite { background-position: 0 100%; animation: pixelCatPlayingFrames 3s steps(1, end) infinite; }
 .pixel-cat.loved .pixel-cat-sprite { animation: pixelCatLove 0.5s steps(3, end); }
 .pixel-cat:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
+
+.pixel-daisy {
+  position: fixed;
+  z-index: 59;
+  width: 92px;
+  height: 92px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pixel-daisy.dragging { cursor: grabbing; }
+.pixel-daisy-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--daisy-direction, 1)); }
+.pixel-daisy-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("../images/optimized/samoyed-sprite-sheet.webp") 0 0 / 600% 400% no-repeat;
+  filter: drop-shadow(0 3px 2px rgba(74,53,36,0.16));
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+}
+.pixel-daisy[data-behavior="running"] .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames 0.7s steps(1, end) infinite, pixelDaisyRunBounce 0.7s ease-in-out infinite; }
+.pixel-daisy[data-behavior="sitting"] .pixel-daisy-sprite { background-position: 0 33.333%; animation: pixelDaisySittingFrames 3.2s steps(1, end) infinite; }
+.pixel-daisy[data-behavior="resting"] .pixel-daisy-sprite { background-position: 0 66.667%; animation: pixelDaisyRestingFrames 3.8s steps(1, end) infinite; }
+.pixel-daisy[data-behavior="howling"] .pixel-daisy-sprite { background-position: 0 100%; animation: pixelDaisyHowlingFrames 2.8s steps(1, end) infinite; }
+.pixel-daisy:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
 
 .pixel-house {
   position: fixed;
@@ -131,13 +161,46 @@
   100% { opacity: 0; transform: translate(calc(-50% + var(--heart-drift)), -92px) scale(1.05); }
 }
 
+@keyframes pixelDaisyRunningFrames {
+  0%, 19.9%, 100% { background-position: 0 0; }
+  20%, 39.9% { background-position: 20% 0; }
+  40%, 59.9% { background-position: 40% 0; }
+  60%, 79.9% { background-position: 60% 0; }
+  80%, 99.9% { background-position: 80% 0; }
+}
+@keyframes pixelDaisyRunBounce { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-1px); } }
+@keyframes pixelDaisySittingFrames {
+  0%, 16.5%, 100% { background-position: 0 33.333%; }
+  16.6%, 33.2% { background-position: 20% 33.333%; }
+  33.3%, 49.9% { background-position: 40% 33.333%; }
+  50%, 66.5% { background-position: 60% 33.333%; }
+  66.6%, 83.2% { background-position: 80% 33.333%; }
+  83.3%, 99.9% { background-position: 100% 33.333%; }
+}
+@keyframes pixelDaisyRestingFrames {
+  0%, 19.9%, 100% { background-position: 0 66.667%; }
+  20%, 39.9% { background-position: 20% 66.667%; }
+  40%, 59.9% { background-position: 40% 66.667%; }
+  60%, 79.9% { background-position: 60% 66.667%; }
+  80%, 99.9% { background-position: 80% 66.667%; }
+}
+@keyframes pixelDaisyHowlingFrames {
+  0%, 16.5%, 100% { background-position: 0 100%; }
+  16.6%, 33.2% { background-position: 20% 100%; }
+  33.3%, 49.9% { background-position: 40% 100%; }
+  50%, 66.5% { background-position: 60% 100%; }
+  66.6%, 83.2% { background-position: 80% 100%; }
+  83.3%, 99.9% { background-position: 100% 100%; }
+}
+
 @media (max-width: 520px) {
   .pixel-cat { width: 80px; height: 80px; }
+  .pixel-daisy { width: 80px; height: 80px; }
   .pixel-house { width: 190px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pixel-cat-sprite, .pixel-house-zzz span { animation: none !important; }
+  .pixel-cat-sprite, .pixel-daisy-sprite, .pixel-house-zzz span { animation: none !important; }
   .pixel-house.sleeping .pixel-house-zzz span { opacity: 1; }
   .pixel-house.shaking { animation: pixelHouseShake 0.18s ease-in-out; }
   .pixel-cat-heart { animation-duration: 0.7s; animation-timing-function: ease-out; }

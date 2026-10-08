@@ -1,6 +1,7 @@
 """Generate display-sized WebP assets while keeping the source artwork intact."""
 
 from pathlib import Path
+from shutil import copyfile
 
 from PIL import Image
 
@@ -8,6 +9,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE_DIRECTORY = ROOT / "assets" / "images"
 OUTPUT_DIRECTORY = IMAGE_DIRECTORY / "optimized"
+LEGACY_CAT_ATLAS = OUTPUT_DIRECTORY / "cat-sprite-sheet-v3.webp"
 WEBP_QUALITY = 85
 WEBP_METHOD = 6
 NAVIGATION_WIDTH = 176
@@ -28,7 +30,7 @@ ASSETS = {
     "pakku-trampoline.webp": (300, None, Image.Resampling.LANCZOS),
     "pakku-suitcase.webp": (200, None, Image.Resampling.LANCZOS),
     # resize each frame separately so neighbouring frames cannot bleed at the edges.
-    "cat-sprite-sheet-v3.webp": (192, (6, 5), Image.Resampling.LANCZOS),
+    "cat-matching-samoyed.png": (192, (6, 5), Image.Resampling.NEAREST),
     # retain the supplied pixel edges instead of blending adjacent colours.
     "samoyed-sprite-sheet.png": (128, (6, 4), Image.Resampling.NEAREST),
 }
@@ -76,6 +78,9 @@ def main():
             else:
                 resized.save(destination, "WEBP", quality=WEBP_QUALITY, method=WEBP_METHOD)
         print(f"{filename}: {source.stat().st_size:,} → {destination.stat().st_size:,} bytes")
+
+    copyfile(OUTPUT_DIRECTORY / "cat-matching-samoyed.webp", LEGACY_CAT_ATLAS)
+    print(f"compatibility copy: {LEGACY_CAT_ATLAS.name}")
 
 
 if __name__ == "__main__":

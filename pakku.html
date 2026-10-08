@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>pakku’s house 🤍</title>
 <meta name="theme-color" content="#F3DDC1" />
-<link rel="icon" href="assets/images/pakku.webp" />
+<link rel="icon" href="assets/images/optimized/pakku.webp" />
 <script src="assets/js/platform.js?v=2"></script>
 <script src="assets/js/auth-guard.js?v=1"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
 <link rel="stylesheet" href="assets/css/base.css?v=12" />
 <link rel="stylesheet" href="assets/css/pixel-companions.css?v=5" />
-<link rel="stylesheet" href="assets/css/pakku-sandbox.css?v=18" />
+<link rel="stylesheet" href="assets/css/pakku-sandbox.css?v=21" />
 <link rel="stylesheet" href="assets/css/seasonal-theme.css?v=1" />
 <script src="assets/js/seasonal-theme.js?v=1"></script>
 </head>
@@ -22,30 +22,32 @@
   <h1>pakku’s house 🤍</h1>
   <section class="pakku-playroom" aria-label="Pakku’s playroom">
     <div id="pakku-sandbox" class="pakku-sandbox" aria-label="Pakku’s play area" tabindex="0">
-      <img class="sandbox-whale" src="assets/images/pakku-whale.webp" alt="Poofy, a blue crochet whale plush with a cream belly" draggable="false" />
+      <img class="sandbox-whale" src="assets/images/optimized/pakku-whale.webp" alt="Poofy, a blue crochet whale plush with a cream belly" draggable="false" />
       <button id="sandbox-slide" class="sandbox-slide" type="button" aria-label="Let Pakku ride the slide">
-        <img src="assets/images/pakku-slide.webp" alt="A pink slide with a wooden ladder" draggable="false" />
+        <img src="assets/images/optimized/pakku-slide.webp" alt="A pink slide with a wooden ladder" draggable="false" />
       </button>
       <button id="sandbox-yarn" class="sandbox-yarn" type="button" aria-label="Roll the yarn ball for Pakku">
-        <img src="assets/images/pakku-yarn.webp" alt="A mint-green ball of yarn" draggable="false" />
+        <img src="assets/images/optimized/pakku-yarn.webp" alt="A mint-green ball of yarn" draggable="false" />
       </button>
       <button id="sandbox-suitcase" class="sandbox-suitcase" type="button" aria-label="Let Pakku sit in the suitcase"><span class="suitcase-art" aria-hidden="true"><span></span><span></span></span></button>
-      <button id="sandbox-trampoline" class="sandbox-trampoline" type="button" aria-label="Bounce Pakku three times"><img src="assets/images/pakku-trampoline.webp" alt="A powder-blue trampoline" draggable="false" /></button>
+      <button id="sandbox-trampoline" class="sandbox-trampoline" type="button" aria-label="Bounce Pakku three times"><img src="assets/images/optimized/pakku-trampoline.webp" alt="A powder-blue trampoline" draggable="false" /></button>
+      <button id="sandbox-samoyed" class="sandbox-samoyed" type="button" aria-label="Drag the Samoyed or select the Samoyed to hear a howl">
+        <span class="sandbox-samoyed-direction" aria-hidden="true"><span class="sandbox-samoyed-sprite"></span></span>
+      </button>
     </div>
     <div class="sandbox-toys" role="group" aria-label="Pakku’s toys">
       <button id="slide-option" class="toy-slot selected" type="button" aria-label="Play on the slide">
-        <img src="assets/images/pakku-slide.webp" alt="" draggable="false" />
+        <img src="assets/images/optimized/pakku-slide.webp" alt="" draggable="false" />
         <span>slide</span>
       </button>
       <button id="yarn-option" class="toy-slot" type="button" aria-label="Play with the yarn ball">
-        <img src="assets/images/pakku-yarn.webp" alt="" draggable="false" />
+        <img src="assets/images/optimized/pakku-yarn.webp" alt="" draggable="false" />
         <span>yarn</span>
       </button>
       <button id="suitcase-option" class="toy-slot" type="button" aria-label="Sit in the suitcase"><span class="suitcase-art" aria-hidden="true"><span></span><span></span></span><span>suitcase</span></button>
-      <button id="trampoline-option" class="toy-slot" type="button" aria-label="Bounce on the trampoline"><img src="assets/images/pakku-trampoline.webp" alt="" draggable="false" /><span>trampoline</span></button>
+      <button id="trampoline-option" class="toy-slot" type="button" aria-label="Bounce on the trampoline"><img src="assets/images/optimized/pakku-trampoline.webp" alt="" draggable="false" /><span>trampoline</span></button>
     </div>
   </section>
-  <p class="sandbox-status" id="sandbox-status" role="status">pakku is out exploring.</p>
 </main>
 <bear-tab-nav current="pakku"></bear-tab-nav>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -55,8 +57,8 @@
 <script defer src="assets/js/shared-settings.js?v=1"></script>
 <script defer src="assets/js/navigation.js?v=24"></script>
 <script defer src="assets/js/all-time-adjustments.js?v=4"></script>
-<script defer src="assets/js/pakku-sandbox.js?v=9"></script>
+<script defer src="assets/js/pakku-sandbox.js?v=10"></script>
 <script defer src="assets/js/pixel-companions.js?v=15"></script>
+<script defer src="assets/js/samoyed-companion.js?v=1"></script>
 </body>
 </html>
-

@@ -43,7 +43,8 @@ See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for a
     │   ├── bears-sitting-lake.webp
     │   ├── bears.jpg
     │   ├── cat-house.png
-    │   └── cat-sprite-sheet-v3.webp
+    │   ├── cat-sprite-sheet-v3.webp
+    │   └── samoyed-sprite-sheet.png
     ├── data
     │   └── world.svg       # country paths for the visited map
     └── js
@@ -58,6 +59,7 @@ See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for a
         ├── navigation.js   # shared bottom tab navigation
         ├── pixel-companions.js # draggable Pakku and house behavior
         ├── platform.js     # safe storage and Firebase initialization
+        ├── samoyed-companion.js # interactive Samoyed in Pakku's playroom
         ├── todo.js         # shared todo state and interactions
         ├── trip-itinerary.js # shared day-note and trip-date editor
         └── trip-reservations.js # shared reservation editor
@@ -75,7 +77,15 @@ Miss history uses Firebase child events and incremental counters. Regular additi
 
 Trip pages share one itinerary editor and subscribe to individual day notes rather than the trip root. Text saves are debounced, unchanged blur events do not write, and subscription/write failures appear in the page. One-time setup checks its marker before starting a transaction, while retaining the transaction's marker check for concurrent first visits. Today's miss reset removes events and adjustments in one atomic database update.
 
-Page scripts use `defer` in dependency order. Fonts load directly from HTML with connection hints, and navigation images use lazy loading and asynchronous decoding. Existing full-size artwork remains available as source assets.
+Page scripts use `defer` in dependency order. Fonts load directly from HTML with connection hints, and navigation images use lazy loading and asynchronous decoding. Navigation icons, favicons, house previews, toys, and the animated sprite sheet load display-sized WebP files from `assets/images/optimized/`. Existing full-size artwork remains available as source assets. Sprite frames are resized separately to keep their animation grid intact.
+
+To regenerate the optimized images after changing source artwork, install [Pillow](https://pillow.readthedocs.io/en/stable/installation/basic-installation.html) in your Python environment, then run:
+
+```sh
+python3 scripts/optimize-images.py
+```
+
+The generator preserves transparency and targets twice the maximum rendered width. The sprite sheet uses 192-pixel frames for the 92-pixel companion. Pillow is only needed for regeneration; the static app has no new runtime dependencies. Serving appropriately sized artwork reduces unnecessary mobile downloads; see [Google's image sizing guidance](https://web.dev/articles/serve-images-with-correct-dimensions).
 
 Run the dependency-free regression tests from the repository root:
 
@@ -89,4 +99,4 @@ Browser validation of all nine main pages used a local HTTP server and mocked Fi
 
 - The stored name and JavaScript passwords are UI gates, not server authentication. No Firebase Authentication integration or deployed database rules are included in this repo. Configure authenticated, authorized access and validate writes in Firebase before exposing private data to more users. See [Firebase's access guidance](https://firebase.google.com/docs/database/web/lists-of-data).
 - Startup still downloads the full miss history to preserve lifetime totals and historical calendars without a database migration. Bounded reads require trusted daily/lifetime aggregates plus paginated history; limiting the existing query alone would make totals incorrect. Todo and city pages also subscribe to whole collections and rebuild their lists, so large collections need pagination and narrower subscriptions.
-- Several full-size WebP images are hundreds of kilobytes, including artwork used as small icons. Lazy loading reduces initial work when those icons are offscreen, but generating appropriately sized image variants would further reduce cold-load transfer. Firebase SDK upgrades and a move from compat scripts to a modular build should be verified against the real backend before deployment.
+- The world-map SVG is still about 1.2 MB. Fonts and the Firebase compat SDK still load from external Google endpoints, so their availability and network latency can affect mobile startup. Firebase SDK upgrades and a move from compat scripts to a modular build should be verified against the real backend before deployment.

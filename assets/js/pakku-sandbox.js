@@ -15,7 +15,6 @@
       this.inSuitcase = false;
       this.yarnX = .78;
       this.yarnRun = null;
-      this.status = document.getElementById('sandbox-status');
       const saved = appStorage.getJson(KEY, {});
       this.inside = saved.inside === true;
       this.x = Number.isFinite(saved.x) ? clamp(saved.x, 0, 1) : .2;
@@ -23,12 +22,8 @@
       this.lastSave = 0;
       this.ride = null;
       if (this.inside) this.activate();
-      this.announce();
       const ride = () => {
-        if (!this.inside) {
-          this.announce();
-          return;
-        }
+        if (!this.inside) return;
         this.startSlide();
       };
       this.slide.addEventListener('click', ride);
@@ -69,14 +64,9 @@
       appStorage.setJson(KEY, { inside: this.inside, x: this.x, y: this.y });
     }
 
-    announce() {
-      this.status.textContent = this.inside ? 'play with pakku!' : 'pakku is out exploring.';
-    }
-
     beginDrag() {
       this.bounce = null;
       this.inSuitcase = false;
-      this.announce();
       this.ride = null;
       this.yarnRun = null;
       this.pet.cat.classList.remove('is-sliding');
@@ -103,7 +93,6 @@
       this.y = clamp((point.y - r.top - this.pet.cat.offsetHeight / 2) / Math.max(1, r.height - this.pet.cat.offsetHeight), 0, 1);
       this.place();
       this.save();
-      this.announce();
       if (this.contains(this.trampoline.getBoundingClientRect(), point.x, point.y)) this.startBounce();
       else if (this.contains(this.suitcase.getBoundingClientRect(), point.x, point.y)) this.startSuitcase();
       else if (this.contains(this.yarn.getBoundingClientRect(), point.x, point.y)) this.startYarn();
@@ -125,7 +114,6 @@
       this.pet.previousBehavior = '';
       this.pet.catDrag.save();
       this.save();
-      this.announce();
     }
 
     // Keep coordinates relative to the room, so scrolling/resizing cannot detach Pakku.
@@ -157,7 +145,6 @@
       this.ride = { elapsed: 0 };
       this.pet.direction = 1;
       this.pet.cat.classList.add('is-sliding');
-      this.status.textContent = 'pakku on the slide?';
     }
 
     selectToy(name) {
@@ -168,7 +155,7 @@
     }
 
     startYarn() {
-      if (!this.inside) { this.announce(); return; }
+      if (!this.inside) return;
       if (this.pet.catDrag.isDragging) return;
       this.ride = null;
       this.pet.cat.classList.remove('is-sliding');
@@ -176,7 +163,6 @@
       this.inSuitcase = false;
       this.selectToy('yarn');
       this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .12 : .82, caught: 0 };
-      this.status.textContent = 'go fetch!';
     }
 
     startSuitcase() {
@@ -184,7 +170,6 @@
       this.beginDrag();
       this.inSuitcase = true;
       this.selectToy('suitcase');
-      this.status.textContent = "pakku's home.";
       this.suitcaseFrame();
       this.save();
     }
@@ -194,7 +179,6 @@
       this.beginDrag();
       this.selectToy('trampoline');
       this.bounce = { elapsed: 0 };
-      this.status.textContent = 'boing, boing, boing!';
       this.bounceFrame(0);
     }
 
@@ -218,7 +202,6 @@
       if (index === 3) {
         this.bounce = null;
         this.save();
-        this.announce();
       }
     }
 
@@ -259,7 +242,6 @@
         this.pet.cat.dataset.behavior = 'playing';
         if (run.caught >= (reduced ? .15 : 1.8)) {
           this.yarnRun = null;
-          this.announce();
         }
       }
       this.rememberPosition();
@@ -294,7 +276,6 @@
         this.ride = null;
         this.pet.cat.classList.remove('is-sliding');
         this.save();
-        this.announce();
       }
     }
 
@@ -324,5 +305,4 @@
     }
   };
 })();
-
 

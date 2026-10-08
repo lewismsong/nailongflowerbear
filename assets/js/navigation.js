@@ -1,9 +1,9 @@
 const bearTabs = [
   { id: "home", label: "misses", href: "index.html", icon: "🤍" },
-  { id: "todo", label: "our list", href: "todo.html", image: "assets/images/bears.jpg" },
-  { id: "coinflip", label: "coinflip", href: "coinflip.html?v=5", image: "assets/images/bear-with-flower.webp" },
-  { id: "cities", label: "world map", href: "cities.html", image: "assets/images/bears-airport.webp" },
-  { id: "pakku", label: "pakku’s house", href: "pakku.html", image: "assets/images/pakku.webp" },
+  { id: "todo", label: "our list", href: "todo.html", image: "assets/images/optimized/bears.webp" },
+  { id: "coinflip", label: "coinflip", href: "coinflip.html?v=5", image: "assets/images/optimized/bear-with-flower.webp" },
+  { id: "cities", label: "world map", href: "cities.html", image: "assets/images/optimized/bears-airport.webp" },
+  { id: "pakku", label: "pakku’s house", href: "pakku.html", image: "assets/images/optimized/pakku.webp" },
 ];
 
 function createBearTab(tab, currentTab) {

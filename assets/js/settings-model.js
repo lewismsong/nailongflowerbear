@@ -3,9 +3,9 @@
 
   const DEFAULTS = { colors: { khali: "#EDB878", lewis: "#EF948F" }, house: "koala-tree" };
   const HOUSES = {
-    temple: { label: "temple", image: "assets/images/chinese-temple.webp" },
-    "cat-house": { label: "cat house", image: "assets/images/cat-house.png" },
-    "koala-tree": { label: "koala tree", image: "assets/images/koala-tree-autumn.webp" },
+    temple: { label: "temple", image: "assets/images/optimized/chinese-temple.webp" },
+    "cat-house": { label: "cat house", image: "assets/images/optimized/cat-house.webp" },
+    "koala-tree": { label: "koala tree", image: "assets/images/optimized/koala-tree-autumn.webp" },
   };
 
   function normalizeHex(value) {

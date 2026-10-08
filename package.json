@@ -1,0 +1,13 @@
+{
+  "name": "nailongflowerbear",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "firebase": "firebase",
+    "firebase:login": "firebase login",
+    "firebase:projects": "firebase projects:list"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.33.0"
+  }
+}

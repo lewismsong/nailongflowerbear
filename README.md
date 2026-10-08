@@ -2,6 +2,23 @@
 
 A small shared “I miss you” web app backed by Firebase Realtime Database.
 
+## Firebase tooling
+
+The app connects to the existing Realtime Database at `https://hi-baby-e6e24-default-rtdb.firebaseio.com`. The repository's Firebase CLI project alias is `hi-baby-e6e24`.
+
+Install the development tools and sign in with the Google account that has access to that project:
+
+```sh
+npm ci
+npm run firebase:login
+npm run firebase:projects
+npm run firebase -- database:instances:list
+```
+
+The official Firebase CLI is a development dependency; the static website still loads its browser SDK from the existing CDN scripts. CLI authentication is separate from the app's browser-side name selection. Credentials stay in the CLI's user configuration outside this repository. No Hosting configuration or replacement database rules are created by this setup.
+
+See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for authentication and project management.
+
 ## Project structure
 
 ```text

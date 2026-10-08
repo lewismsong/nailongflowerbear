@@ -217,6 +217,8 @@
       this.house = createButton("pixel-house", "drag the koala tree or select it to make it shake", HOUSE_MARKUP);
       this.cat = createButton("pixel-cat", "drag Pakku or select him to send some love", CAT_MARKUP);
       document.body.append(this.house, this.cat);
+      this.updateHouse(window.appSettings.current.house);
+      window.addEventListener("app-settings-change", event => this.updateHouse(event.detail.house));
 
       this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       this.startedAt = pixelCatStartedAt();
@@ -334,15 +336,23 @@
       this.saveSleepState();
     }
 
+    updateHouse(selection) {
+      const house = SettingsModel.HOUSES[selection];
+      this.houseName = house.label;
+      this.house.querySelector("img").src = house.image;
+      this.updateHouseLabel(this.house.classList.contains("sleeping"));
+    }
+
+    updateHouseLabel(sleeping) {
+      this.house.setAttribute("aria-label", sleeping
+        ? `Pakku is sleeping; select the ${this.houseName} twice to wake him or drag it`
+        : `drag the ${this.houseName} or select it to make it shake`);
+    }
+
     setSleepingAppearance(sleeping) {
       this.cat.classList.toggle("in-house", sleeping);
       this.house.classList.toggle("sleeping", sleeping);
-      this.house.setAttribute(
-        "aria-label",
-        sleeping
-          ? "Pakku is sleeping; select the koala tree twice to wake him or drag the tree"
-          : "drag the koala tree or select it to make it shake",
-      );
+      this.updateHouseLabel(sleeping);
     }
 
     enterHouse() {

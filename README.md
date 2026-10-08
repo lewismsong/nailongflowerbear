@@ -63,6 +63,12 @@ See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for a
         └── trip-reservations.js # shared reservation editor
 ```
 
+## Shared settings
+
+The gear beside the signed-in name opens `settings.html`. Khali and Lewis can choose their accent colours using a colour wheel or six-digit hex input, and select Pakku’s temple, cat house, or koala tree. Edits remain in the page’s draft until Apply is confirmed; Cancel discards them.
+
+Confirmed changes update only the edited fields under Realtime Database `/settings`: `colors/khali`, `colors/lewis`, and `house`. Every signed-in page subscribes to this shared state, so applied changes also appear on other devices. Unset colours follow the seasonal palette, and the default house remains the autumn koala tree. Loading and write failures are shown in the page; failed writes keep the draft for retrying.
+
 ## Performance and validation
 
 Miss history uses Firebase child events and incremental counters. Regular additions and forward timestamp corrections do not scan the history; deleting or moving a latest event backwards can require a scan. Calendar rendering reads daily counters rather than recalculating every event. Initial child events share a queued render, and date/time formatters are reused.

@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "misses": { ".read": true, ".write": true },
+    "adjust": { ".read": true, ".write": true },
+    "call": { ".read": true, ".write": true },
+    "todos": { ".read": true, ".write": true },
+    "france": { ".read": true, ".write": true },
+    "shanghai": { ".read": true, ".write": true },
+    "berlin": { ".read": true, ".write": true },
+    "toronto": { ".read": true, ".write": true },
+    "visitedCities": { ".read": true, ".write": true },
+    "settings": { ".read": true, ".write": true }
+  }
+}

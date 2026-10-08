@@ -1,0 +1,18 @@
+/* Sparse still leaves beneath the carousel; no images or animation. */
+.carousel-floor { position: relative; width: min(100% - 24px, 560px); height: 38px; margin-top: -7px; pointer-events: none; user-select: none; }
+.floor-leaf { position: absolute; width: 25px; height: 27px; background: var(--leaf-color); left: var(--leaf-x); top: var(--leaf-y); transform: rotate(var(--leaf-turn)); clip-path: polygon(50% 0, 62% 24%, 84% 15%, 79% 40%, 100% 43%, 75% 67%, 57% 78%, 54% 100%, 46% 100%, 44% 78%, 24% 67%, 0 43%, 21% 40%, 16% 15%, 38% 24%); }
+.floor-leaf::after { content: ""; position: absolute; left: 48%; top: 28%; width: 2px; height: 68%; background: rgba(111,65,36,.28); }
+.pakku-birthday-note { display: none; margin: 8px 0 0; padding: 10px 20px; border-radius: 18px; font-family: 'Fraunces', Georgia, serif; color: var(--deep); background: rgba(255,255,255,.7); text-align: center; }
+:root[data-season="birthday"] {
+  --bg-top: #FFFCFA; --bg-bottom: #F4DFED; --deep: #65425C;
+  --yellow: #E9B7D1; --yellow-deep: #975376; --text: #533D4C; --muted: #795C6D;
+  --card: rgba(151,83,118,.045); --card-edge: rgba(151,83,118,.16);
+  --accent-rgb: 233,183,209; --accent-deep-rgb: 151,83,118;
+  --accent-light: #FBE5F0; --accent-shadow: #CD91B0; --surface-warm: #FFF2F8;
+}
+[data-season="birthday"] .pakku-birthday-note { display: block; }
+[data-season="birthday"] .floor-leaf { width: 9px; height: 14px; border-radius: 2px; clip-path: none; background: #D6ACD8; }
+[data-season="birthday"] .floor-leaf:nth-child(2n) { background: #E5BC73; border-radius: 50%; width: 11px; height: 11px; }
+[data-season="birthday"] .floor-leaf:nth-child(3n) { background: var(--blue); }
+[data-season="birthday"] .floor-leaf::after { display: none; }
+[data-season="birthday"] .bear-tab-image { border-color: #DFABC9; box-shadow: 0 3px 12px rgba(151,83,118,.15); }

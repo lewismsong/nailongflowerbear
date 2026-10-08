@@ -24,7 +24,7 @@
 .trip-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(74, 53, 36, 0.14); }
 .trip-card + .trip-card { margin-top: 10px; }
 
-.trip-next { border-color: rgba(82, 115, 87, 0.45); box-shadow: 0 12px 32px rgba(82, 115, 87, 0.16); }
+.trip-next { border-color: rgba(var(--accent-deep-rgb), 0.45); box-shadow: 0 12px 32px rgba(var(--accent-deep-rgb), 0.16); }
 
 .trip-flag { font-size: 30px; line-height: 1; flex-shrink: 0; }
 .trip-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -39,7 +39,7 @@
 
 /* editable trip dates line */
 .trip-dates { outline: none; border-radius: 8px; padding: 1px 5px; margin-left: -5px; }
-.trip-dates:focus { background: #F5F9F1; box-shadow: 0 0 0 2px rgba(82, 115, 87, 0.25); }
+.trip-dates:focus { background: var(--surface-warm); box-shadow: 0 0 0 2px rgba(var(--accent-deep-rgb), 0.25); }
 .trip-dates:empty::before { content: attr(data-placeholder); color: var(--muted); opacity: 0.75; }
 
 /* Trip itineraries live beneath the shared world map. */
@@ -49,7 +49,7 @@
 .world-trips { margin: 36px 0 24px; padding-top: 28px; border-top: 1px solid var(--card-edge); scroll-margin-top: 24px; }
 .world-trips-heading h2 { margin: 6px 0 0; font-family: 'Fraunces', Georgia, serif; font-size: 32px; line-height: 1.1; }
 .world-trips .trips-kicker { margin: 20px 0 10px; }
-.world-trips .trip-next { background: #edf4e6; border-color: #bdcfb6; box-shadow: 0 6px 20px rgba(74,53,36,0.06); }
+.world-trips .trip-next { background: var(--surface-warm); border-color: var(--card-edge); box-shadow: 0 6px 20px rgba(74,53,36,0.06); }
 .trip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .trip-grid .trip-card { margin: 0; box-shadow: 0 6px 20px rgba(74,53,36,0.05); }
 .trip-card:focus-visible, .trips-jump:focus-visible { outline: 3px solid var(--deep); outline-offset: 4px; }

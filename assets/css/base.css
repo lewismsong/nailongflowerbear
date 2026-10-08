@@ -1,19 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-  /* Soft sage & cream. Original yellow: bg-bottom #FFF4D6, deep #4A3524,
-     yellow #FFC94D, yellow-deep #DE9B00, text #3D342B, muted #9C8D7A. */
-  --bg-top: #FBFCF7;
-  --bg-bottom: #DCE9DC;
-  --deep: #344B3D;
-  --card: rgba(67, 96, 77, 0.045);
-  --card-edge: rgba(67, 96, 77, 0.14);
-  --yellow: #B4CEAE;
-  --yellow-deep: #527357;
+  /* Autumn palette; birthday colours override these on November 30. */
+  --accent-rgb: 237, 184, 120;
+  --accent-deep-rgb: 155, 82, 46;
+  --accent-light: #FFE6B8;
+  --accent-shadow: #CE884E;
+  --surface-warm: #FFF6E8;
+  --bg-top: #FFFCF5;
+  --bg-bottom: #F3DDC1;
+  --deep: #563C2C;
+  --card: rgba(112, 70, 38, 0.045);
+  --card-edge: rgba(112, 70, 38, 0.15);
+  --yellow: #EDB878;
+  --yellow-deep: #9B522E;
   --blue: #BCD3E2;
   --blue-deep: #496D87;
-  --text: #33483C;
-  --muted: #56665A;
+  --text: #503B2E;
+  --muted: #78604D;
   --pink-deep: #B14F67;
 }
 

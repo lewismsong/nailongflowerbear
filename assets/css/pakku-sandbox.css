@@ -24,7 +24,7 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 }
 @media (prefers-reduced-motion: reduce) { .pakku-sandbox { transition: none; } }
 
-.pakku-house-page { background: linear-gradient(180deg, #fbfcf7, #f0eafb 62%, #dce9dc); }
+.pakku-house-page { background: linear-gradient(180deg, var(--bg-top), #f3e9ed 62%, var(--bg-bottom)); }
 .toy-slot[type="button"] { cursor: pointer; }
 .toy-slot:hover { background-color: #faf6ff; }
 .toy-slot.empty:hover { background: #ffffff35; }

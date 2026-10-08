@@ -70,7 +70,27 @@ class BearTabNavigation extends HTMLElement {
     brand.className = "trademark bear-tab-brand";
     brand.setAttribute("aria-label", "adjust all-time misses");
     brand.textContent = "lewiskhalico™";
-    this.append(navigation, brand);
+    const floor = document.createElement("div");
+    floor.className = "carousel-floor";
+    floor.setAttribute("aria-hidden", "true");
+    const leaves = [
+      [4, 9, -34, "#C47740"], [18, 2, 28, "#D5A344"],
+      [37, 16, -68, "#AB5841"], [58, 6, 46, "#DB9554"],
+      [76, 17, -24, "#AA8547"], [91, 3, 72, "#C46747"]
+    ];
+    for (const [x, y, turn, color] of leaves) {
+      const leaf = document.createElement("span");
+      leaf.className = "floor-leaf";
+      leaf.style.setProperty("--leaf-x", x + "%");
+      leaf.style.setProperty("--leaf-y", y + "px");
+      leaf.style.setProperty("--leaf-turn", turn + "deg");
+      leaf.style.setProperty("--leaf-color", color);
+      floor.appendChild(leaf);
+    }
+    const birthdayNote = document.createElement("p");
+    birthdayNote.className = "pakku-birthday-note";
+    birthdayNote.textContent = "happy birthday, pakku! 🎂";
+    this.append(birthdayNote, navigation, floor, brand);
   }
 }
 

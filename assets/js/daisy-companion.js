@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "ily:samoyedPosition";
-  const EDGE = 4;
+  const STORAGE_KEY = "ily:daisyPosition";
+  const EDGE = 8;
   const RUN_SPEED = 20;
   const BEHAVIORS = [
     { name: "running", duration: 7000 },
@@ -10,18 +10,23 @@
     { name: "running", duration: 5200 },
     { name: "resting", duration: 4800 },
   ];
+  const MARKUP = `
+    <span class="pixel-daisy-direction" aria-hidden="true">
+      <span class="pixel-daisy-sprite"></span>
+    </span>`;
 
-  class SamoyedCompanion {
+  class DaisyCompanion {
     constructor() {
-      this.area = document.getElementById("pakku-sandbox");
-      this.element = document.getElementById("sandbox-samoyed");
-      if (!this.area || !this.element) {
-        throw new Error("the Samoyed playroom elements are required");
-      }
+      this.element = document.createElement("button");
+      this.element.className = "pixel-daisy";
+      this.element.type = "button";
+      this.element.setAttribute("aria-label", "drag Daisy or select Daisy to hear a howl");
+      this.element.innerHTML = MARKUP;
+      document.body.appendChild(this.element);
 
       const storedPosition = appStorage.getJson(STORAGE_KEY, {});
-      this.x = Number.isFinite(storedPosition.x) ? this.clamp(storedPosition.x, 0, 1) : 0.68;
-      this.y = Number.isFinite(storedPosition.y) ? this.clamp(storedPosition.y, 0, 1) : 0.7;
+      this.x = Number.isFinite(storedPosition.x) ? storedPosition.x : 112;
+      this.bottom = Number.isFinite(storedPosition.bottom) ? storedPosition.bottom : 108;
       this.direction = storedPosition.direction === -1 ? -1 : 1;
       this.behaviorIndex = 0;
       this.behaviorStartedAt = performance.now();
@@ -30,38 +35,38 @@
       this.activePointerId = null;
       this.dragged = false;
       this.suppressClick = false;
+      this.dirty = true;
+      this.lastSavedAt = 0;
       this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       this.attachEvents();
       this.setBehavior(this.reducedMotion.matches ? "sitting" : "running");
-      this.render();
+      this.clampAndRender();
       requestAnimationFrame(frameTime => this.update(frameTime));
-    }
-
-    clamp(value, minimum, maximum) {
-      return Math.max(minimum, Math.min(maximum, value));
-    }
-
-    availableSpace() {
-      return {
-        width: Math.max(0, this.area.clientWidth - this.element.offsetWidth - EDGE * 2),
-        height: Math.max(0, this.area.clientHeight - this.element.offsetHeight - EDGE * 2),
-      };
     }
 
     setBehavior(behavior) {
       this.element.dataset.behavior = behavior;
     }
 
-    render() {
-      const space = this.availableSpace();
-      this.element.style.left = `${EDGE + this.x * space.width}px`;
-      this.element.style.top = `${EDGE + this.y * space.height}px`;
-      this.element.style.setProperty("--samoyed-direction", String(this.direction));
+    clampAndRender() {
+      const maximumX = Math.max(EDGE, window.innerWidth - this.element.offsetWidth - EDGE);
+      const maximumBottom = Math.max(EDGE, window.innerHeight - this.element.offsetHeight - EDGE);
+      this.x = Math.min(Math.max(this.x, EDGE), maximumX);
+      this.bottom = Math.min(Math.max(this.bottom, EDGE), maximumBottom);
+      this.element.style.left = `${this.x}px`;
+      this.element.style.bottom = `${this.bottom}px`;
+      this.element.style.setProperty("--daisy-direction", String(this.direction));
+      return maximumX;
     }
 
     save() {
-      appStorage.setJson(STORAGE_KEY, { x: this.x, y: this.y, direction: this.direction });
+      appStorage.setJson(STORAGE_KEY, {
+        x: this.x,
+        bottom: this.bottom,
+        direction: this.direction,
+      });
+      this.dirty = false;
     }
 
     startHowling() {
@@ -95,14 +100,11 @@
 
       this.element.addEventListener("pointermove", event => {
         if (event.pointerId !== this.activePointerId) return;
-        const areaBounds = this.area.getBoundingClientRect();
-        const space = this.availableSpace();
-        const left = event.clientX - this.dragOffsetX - areaBounds.left - this.area.clientLeft - EDGE;
-        const top = event.clientY - this.dragOffsetY - areaBounds.top - this.area.clientTop - EDGE;
-        this.x = space.width ? this.clamp(left / space.width, 0, 1) : 0;
-        this.y = space.height ? this.clamp(top / space.height, 0, 1) : 0;
+        this.x = event.clientX - this.dragOffsetX;
+        this.bottom = window.innerHeight - (event.clientY - this.dragOffsetY) - this.element.offsetHeight;
         this.dragged ||= Math.hypot(event.clientX - this.dragStartX, event.clientY - this.dragStartY) > 4;
-        this.render();
+        this.dirty = true;
+        this.clampAndRender();
         event.preventDefault();
       });
 
@@ -123,8 +125,25 @@
 
       this.element.addEventListener("pointerup", finishDragging);
       this.element.addEventListener("pointercancel", finishDragging);
-      window.addEventListener("resize", () => this.render());
+      window.addEventListener("resize", () => {
+        this.clampAndRender();
+        this.save();
+      });
       window.addEventListener("pagehide", () => this.save());
+    }
+
+    move(frameDuration) {
+      const maximumX = this.clampAndRender();
+      this.x += this.direction * RUN_SPEED * frameDuration;
+      if (this.x >= maximumX) {
+        this.x = maximumX;
+        this.direction = -1;
+      } else if (this.x <= EDGE) {
+        this.x = EDGE;
+        this.direction = 1;
+      }
+      this.dirty = true;
+      this.clampAndRender();
     }
 
     update(frameTime) {
@@ -147,21 +166,19 @@
           }
           const currentBehavior = BEHAVIORS[this.behaviorIndex];
           this.setBehavior(currentBehavior.name);
-          if (currentBehavior.name === "running") {
-            const space = this.availableSpace();
-            this.x += this.direction * RUN_SPEED * frameDuration / Math.max(1, space.width);
-            if (this.x >= 1 || this.x <= 0) this.direction *= -1;
-            this.x = this.clamp(this.x, 0, 1);
-            this.render();
-          }
+          if (currentBehavior.name === "running") this.move(frameDuration);
         } else {
           this.setBehavior("sitting");
         }
       }
 
+      if (this.dirty && frameTime - this.lastSavedAt >= 500) {
+        this.save();
+        this.lastSavedAt = frameTime;
+      }
       requestAnimationFrame(nextFrameTime => this.update(nextFrameTime));
     }
   }
 
-  if (isAppAuthenticated()) new SamoyedCompanion();
+  if (isAppAuthenticated()) new DaisyCompanion();
 })();

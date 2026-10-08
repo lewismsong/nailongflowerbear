@@ -43,7 +43,7 @@ See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for a
     │   ├── bears-sitting-lake.webp
     │   ├── bears.jpg
     │   ├── cat-house.png
-    │   ├── cat-sprite-sheet-v3.webp
+    │   ├── cat-matching-samoyed.png
     │   └── samoyed-sprite-sheet.png
     ├── data
     │   └── world.svg       # country paths for the visited map
@@ -59,7 +59,7 @@ See the [Firebase CLI documentation](https://firebase.google.com/docs/cli) for a
         ├── navigation.js   # shared bottom tab navigation
         ├── pixel-companions.js # draggable Pakku and house behavior
         ├── platform.js     # safe storage and Firebase initialization
-        ├── samoyed-companion.js # interactive Samoyed in Pakku's playroom
+        ├── daisy-companion.js # roaming, draggable Daisy companion
         ├── todo.js         # shared todo state and interactions
         ├── trip-itinerary.js # shared day-note and trip-date editor
         └── trip-reservations.js # shared reservation editor

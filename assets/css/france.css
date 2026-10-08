@@ -1,7 +1,7 @@
 .france-page {
   padding: 0 0 48px;
   background:
-    radial-gradient(circle at 8% 12%, rgba(188, 211, 226, 0.24), transparent 26rem),
+    radial-gradient(circle at 8% 12%, rgba(217, 168, 161, 0.24), transparent 26rem),
     radial-gradient(circle at 92% 28%, rgba(var(--accent-rgb), 0.25), transparent 30rem),
     linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
 }
@@ -66,7 +66,7 @@
   height: 250px;
   top: -140px;
   right: 9%;
-  background: rgba(188, 211, 226, 0.28);
+  background: rgba(217, 168, 161, 0.28);
 }
 
 .france-header::after {
@@ -304,10 +304,10 @@
 
 .resv-col {
   --resv-accent: var(--blue-deep);
-  --resv-tint: rgba(188, 211, 226, 0.14);
+  --resv-tint: rgba(217, 168, 161, 0.14);
   min-width: 0;
   padding: 18px;
-  border: 1px solid rgba(73, 109, 135, 0.18);
+  border: 1px solid rgba(137, 76, 73, 0.18);
   border-radius: 20px;
   background: linear-gradient(180deg, var(--resv-tint), rgba(255, 255, 255, 0.9) 130px);
 }
@@ -542,7 +542,7 @@
   .france-page {
     padding-bottom: 36px;
     background:
-      radial-gradient(circle at 0 8%, rgba(188, 211, 226, 0.22), transparent 18rem),
+      radial-gradient(circle at 0 8%, rgba(217, 168, 161, 0.22), transparent 18rem),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 

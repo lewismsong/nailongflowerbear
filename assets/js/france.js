@@ -21,29 +21,28 @@ const DEFAULT_PLANS = {
 // write the defaults exactly once (a flag in the database guards against re-seeding,
 // so nothing you edit or delete later will ever come back on its own)
 function seedDefaultsOnce() {
-  franceRef.transaction((current) => {
-    const trip = current || {};
-    if (trip._seeded) return;
-    for (const [key, notes] of Object.entries(DEFAULT_PLANS)) {
-      if (trip[key] == null) trip[key] = notes;
-    }
-    trip._seeded = true;
-    return trip;
+  return franceRef.child("_seeded").once("value").then((snapshot) => {
+    if (snapshot.val()) return;
+    return franceRef.transaction((current) => {
+      const trip = current || {};
+      if (trip._seeded) return;
+      for (const [key, notes] of Object.entries(DEFAULT_PLANS)) {
+        if (trip[key] == null) trip[key] = notes;
+      }
+      trip._seeded = true;
+      return trip;
+    });
   }).catch((error) => {
     console.error("itinerary seed failed:", error);
     showFranceError("couldn't load the starter plans, check the firebase rules");
   });
 }
 
-const daysList = document.getElementById("days");
 const franceCount = document.getElementById("france-count");
-const franceError = document.getElementById("france-error");
-const pendingDaySaves = new Map();
-const dayNotes = new Map(); // day key to editable notes element
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function showFranceError(message) {
-  franceError.textContent = message;
+  document.getElementById("france-error").textContent = message;
 }
 
 function dayKeyOf(date) {
@@ -72,146 +71,13 @@ function renderCountdown() {
   else franceCount.textContent = "we'll always have france";
 }
 
-const itineraryToggle = document.getElementById("itinerary-toggle");
-const itineraryToggleLabel = document.getElementById("itinerary-toggle-label");
-
-function setItineraryExpanded(expanded) {
-  daysList.hidden = !expanded;
-  itineraryToggle.setAttribute("aria-expanded", String(expanded));
-  itineraryToggleLabel.textContent = expanded ? "collapse" : "show itinerary";
-}
-
-itineraryToggle.addEventListener("click", () => {
-  setItineraryExpanded(itineraryToggle.getAttribute("aria-expanded") !== "true");
-});
-
-function buildDays() {
-  const frag = document.createDocumentFragment();
-  tripDays().forEach((date, index) => {
-    const key = dayKeyOf(date);
-
-    const item = document.createElement("li");
-    item.className = "day-card";
-    item.dataset.key = key;
-
-    const head = document.createElement("div");
-    head.className = "day-head";
-
-    const number = document.createElement("span");
-    number.className = "day-number";
-    number.textContent = "day " + (index + 1);
-
-    const label = document.createElement("span");
-    label.className = "day-date";
-    label.textContent = date
-      .toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })
-      .toLowerCase();
-
-    head.append(number, label);
-
-    const notes = document.createElement("div");
-    notes.className = "day-notes";
-    notes.contentEditable = "true";
-    notes.dataset.placeholder = "nothing planned yet, tap to write";
-    notes.setAttribute("role", "textbox");
-    notes.setAttribute("aria-label", "plans for " + label.textContent);
-    notes.setAttribute("spellcheck", "true");
-    notes.addEventListener("input", () => scheduleDaySave(key, notes));
-    notes.addEventListener("blur", () => flushDaySave(key, notes));
-
-    dayNotes.set(key, notes);
-    item.append(head, notes);
-    frag.appendChild(item);
-  });
-  daysList.replaceChildren(frag);
-}
-
-function scheduleDaySave(key, notesElement) {
-  const previousTimer = pendingDaySaves.get(key);
-  if (previousTimer) clearTimeout(previousTimer);
-  const timer = setTimeout(() => saveDay(key, notesElement), 400);
-  pendingDaySaves.set(key, timer);
-}
-
-function flushDaySave(key, notesElement) {
-  const timer = pendingDaySaves.get(key);
-  if (timer) clearTimeout(timer);
-  pendingDaySaves.delete(key);
-  saveDay(key, notesElement);
-}
-
-function saveDay(key, notesElement) {
-  pendingDaySaves.delete(key);
-  const text = notesElement.innerText.replace(/\u00a0/g, " ").trimEnd();
-  const reference = franceRef.child(key);
-  const write = text.trim() ? reference.set(text) : reference.remove();
-  write
-    .then(() => showFranceError(""))
-    .catch((error) => {
-      console.error("itinerary save failed:", error);
-      showFranceError("couldn't save that day, check your connection");
-    });
-}
-
-// firebase: shared value subscription, both devices plan the same trip, live
-franceRef.on("value", (snapshot) => {
-  const value = snapshot.val() || {};
-  dayNotes.forEach((notesElement, key) => {
-    if (document.activeElement === notesElement) return; // don't yank the cursor mid-edit
-    const text = typeof value[key] === "string" ? value[key] : "";
-    if (notesElement.innerText !== text) notesElement.innerText = text;
-  });
-}, (error) => {
-  console.error("itinerary subscription failed:", error);
-  showFranceError("can't reach the itinerary, check the connection (or the firebase rules)");
-});
-
-
-// Reservation forms use the shared editor.
+const days = tripDays().map((date) => ({
+  key: dayKeyOf(date),
+  label: date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }).toLowerCase(),
+}));
+initializeTripItinerary(franceRef, days, showFranceError, "nothing planned yet, tap to write");
+initializeTripDates(franceRef, showFranceError, document.getElementById("trip-dates").innerText.trim());
 initializeTripReservations(franceRef, showFranceError);
-
-buildDays();
 renderCountdown();
 seedDefaultsOnce();
-setInterval(renderCountdown, 60 * 1000);
-
-// the dates line is shared and editable, since shanghai has no fixed dates yet
-const tripDates = document.getElementById("trip-dates");
-const tripDatesRef = franceRef.child("_dates");
-let tripDatesTimer = null;
-
-function saveTripDates() {
-  const text = tripDates.innerText.replace(/\u00a0/g, " ").trim();
-  const write = text ? tripDatesRef.set(text) : tripDatesRef.remove();
-  write.catch((error) => {
-    console.error("trip dates save failed:", error);
-    showFranceError("couldn't save the dates, check your connection");
-  });
-}
-
-tripDates.addEventListener("input", () => {
-  if (tripDatesTimer) clearTimeout(tripDatesTimer);
-  tripDatesTimer = setTimeout(saveTripDates, 400);
-});
-
-tripDates.addEventListener("blur", () => {
-  if (tripDatesTimer) clearTimeout(tripDatesTimer);
-  saveTripDates();
-});
-
-tripDates.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    tripDates.blur();
-  }
-});
-
-const tripDatesFallback = tripDates.innerText.trim();
-
-tripDatesRef.on("value", (snapshot) => {
-  if (document.activeElement === tripDates) return; // don't yank the cursor mid-edit
-  const stored = snapshot.val();
-  const text = typeof stored === "string" && stored.trim() ? stored.trim() : tripDatesFallback;
-  if (tripDates.innerText !== text) tripDates.innerText = text;
-});
-
+setInterval(() => { if (!document.hidden) renderCountdown(); }, 60000);

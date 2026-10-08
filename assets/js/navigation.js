@@ -26,6 +26,10 @@ function createBearTab(tab, currentTab) {
     image.className = "bear-tab-image";
     image.src = tab.image;
     image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.width = 88;
+    image.height = 82;
     element.appendChild(image);
   } else {
     const icon = document.createElement("span");

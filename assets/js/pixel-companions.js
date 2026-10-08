@@ -240,7 +240,7 @@
       this.sandbox = window.PakkuSandbox ? new window.PakkuSandbox(this) : null;
       this.parkedInSandbox = !this.sandbox && appStorage.getJson("ily:pakkuSandbox", {}).inside === true;
       this.cat.hidden = this.parkedInSandbox;
-      requestAnimationFrame((frameTime) => this.update(frameTime));
+      if (!this.parkedInSandbox) requestAnimationFrame((frameTime) => this.update(frameTime));
     }
 
     calculateInitialCatState() {

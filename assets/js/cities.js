@@ -368,23 +368,26 @@ function renderVisits() {
 }
 
 
-// One atomic, idempotent addition: preserve existing cities/dates and respect later removals.
+// preserve existing cities and dates, and respect later removals.
 function addChinaCitiesOnce() {
-  return visitsRef.transaction((current) => {
-    const value = current || {};
-    if (value._chinaTrip2026) return;
-    for (const city of [
-      { city: 'Shanghai', cityId: '1796236', latitude: 31.22222, longitude: 121.45806, visitFrom: '2026-11-20', visitTo: '2026-12-13' },
-      { city: 'Chongqing', cityId: '1814906', latitude: 29.56278, longitude: 106.55278, visitFrom: '', visitTo: '' }
-    ]) {
-      const exists = Object.values(value).some(entry => entry && entry.countryCode === 'CN'
-        && (String(entry.cityId) === city.cityId || String(entry.city).toLowerCase() === city.city.toLowerCase()));
-      if (!exists) value['china-2026-' + city.city.toLowerCase()] = {
-        ...city, country: 'China', countryCode: 'CN', addedBy: 'trip-planner', createdAt: 1791072000000
-      };
-    }
-    value._chinaTrip2026 = true;
-    return value;
+  return visitsRef.child("_chinaTrip2026").once("value").then((snapshot) => {
+    if (snapshot.val()) return;
+    return visitsRef.transaction((current) => {
+      const value = current || {};
+      if (value._chinaTrip2026) return;
+      for (const city of [
+        { city: 'Shanghai', cityId: '1796236', latitude: 31.22222, longitude: 121.45806, visitFrom: '2026-11-20', visitTo: '2026-12-13' },
+        { city: 'Chongqing', cityId: '1814906', latitude: 29.56278, longitude: 106.55278, visitFrom: '', visitTo: '' }
+      ]) {
+        const exists = Object.values(value).some(entry => entry && entry.countryCode === 'CN'
+          && (String(entry.cityId) === city.cityId || String(entry.city).toLowerCase() === city.city.toLowerCase()));
+        if (!exists) value['china-2026-' + city.city.toLowerCase()] = {
+          ...city, country: 'China', countryCode: 'CN', addedBy: 'trip-planner', createdAt: 1791072000000
+        };
+      }
+      value._chinaTrip2026 = true;
+      return value;
+    });
   }).catch(error => {
     console.error('China city setup failed:', error);
     setVisitsError("couldn't add shanghai and chongqing — refresh to try again");

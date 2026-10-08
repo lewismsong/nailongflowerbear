@@ -1,5 +1,3 @@
-console.log("lewiskhalico v2.6");
-
 const $ = (id) => document.getElementById(id);
 const setupEl = $("setup");
 const mainEl = $("main");
@@ -17,10 +15,11 @@ const CIRCUMFERENCE = 2 * Math.PI * 92;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
 let name = currentAuthenticatedUser();
-let events = [];
+const missHistory = new MissHistory(torontoDayKey);
 let db = null;
 let eventsRef = null;
-let prevIncoming = null;
+let historyReady = false;
+let historyRenderTimer = null;
 let adjust = {};
 let call = null;
 let missSending = false;
@@ -45,7 +44,7 @@ function adjustTotal(person) {
 }
 
 function personPoints(person) {
-  return events.filter((event) => normalizeName(event.from) === person).length;
+  return missHistory.count(person);
 }
 
 function totalFor(person) {
@@ -58,7 +57,7 @@ function allTimeAdjustment() {
 
 // misses for one toronto day, including that day's adjustments
 function dayPoints(person, key) {
-  let total = events.filter((event) => normalizeName(event.from) === person && torontoDayKey(event.at) === key).length;
+  let total = missHistory.countOnDay(person, key);
   const dayAdjustments = adjust[key];
   if (dayAdjustments && typeof dayAdjustments === "object") {
     total += Number(dayAdjustments[person]) || 0;
@@ -69,11 +68,16 @@ function dayPoints(person, key) {
 // server-synced clock is immune to device clock changes
 let serverOffset = 0;
 const serverNow = () => Date.now() + serverOffset;
+const hourFormatters = Object.fromEntries(Object.entries(TIME_ZONES).map(([person, timeZone]) =>
+  [person, new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone })]));
+const clockFormatters = Object.fromEntries(Object.entries(TIME_ZONES).map(([person, timeZone]) =>
+  [person, new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZone })]));
+
 function hourFor(person) {
   const timeZone = TIME_ZONES[person];
   const date = new Date(serverNow());
   if (!timeZone) return date.getHours();
-  return Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone }).format(date)) % 24;
+  return Number(hourFormatters[person].format(date)) % 24;
 }
 
 const configured = Boolean(firebaseConfig.databaseURL);
@@ -110,21 +114,9 @@ function spawnLeaves(count) {
   }
 }
 
-function myEvents() {
-  const normalizedName = normalizeName(name);
-  return events.filter((event) => normalizeName(event.from) === normalizedName);
-}
-
-function theirEvents() {
-  const normalizedName = normalizeName(name);
-  return events.filter((event) => normalizeName(event.from) !== normalizedName);
-}
-
 function myLastAt() {
-  const sentEvents = myEvents();
-  const fromFeed = sentEvents.length ? sentEvents[sentEvents.length - 1].at : 0;
   const fromLocal = Number(appStorage.get("ily:lastSent", "0"));
-  return Math.max(fromFeed, fromLocal);
+  return Math.max(missHistory.lastAt(normalizeName(name)), fromLocal);
 }
 
 function renderBeacon(now) {
@@ -150,11 +142,7 @@ function renderPartnerClock(normalizedName, now) {
   if (partner) {
     partnerClock.classList.remove("hidden");
     partnerClockLabel.textContent = partner + (partner.endsWith("s") ? "' time" : "'s time");
-    const time = new Intl.DateTimeFormat([], {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone: TIME_ZONES[partner],
-    }).format(new Date(now));
+    const time = clockFormatters[partner].format(new Date(now));
     const partnerHour = hourFor(partner);
     const icon = partnerHour >= 22 || partnerHour < 6 ? "🌙 " : partnerHour < 9 ? "🌅 " : partnerHour < 18 ? "☀️ " : "🌆 ";
     partnerClockTime.textContent = icon + time;
@@ -167,7 +155,7 @@ function renderPartnerClock(normalizedName, now) {
 let statsCache = null;
 function renderStats() {
   const todayKey = torontoDayKey(serverNow());
-  if (!statsCache || statsCache.events !== events || statsCache.adjust !== adjust || statsCache.day !== todayKey) {
+  if (statsCache?.version === missHistory.version && statsCache.adjust === adjust && statsCache.day === todayKey) return;
   const yesterdayKey = previousTorontoDayKey(serverNow());
   $("yesterday-khali-count").textContent = Math.max(0, dayPoints("khali", yesterdayKey));
   $("yesterday-lewis-count").textContent = Math.max(0, dayPoints("lewis", yesterdayKey));
@@ -175,10 +163,7 @@ function renderStats() {
     - dayPoints("khali", todayKey) - dayPoints("lewis", todayKey)
     + allTimeAdjustment();
   $("total-count").textContent = Math.max(0, completedMisses);
-  statsCache = { events, adjust, day: todayKey };
-  }
-
-
+  statsCache = { version: missHistory.version, adjust, day: todayKey };
 }
 
 function render() {
@@ -191,7 +176,7 @@ function render() {
 
 function renderFeed() {
   const feedEl = $("feed");
-  const latest = events[events.length - 1];
+  const latest = missHistory.latest;
   $("empty").classList.toggle("hidden", Boolean(latest));
   feedEl.innerHTML = "";
   if (!latest) return;
@@ -224,10 +209,11 @@ function torontoDayKey(t) {
   return torontoDateFormatter.format(new Date(t));
 }
 
+const gameTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: GAME_TZ, hour: "numeric", minute: "numeric", second: "numeric", hour12: false,
+});
 function secondsUntilTorontoMidnight() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: GAME_TZ, hour: "numeric", minute: "numeric", second: "numeric", hour12: false,
-  }).formatToParts(new Date(serverNow()));
+  const parts = gameTimeFormatter.formatToParts(new Date(serverNow()));
   const value = (type) => Number(parts.find((part) => part.type === type).value);
   const secondsElapsed = (value("hour") % 24) * 3600 + value("minute") * 60 + value("second");
   return 24 * 3600 - secondsElapsed;
@@ -245,6 +231,7 @@ function revealCountdownToronto() {
 
 function renderRevealCountdown() {
   if (name && !document.hidden && !mainEl.classList.contains("hidden")) {
+    $("today-score").textContent = "today's result is hidden · " + timeLeftToronto() + " left";
     $("reveal-countdown").textContent = "today reveals in " + revealCountdownToronto();
   }
 }
@@ -257,9 +244,7 @@ let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
 const CAL_FIRST_MONTH = { year: 2026, month: 7 }; // nothing exists before july 2026
 
 function torontoParts(timestamp) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: GAME_TZ, year: "numeric", month: "2-digit", day: "2-digit",
-  }).formatToParts(new Date(timestamp));
+  const parts = torontoDateFormatter.formatToParts(new Date(timestamp));
   const value = (type) => Number(parts.find((part) => part.type === type).value);
   return { year: value("year"), month: value("month"), day: value("day") };
 }
@@ -276,12 +261,8 @@ function previousTorontoDayKey(timestamp) {
 
 function dayScores() {
   const days = {};
-  for (const event of events) {
-    const key = torontoDayKey(event.at);
-    const record = days[key] || (days[key] = { k: 0, l: 0 });
-    const sender = normalizeName(event.from);
-    if (sender === "khali") record.k++;
-    if (sender === "lewis") record.l++;
+  for (const [key, counts] of missHistory.days) {
+    days[key] = { k: counts.get("khali") || 0, l: counts.get("lewis") || 0 };
   }
   // preserve existing dated adjustments in their original day
   for (const key in adjust) {
@@ -495,12 +476,11 @@ $("refresh-btn").addEventListener("click", async () => {
   try {
     if (!eventsRef) throw new Error("not connected");
     const todayKey = torontoDayKey(serverNow());
-    const updates = {};
-    for (const event of events) {
-      if (event.id && torontoDayKey(event.at) === todayKey) updates[event.id] = null;
+    const reset = { ["adjust/" + todayKey]: null };
+    for (const event of missHistory.records.values()) {
+      if (torontoDayKey(event.at) === todayKey) reset["misses/" + event.id] = null;
     }
-    if (Object.keys(updates).length) await eventsRef.update(updates);
-    await db.ref("adjust/" + todayKey).remove();
+    await db.ref().update(reset);
     alert("today's misses cleared — fresh day 🧹");
   } catch (error) {
     console.error("miss reset failed:", error);
@@ -537,45 +517,48 @@ function connectFirebase() {
   try {
     db = initializeFirebaseDatabase();
     eventsRef = db.ref("misses");
+    const showSubscriptionError = (error) => {
+      console.error("firebase data subscription failed:", error);
+      $("err").textContent = "can't reach the misses database — check your connection and Firebase rules";
+    };
     db.ref(".info/serverTimeOffset").on("value", (s) => {
       serverOffset = s.val() || 0;
       resolveServerClock();
-    });
-    db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) render(); });
-    db.ref("call").on("value", (s) => { call = s.val();  if (name) render(); });
-    db.ref("hibernation").on("value", (s) => { hibernation = s.val() || {}; renderHibernation(); });
-    eventsRef.on("value", (snap) => {
-      try {
-        const val = snap.val() || {};
-        // keep only well-formed misses (with their ids, so day-resets can target them)
-        events = Object.entries(val)
-          .map(([id, e]) => (e && typeof e === "object" ? { id, ...e } : null))
-          .filter((e) => e && typeof e.from === "string" && typeof e.at === "number" && e.at > 0)
-          .sort((a, b) => a.at - b.at);
-        const incoming = theirEvents().length;
-        if (name && prevIncoming !== null && incoming > prevIncoming) {
-          spawnLeaves(44);
-          try {
-            if (navigator.vibrate) navigator.vibrate([90, 50, 90]);
-          } catch (error) {
-            console.warn("vibration failed:", error);
-          }
+    }, showSubscriptionError);
+    db.ref("adjust").on("value", (s) => { adjust = s.val() || {}; if (name) { render(); renderCal(); } }, showSubscriptionError);
+    db.ref("call").on("value", (s) => { call = s.val();  if (name) render(); }, showSubscriptionError);
+    db.ref("hibernation").on("value", (s) => { hibernation = s.val() || {}; renderHibernation(); }, showSubscriptionError);
+    const updateMiss = (snapshot, removed = false) => {
+      const previous = missHistory.records.get(snapshot.key);
+      if (removed) missHistory.remove(snapshot.key);
+      else missHistory.update(snapshot.key, snapshot.val());
+      const event = missHistory.records.get(snapshot.key);
+      if (historyReady && !previous && event && event.from !== normalizeName(name)) {
+        spawnLeaves(44);
+        try {
+          navigator.vibrate?.([90, 50, 90]);
+        } catch (error) {
+          console.warn("vibration failed:", error);
         }
-        prevIncoming = incoming;
+      }
+      // initial child events arrive in a burst; render them together.
+      if (historyRenderTimer !== null) return;
+      historyRenderTimer = setTimeout(() => {
+        historyRenderTimer = null;
         if (name) {
           render();
           renderFeed();
           renderCal();
         }
-      } catch (error) {
-        console.error("data update failed:", error);
-      }
-    }, (error) => {
-      console.error("firebase data subscription failed:", error);
-      $("err").textContent = "can't reach the misses database — check the Firebase rules";
-    });
+      }, 0);
+    };
+    eventsRef.on("child_added", (snapshot) => updateMiss(snapshot), showSubscriptionError);
+    eventsRef.on("child_changed", (snapshot) => updateMiss(snapshot), showSubscriptionError);
+    eventsRef.on("child_removed", (snapshot) => updateMiss(snapshot, true), showSubscriptionError);
+    eventsRef.once("value").then(() => { historyReady = true; }).catch(showSubscriptionError);
   } catch (error) {
     console.error("firebase initialization failed:", error);
+    $("err").textContent = "couldn't connect to the misses database";
   }
 }
 

@@ -47,7 +47,8 @@
     placeAt(left, top, submerged = false) {
       const r = this.bounds(), c = this.pet.cat;
       left = clamp(left, r.left, r.left + Math.max(0, r.width - c.offsetWidth));
-      top = clamp(top, r.top, r.top + Math.max(0, r.height - c.offsetHeight));
+      const groundTop = r.top + Math.max(0, r.height * .60 - c.offsetHeight * .7);
+      top = clamp(top, groundTop, r.top + Math.max(0, r.height - c.offsetHeight));
       this.pet.catDrag.x = left;
       this.pet.catDrag.bottom = window.innerHeight - top - c.offsetHeight;
       this.pet.catDrag.render();

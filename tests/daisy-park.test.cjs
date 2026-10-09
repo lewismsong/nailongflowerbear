@@ -46,3 +46,10 @@ test('daisy restores roaming state, rejects pakku’s room and portals to her pa
  const daisy=window.initializeDaisy();assert.equal(cat.hidden,false);assert(daisy.catDrag.options.onDrop());assert.equal(daisy.catDrag.bottom,8);
  tree=room;daisy.catDrag.options.onDrop();assert.equal(destination,'daisy.html');assert.equal(storage.get('ily:daisyPark').inside,true);assert.equal(storage.has('ily:pakkuSandbox'),false);
 });
+test('landscape keeps daisy below the horizon without changing toy interaction',()=>{
+ const {park,pet}=setup();park.placeAt(200,108);
+ const top=800-pet.catDrag.bottom-pet.cat.offsetHeight;
+ assert(top>=108+380*.60-88*.7);
+ park.start('bed');park.update(1600,.1,{name:'walking'});
+ assert.equal(pet.cat.dataset.behavior,'idle');
+});

@@ -8,6 +8,7 @@
       this.area = document.getElementById("daisy-park");
       this.lake = document.getElementById("daisy-lake");
       this.bed = document.getElementById("daisy-bed");
+      this.plane = document.getElementById("daisy-airplane");
       this.status = document.getElementById("daisy-status");
       const state = appStorage.getJson(this.key, options.initialState);
       this.inside = state.inside === true;
@@ -18,6 +19,7 @@
       this.lastSave = 0;
       for (const id of ["daisy-lake", "lake-option"]) document.getElementById(id).addEventListener("click", () => this.start("swim"));
       for (const id of ["daisy-bed", "bed-option"]) document.getElementById(id).addEventListener("click", () => this.start("bed"));
+      document.getElementById("airplane-option").addEventListener("click", () => this.start("fly"));
       this.announce();
     }
     bounds() {
@@ -26,9 +28,9 @@
     }
     contains(r, x, y) { return x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height; }
     activate() { this.pet.cat.setAttribute("aria-label", "Daisy in her park; drag her onto a toy or out to explore"); this.announce(); }
-    announce() { this.status.textContent = !this.inside ? "daisy is out exploring." : this.mode === "swim" ? "just keep swimming, daisy!" : this.mode === "bed" ? "sweet dreams, daisy." : "play with daisy!"; }
+    announce() { this.status.textContent = !this.inside ? "daisy is out exploring." : this.mode === "swim" ? "just keep swimming, daisy!" : this.mode === "fly" ? "up in the clouds, daisy!" : this.mode === "bed" ? "sweet dreams, daisy." : "play with daisy!"; }
     save() { appStorage.setJson(this.key, { inside: this.inside, x: this.x, y: this.y }); }
-    beginDrag() { this.mode = null; this.pet.cat.classList.remove("is-swimming"); this.pet.cat.style.clipPath = ""; this.announce(); }
+    beginDrag() { this.mode = null; this.pet.cat.classList.remove("is-swimming"); this.pet.cat.classList.remove("is-flying"); this.plane.hidden = true; this.pet.cat.style.clipPath = ""; this.announce(); }
     cancelDrag() { if (this.inside) this.place(); }
     drop() {
       const c = this.pet.cat.getBoundingClientRect();
@@ -57,13 +59,14 @@
     }
     place() { const r = this.bounds(); this.placeAt(r.left + this.x * Math.max(0, r.width - this.pet.cat.offsetWidth), r.top + this.y * Math.max(0, r.height - this.pet.cat.offsetHeight)); }
     rememberPosition() { const r = this.bounds(), c = this.pet.cat.getBoundingClientRect(); this.x = clamp((c.left - r.left) / Math.max(1, r.width - c.width), 0, 1); this.y = clamp((c.top - r.top) / Math.max(1, r.height - c.height), 0, 1); }
-    start(mode) { if (!this.inside || this.pet.catDrag.isDragging) return; this.beginDrag(); this.mode = mode; this.elapsed = 0; this.announce(); }
+    start(mode) { if (!this.inside || this.pet.catDrag.isDragging) return; this.beginDrag(); this.mode = mode; this.elapsed = 0; this.announce(); if (mode === "fly") { this.pet.cat.classList.add("is-flying"); this.plane.hidden = false; this.fly(0); } }
     swim(dt) {
       this.elapsed += dt;
       const r = this.lake.getBoundingClientRect(), c = this.pet.cat;
-      // enter from the right bank, swim across, leave briefly, then go back in.
-      const points = [[1.04,.64], [.68,.54], [.30,.49], [.68,.54], [1.04,.64], [1.04,.64]];
-      const phase = this.pet.reducedMotion.matches ? 1 : (this.elapsed % 12) / 2;
+      // one trip from the right bank, across the pond, and back ashore.
+      if (this.elapsed >= (this.pet.reducedMotion.matches ? 3 : 8)) { this.finishToy(); return; }
+      const points = [[1.04,.64], [.68,.54], [.30,.49], [.68,.54], [1.04,.64]];
+      const phase = this.pet.reducedMotion.matches ? 1 : this.elapsed / 2;
       const i = Math.floor(phase), a = points[i], b = points[(i + 1) % points.length];
       const t = phase - i, smooth = t * t * (3 - 2 * t);
       const x = a[0] + (b[0] - a[0]) * smooth, y = a[1] + (b[1] - a[1]) * smooth;
@@ -74,10 +77,26 @@
       this.placeAt(r.left + r.width * x - c.offsetWidth / 2, r.top + r.height * y - c.offsetHeight * .62 + (inWater && !this.pet.reducedMotion.matches ? Math.sin(this.elapsed * 7) * 2 : 0), inWater);
       this.rememberPosition();
     }
+    finishToy() {
+      this.beginDrag();
+      this.x = .86; this.y = .94;
+      this.pet.cat.dataset.behavior = "idle";
+      this.place(); this.save();
+    }
+    fly(dt) {
+      this.elapsed += dt;
+      const duration = this.pet.reducedMotion.matches ? 1.5 : 7;
+      if (this.elapsed >= duration) { this.finishToy(); return; }
+      const progress = this.pet.reducedMotion.matches ? .5 : this.elapsed / duration;
+      // percentage of the park width; subtract the sprite width at the far edge.
+      this.plane.style.left = `${progress * 100}%`;
+      this.plane.style.transform = `translateX(${-progress * 100}%)`;
+    }
     update(time, dt, behavior) {
       if (!this.inside) return false;
       if (this.pet.catDrag.isDragging) return true;
       if (this.mode === "swim") this.swim(dt);
+      else if (this.mode === "fly") this.fly(dt);
       else if (this.mode === "bed") {
         const r = this.bed.getBoundingClientRect(), c = this.pet.cat;
         c.dataset.behavior = "idle";

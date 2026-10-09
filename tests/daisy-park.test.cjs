@@ -10,7 +10,7 @@ function setup() {
   const cat = { offsetWidth: 88, offsetHeight: 88, style: { setProperty() {} }, dataset: {},
     classList: { add: x=>classes.add(x), remove: x=>classes.delete(x), toggle: (x,on)=>on?classes.add(x):classes.delete(x) }, setAttribute() {},
     getBoundingClientRect() { return { left: pet.catDrag.x, top: 800-pet.catDrag.bottom-88, width:88, height:88 }; } };
-  for (const id of ['daisy-park','daisy-lake','daisy-bed','lake-option','bed-option','daisy-status']) elements[id] = { listeners: {}, addEventListener(k,f){this.listeners[k]=f}, clientLeft:8, clientTop:8, clientWidth:500, clientHeight:380 };
+  for (const id of ['daisy-park','daisy-lake','daisy-bed','lake-option','bed-option','daisy-status','airplane-option','daisy-airplane']) elements[id] = { style: {}, hidden: true, listeners: {}, addEventListener(k,f){this.listeners[k]=f}, clientLeft:8, clientTop:8, clientWidth:500, clientHeight:380 };
   elements['daisy-park'].getBoundingClientRect=()=>({left:100,top:100,width:516,height:396});
   elements['daisy-lake'].getBoundingClientRect=()=>({left:130,top:250,width:250,height:130});
   elements['daisy-bed'].getBoundingClientRect=()=>({left:440,top:350,width:130,height:80});
@@ -20,14 +20,18 @@ function setup() {
   const park=new context.window.DaisyPark(pet,{storageKey:'daisy',initialState:{inside:true,x:.68,y:.7}});
   return {park,pet,store,elements,classes};
 }
-test('daisy swims into the lake, comes ashore, then returns; dragging interrupts',()=>{
- const {park,classes}=setup();park.start('swim');park.swim(3);assert(classes.has('is-swimming'));park.swim(6);assert(!classes.has('is-swimming'));park.swim(6);assert(classes.has('is-swimming'));park.beginDrag();assert.equal(park.mode,null);assert(!classes.has('is-swimming'));
+test('swimming finishes once and requires another activation',()=>{
+ const {park,classes}=setup();park.start('swim');park.swim(3);assert(classes.has('is-swimming'));
+ park.swim(6);assert.equal(park.mode,null);assert(!classes.has('is-swimming'));
+ park.update(18000,9,{name:'idle'});assert.equal(park.mode,null);
+ park.start('swim');park.swim(3);assert(classes.has('is-swimming'));
+ park.beginDrag();assert.equal(park.mode,null);assert(!classes.has('is-swimming'));
 });
 test('bed rests her, leaving persists, dropping on the lake restarts swimming',()=>{
  const {park,pet,store}=setup();park.start('bed');park.update(1600,.1,{name:'walking'});assert.equal(pet.cat.dataset.behavior,'idle');assert.equal(park.mode,'bed');pet.catDrag.x=20;pet.catDrag.bottom=8;assert(park.drop());assert.equal(store.get('daisy').inside,false);park.start('swim');assert.equal(park.mode,null);pet.catDrag.x=190;pet.catDrag.bottom=800-270-88;park.drop();assert.equal(park.inside,true);assert.equal(park.mode,'swim');assert.equal(store.get('daisy').inside,true);
 });
 test('reduced motion avoids travelling and preserves her size',()=>{
- const {park,pet}=setup();pet.reducedMotion.matches=true;park.start('swim');park.swim(1);const first=[pet.catDrag.x,pet.catDrag.bottom];park.swim(10);assert.deepEqual([pet.catDrag.x,pet.catDrag.bottom],first);assert.equal(pet.cat.offsetWidth,88);
+ const {park,pet}=setup();pet.reducedMotion.matches=true;park.start('swim');park.swim(1);const first=[pet.catDrag.x,pet.catDrag.bottom];park.swim(1);assert.deepEqual([pet.catDrag.x,pet.catDrag.bottom],first);assert.equal(pet.cat.offsetWidth,88);
 });
 test('all navigation pages load daisy once after shared drag support',()=>{
  for(const name of fs.readdirSync(root).filter(n=>n.endsWith('.html'))){const html=fs.readFileSync(path.join(root,name),'utf8');if(!html.includes('pixel-companions.js'))continue;assert.equal((html.match(/daisy-companion.js/g)||[]).length,1,name);assert(html.indexOf('pixel-companions.js')<html.indexOf('daisy-companion.js'),name);}
@@ -52,4 +56,16 @@ test('landscape keeps daisy below the horizon without changing toy interaction',
  assert(top>=108+380*.60-88*.7);
  park.start('bed');park.update(1600,.1,{name:'walking'});
  assert.equal(pet.cat.dataset.behavior,'idle');
+});
+
+test('airplane crosses once, returns daisy to the ground and can restart',()=>{
+ const {park,pet,elements,classes}=setup();const plane=elements['daisy-airplane'];
+ elements['airplane-option'].listeners.click();assert.equal(park.mode,'fly');assert(classes.has('is-flying'));assert.equal(plane.hidden,false);assert.equal(plane.style.left,'0%');
+ park.update(1000,3.5,{name:'walking'});assert.equal(plane.style.left,'50%');
+ park.update(2000,3.5,{name:'walking'});assert.equal(park.mode,null);assert.equal(plane.hidden,true);assert(!classes.has('is-flying'));assert.equal(pet.cat.dataset.behavior,'idle');assert.equal(park.y,.94);
+ park.start('fly');park.start('bed');assert.equal(plane.hidden,true);assert(!classes.has('is-flying'));assert.equal(park.mode,'bed');
+});
+test('reduced-motion flight stays still and finishes; outside daisy cannot fly',()=>{
+ const {park,pet,elements}=setup();pet.reducedMotion.matches=true;park.start('fly');assert.equal(elements['daisy-airplane'].style.left,'50%');park.fly(1);assert.equal(elements['daisy-airplane'].style.left,'50%');park.fly(.5);assert.equal(park.mode,null);
+ park.inside=false;park.start('fly');assert.equal(park.mode,null);
 });

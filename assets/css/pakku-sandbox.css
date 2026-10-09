@@ -10,14 +10,14 @@
 .toy-slot img { width: 54px; height: 54px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
 .toy-slot span { font-size: 14px; line-height: 1.2; }
 .toy-slot.empty { border-style: dashed; background: #ffffff35; }
-.pixel-cat.in-sandbox { width: 64px; height: 64px; }
+
 .pixel-cat.is-sliding .pixel-cat-sprite { animation: none !important; background-position: 0 75%; transform: rotate(26deg); }
 body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 @media (max-width: 440px) {
   .pakku-playroom { grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; height: 320px; }
   .pakku-sandbox { border-width: 6px; border-radius: 16px; }
   .toy-slot img { width: 42px; height: 42px; }
-  .pixel-cat.in-sandbox { width: 52px; height: 52px; }
+
 }
 @media (prefers-reduced-motion: reduce) { .pakku-sandbox { transition: none; } }
 

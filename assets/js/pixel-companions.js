@@ -212,6 +212,8 @@
     }
   }
 
+  window.CompanionDraggable = PersistentDraggable;
+
   class PixelCompanions {
     constructor() {
       this.house = createButton("pixel-house", "drag the koala tree or select it to make it shake", HOUSE_MARKUP);
@@ -273,6 +275,15 @@
             this.sendToPlayroom();
             return true;
           }
+          const park = document.getElementById("daisy-park");
+          if (park && this.catDrag.dragged) {
+            const r = park.getBoundingClientRect(), c = this.cat.getBoundingClientRect();
+            const x = c.left + c.width / 2, y = c.top + c.height / 2;
+            if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+              this.catDrag.setPosition(this.catDrag.x, 8);
+              return true;
+            }
+          }
           if (this.sandbox && this.catDrag.dragged && this.sandbox.drop()) return true;
           if (!this.isCatOverHouse()) return false;
           this.enterHouse();
@@ -300,7 +311,7 @@
         this.sandbox.activate();
         this.sandbox.place();
         this.sandbox.save();
-        this.sandbox.announce();
+
       } else {
         appStorage.setJson("ily:pakkuSandbox", { inside: true, x: .2, y: .8 });
         window.location.assign("pakku.html");
@@ -510,6 +521,7 @@
     if (!pixelCompanions && !document.querySelector(".pixel-cat, .pixel-house")) {
       pixelCompanions = new PixelCompanions();
     }
+    window.initializeDaisy?.();
     return pixelCompanions;
   }
 

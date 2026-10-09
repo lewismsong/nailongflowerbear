@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>daisy’s park 🌼</title>
+<meta name="theme-color" content="#F3DDC1" />
+<link rel="icon" href="assets/images/optimized/pakku.webp" />
+<script src="assets/js/platform.js?v=2"></script>
+<script src="assets/js/auth-guard.js?v=1"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
+<link rel="stylesheet" href="assets/css/base.css?v=12" />
+<link rel="stylesheet" href="assets/css/pixel-companions.css?v=7" />
+<link rel="stylesheet" href="assets/css/daisy-park.css?v=1" />
+<link rel="stylesheet" href="assets/css/seasonal-theme.css?v=1" />
+<script src="assets/js/seasonal-theme.js?v=1"></script>
+</head>
+<body class="daisy-park-page">
+<main class="daisy-home">
+  <header><p class="park-kicker">a little fresh air</p><h1>daisy’s park 🌼</h1></header>
+  <section class="park-layout" aria-label="daisy’s park and toys">
+    <div id="daisy-park" class="daisy-park" aria-label="daisy’s own play area">
+      <span class="park-cloud cloud-one" aria-hidden="true"></span><span class="park-cloud cloud-two" aria-hidden="true"></span>
+      <div class="park-hills" aria-hidden="true"></div><div class="park-path" aria-hidden="true"></div>
+      <span class="park-tree tree-one" aria-hidden="true">🌳</span><span class="park-tree tree-two" aria-hidden="true">🍂</span>
+      <span class="park-flowers" aria-hidden="true">✿ &nbsp; &nbsp; ✿</span>
+      <button id="daisy-lake" class="daisy-lake" aria-label="let daisy swim in the lake"><span aria-hidden="true" class="lake-ripple"></span></button>
+      <button id="daisy-bed" class="daisy-bed" aria-label="let daisy rest in her bed"><span aria-hidden="true">☾</span></button>
+    </div>
+    <div class="park-toys" role="group" aria-label="daisy’s toys">
+      <button id="lake-option" type="button"><span aria-hidden="true">≈</span>lake</button>
+      <button id="bed-option" type="button"><span aria-hidden="true">☾</span>doggy bed</button>
+    </div>
+  </section>
+  <p id="daisy-status" class="daisy-status" role="status">a park just for daisy.</p>
+</main>
+<bear-tab-nav current="daisy"></bear-tab-nav>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script defer src="assets/js/config.js?v=2"></script>
+<script defer src="assets/js/settings-model.js?v=1"></script>
+<script defer src="assets/js/shared-settings.js?v=1"></script>
+<script defer src="assets/js/navigation.js?v=25"></script>
+<script defer src="assets/js/all-time-adjustments.js?v=4"></script>
+<script defer src="assets/js/daisy-park.js?v=1"></script>
+<script defer src="assets/js/pixel-companions.js?v=16"></script>
+<script defer src="assets/js/daisy-companion.js?v=2"></script>
+</body>
+</html>

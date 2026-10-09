@@ -46,7 +46,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .pixel-daisy.dragging { cursor: grabbing; }
-.pixel-daisy-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--daisy-direction, 1)); }
+.pixel-daisy-direction { display: block; width: 100%; height: 100%; transform: scaleX(var(--cat-direction, 1)); }
 .pixel-daisy-sprite {
   display: block;
   width: 100%;
@@ -56,9 +56,9 @@
   image-rendering: pixelated;
   transform-origin: center bottom;
 }
-.pixel-daisy[data-behavior="running"] .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames 0.7s steps(1, end) infinite, pixelDaisyRunBounce 0.7s ease-in-out infinite; }
+.pixel-daisy[data-behavior="walking"] .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames 0.7s steps(1, end) infinite, pixelDaisyRunBounce 0.7s ease-in-out infinite; }
 .pixel-daisy[data-behavior="sitting"] .pixel-daisy-sprite { background-position: 0 33.333%; animation: pixelDaisySittingFrames 3.2s steps(1, end) infinite; }
-.pixel-daisy[data-behavior="resting"] .pixel-daisy-sprite { background-position: 0 66.667%; animation: pixelDaisyRestingFrames 3.8s steps(1, end) infinite; }
+.pixel-daisy[data-behavior="idle"] .pixel-daisy-sprite { background-position: 0 66.667%; animation: pixelDaisyRestingFrames 3.8s steps(1, end) infinite; }
 .pixel-daisy[data-behavior="howling"] .pixel-daisy-sprite { background-position: 0 100%; animation: pixelDaisyHowlingFrames 2.8s steps(1, end) infinite; }
 .pixel-daisy:focus-visible { border-radius: 10px; outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
 

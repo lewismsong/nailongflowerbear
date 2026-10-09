@@ -5,7 +5,7 @@
   const HOUSES = {
     temple: { label: "temple", image: "assets/images/optimized/chinese-temple.webp" },
     "cat-house": { label: "cat house", image: "assets/images/optimized/cat-house.webp" },
-    "koala-tree": { label: "koala tree", image: "assets/images/optimized/koala-tree-autumn.webp" },
+    "koala-tree": { label: "koala tree", image: "assets/images/optimized/koala-tree-mango.webp" },
   };
 
   function normalizeHex(value) {

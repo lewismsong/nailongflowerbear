@@ -88,9 +88,29 @@
       const duration = this.pet.reducedMotion.matches ? 1.5 : 7;
       if (this.elapsed >= duration) { this.finishToy(); return; }
       const progress = this.pet.reducedMotion.matches ? .5 : this.elapsed / duration;
-      // percentage of the park width; subtract the sprite width at the far edge.
-      this.plane.style.left = `${progress * 100}%`;
-      this.plane.style.transform = `translateX(${-progress * 100}%)`;
+      let across = progress, dx = 0, dy = 0, rotation = 0;
+      if (!this.pet.reducedMotion.matches) {
+        if (progress < .35) {
+          const t = progress / .35;
+          across = t * .5;
+          dy = Math.sin(t * Math.PI * 2) * 3;
+          rotation = Math.sin(t * Math.PI * 2) * 4;
+        } else if (progress <= .65) {
+          const angle = (progress - .35) / .30 * Math.PI * 2;
+          const radius = Math.min(30, this.area.clientHeight * .075);
+          across = .5;
+          dx = Math.sin(angle) * radius;
+          dy = (1 - Math.cos(angle)) * radius;
+          rotation = angle * 180 / Math.PI;
+        } else {
+          const t = (progress - .65) / .35;
+          across = .5 + t * .5;
+          dy = Math.sin(t * Math.PI * 2) * 3;
+          rotation = Math.sin(t * Math.PI * 2) * 4;
+        }
+      }
+      this.plane.style.left = `${across * 100}%`;
+      this.plane.style.transform = `translateX(${-across * 100}%) translate(${dx}px, ${dy}px) rotate(${rotation}deg)`;
     }
     update(time, dt, behavior) {
       if (!this.inside) return false;

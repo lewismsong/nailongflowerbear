@@ -69,3 +69,10 @@ test('reduced-motion flight stays still and finishes; outside daisy cannot fly',
  const {park,pet,elements}=setup();pet.reducedMotion.matches=true;park.start('fly');assert.equal(elements['daisy-airplane'].style.left,'50%');park.fly(1);assert.equal(elements['daisy-airplane'].style.left,'50%');park.fly(.5);assert.equal(park.mode,null);
  park.inside=false;park.start('fly');assert.equal(park.mode,null);
 });
+test('flight sways, completes one central loop and levels out',()=>{
+ const {park,elements}=setup();const plane=elements['daisy-airplane'];park.start('fly');
+ park.fly(.6125);assert.notEqual(plane.style.transform,'translateX(-12.5%) translate(0px, 0px) rotate(0deg)');
+ park.fly(3.5-.6125);assert.equal(plane.style.left,'50%');assert(Math.abs(Number(plane.style.transform.match(/rotate\(([-\d.]+)deg/)[1])-180)<.001);
+ park.fly(1.75);assert(parseFloat(plane.style.left)>50);assert(!plane.style.transform.includes('rotate(180deg)'));
+ park.fly(1.75);assert.equal(park.mode,null);assert.equal(plane.hidden,true);
+});

@@ -1,19 +1,17 @@
-.daisy-park-page { background: linear-gradient(#fffdf3, #e6eddc); padding-bottom: 30px; }
-.daisy-home { width: min(100% - 28px, 780px); margin: 36px auto 0; text-align: center; }
-.daisy-home h1 { font: 700 clamp(28px, 6vw, 40px) 'Fraunces', Georgia, serif; margin: 4px 0 28px; }
-.park-kicker { color: var(--muted); font-size: 12px; letter-spacing: 2px; }
-.park-layout { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 16px; }
-.daisy-park { position: relative; height: 420px; overflow: hidden; border: 8px solid #a8b78a; border-radius: 28px; background: linear-gradient(#dfeff0 0 35%, #c4d6a3 35% 100%); box-shadow: 0 5px 0 #839667, 0 16px 35px #6b784520; }
-.park-hills { position: absolute; top: 24%; left: -10%; width: 120%; height: 30%; border-radius: 50%; background: #b6c797; box-shadow: 100px -12px 0 #c4d4aa; }
-.park-path { position: absolute; top: 36%; left: 35%; width: 24%; height: 80%; background: #eed9b4; transform: rotate(-28deg); border-radius: 50%; }
-.park-cloud { position: absolute; top: 8%; width: 70px; height: 18px; border-radius: 20px; background: #fffdf5; box-shadow: 13px -8px 0 -2px #fffdf5; }
-.cloud-one { left: 12%; }.cloud-two { right: 12%; top: 14%; width: 48px; }
-.park-tree { position: absolute; top: 13%; font-size: 78px; }.tree-one { left: 3%; }.tree-two { right: 6%; top: 24%; font-size: 38px; }
-.park-flowers { position: absolute; bottom: 7%; left: 9%; color: #f9f3ca; font-size: 25px; }
-.daisy-lake { position: absolute; left: 7%; top: 41%; width: 52%; height: 35%; border: 7px solid #ebe1bd; border-radius: 47% 55% 43% 50%; background: #8fc8cb; box-shadow: inset 0 5px 0 #75b4bc, 0 4px 0 #a8bc87; cursor: pointer; }
-.lake-ripple { display: block; width: 58%; height: 35%; margin: auto; border-top: 3px solid #c6e7dd; border-bottom: 2px solid #c6e7dd; border-radius: 50%; transform: rotate(-8deg); }
-.daisy-bed { position: absolute; right: 7%; bottom: 9%; width: 28%; height: 22%; border: 9px solid #b98474; border-bottom-width: 15px; border-radius: 45%; background: #f1d6b6; box-shadow: inset 0 5px 0 #dbb697, 0 4px 0 #78935d40; cursor: pointer; color: #aa7768; font-size: 28px; }
-.park-toys { display: flex; flex-direction: column; gap: 14px; }.park-toys button { min-height: 92px; display: flex; flex-direction: column; justify-content: center; gap: 8px; border: 1px solid #b8c59d; border-radius: 18px; background: #fffdf2; color: var(--text); font: inherit; cursor: pointer; }.park-toys button span { font-size: 30px; color: #789e98; }
+.daisy-park-page { background: linear-gradient(180deg,var(--bg-top),#edf0df 62%,var(--bg-bottom)); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+.daisy-home { width: min(100% - 32px, 620px); margin: clamp(24px, 6vh, 48px) auto 0; text-align: center; }
+.daisy-home h1 { font: 700 clamp(28px, 6vw, 42px) 'Fraunces', Georgia, serif; margin: 0 0 24px; }
+.park-layout { display: grid; grid-template-columns: minmax(0, 1fr) 86px; gap: 14px; height: 380px; }
+.daisy-park { position: relative; min-width: 0; overflow: hidden; border: 8px solid #a8b78a; border-radius: 20px; background: #bacd97 url('../images/daisy-park.svg') center / 100% 100% no-repeat; image-rendering: pixelated; box-shadow: inset 0 0 0 2px #f5f4d6a8, 0 5px 0 #78895d, 0 12px 24px #63764024; }
+.daisy-lake, .daisy-bed { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; touch-action: manipulation; }
+.daisy-lake { left: 6%; top: 40%; width: 54%; height: 38%; }
+.daisy-bed { right: 5%; bottom: 9%; width: 34%; height: 27%; }
+.daisy-lake img, .daisy-bed img { width: 100%; height: 100%; display: block; image-rendering: pixelated; pointer-events: none; }
+.park-toys { display: grid; grid-template-rows: repeat(4, 1fr); gap: 10px; }
+.park-toys button { min-height: 0; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px solid #b8c59d; border-radius: 14px; background: #fffaf080; color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
+.park-toys button:hover { background: #fff8e5; }
+.park-toys img { width: 54px; height: 44px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.park-toys button:focus-visible, .daisy-lake:focus-visible, .daisy-bed:focus-visible { outline: 2px solid #687b4e; outline-offset: 3px; border-radius: 10px; }
 .daisy-status { color: var(--muted); font-size: 13px; min-height: 20px; margin-top: 22px; }
 .pixel-daisy.is-swimming .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames .9s steps(1,end) infinite; }
-@media(max-width: 520px) { .park-layout { grid-template-columns: 1fr; }.daisy-park { height: 350px; }.park-toys { flex-direction: row; }.park-toys button { flex: 1; min-height: 65px; flex-direction: row; align-items: center; }.park-tree { font-size: 55px; } }
+@media(max-width: 440px) { .park-layout { grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; height: 320px; }.daisy-park { border-width: 6px; border-radius: 16px; }.park-toys img { width: 42px; height: 36px; } }

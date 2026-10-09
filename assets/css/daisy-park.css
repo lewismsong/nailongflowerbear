@@ -1,17 +1,19 @@
-.daisy-park-page { background: linear-gradient(180deg,var(--bg-top),#edf0df 62%,var(--bg-bottom)); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
-.daisy-home { width: min(100% - 32px, 620px); margin: clamp(24px, 6vh, 48px) auto 0; text-align: center; }
+.daisy-park-page { background: linear-gradient(180deg,var(--bg-top),#e8efdf 62%,var(--bg-bottom)); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+.daisy-home { width: min(100% - 28px, 780px); margin: clamp(24px, 6vh, 48px) auto 0; text-align: center; }
 .daisy-home h1 { font: 700 clamp(28px, 6vw, 42px) 'Fraunces', Georgia, serif; margin: 0 0 24px; }
-.park-layout { display: grid; grid-template-columns: minmax(0, 1fr) 86px; gap: 14px; height: 380px; }
-.daisy-park { position: relative; min-width: 0; overflow: hidden; border: 8px solid #a8b78a; border-radius: 20px; background: #bacd97 url('../images/daisy-park.svg') center / 100% 100% no-repeat; image-rendering: pixelated; box-shadow: inset 0 0 0 2px #f5f4d6a8, 0 5px 0 #78895d, 0 12px 24px #63764024; }
+.park-layout { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 16px; height: 420px; }
+.daisy-park { position: relative; min-width: 0; overflow: hidden; border: 8px solid #a8b99b; border-radius: 20px; background: #c4d4aa url('../images/daisy-park.svg?v=2') center / 100% 100% no-repeat; image-rendering: auto; box-shadow: inset 0 0 0 2px #f5f4d6a8, 0 5px 0 #718b72, 0 12px 24px #63764024; }
 .daisy-lake, .daisy-bed { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; touch-action: manipulation; }
 .daisy-lake { left: 6%; top: 40%; width: 54%; height: 38%; }
 .daisy-bed { right: 5%; bottom: 9%; width: 34%; height: 27%; }
-.daisy-lake img, .daisy-bed img { width: 100%; height: 100%; display: block; image-rendering: pixelated; pointer-events: none; }
+.daisy-lake img, .daisy-bed img { width: 100%; height: 100%; display: block; image-rendering: auto; pointer-events: none; }
 .park-toys { display: grid; grid-template-rows: repeat(4, 1fr); gap: 10px; }
-.park-toys button { min-height: 0; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px solid #b8c59d; border-radius: 14px; background: #fffaf080; color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
+.park-toys button { min-height: 0; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px solid #b5c7ae; border-radius: 14px; background: #fffaf080; color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
 .park-toys button:hover { background: #fff8e5; }
-.park-toys img { width: 54px; height: 44px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
-.park-toys button:focus-visible, .daisy-lake:focus-visible, .daisy-bed:focus-visible { outline: 2px solid #687b4e; outline-offset: 3px; border-radius: 10px; }
+.park-toys img { width: 54px; height: 44px; object-fit: contain; image-rendering: auto; pointer-events: none; }
+.park-toys button:focus-visible, .daisy-lake:focus-visible, .daisy-bed:focus-visible { outline: 2px solid #617c69; outline-offset: 3px; border-radius: 10px; }
 .daisy-status { color: var(--muted); font-size: 13px; min-height: 20px; margin-top: 22px; }
 .pixel-daisy.is-swimming .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames .9s steps(1,end) infinite; }
 @media(max-width: 440px) { .park-layout { grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; height: 320px; }.daisy-park { border-width: 6px; border-radius: 16px; }.park-toys img { width: 42px; height: 36px; } }
+
+@media(max-width: 520px) { .park-layout { grid-template-columns: 1fr; height: auto; gap: 16px; }.daisy-park { height: 350px; }.park-toys { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 1fr; }.park-toys button { min-height: 70px; flex-direction: row; gap: 10px; } }

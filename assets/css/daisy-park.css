@@ -16,7 +16,7 @@
 .pixel-daisy.is-swimming .pixel-daisy-sprite { background-position: 0 0; animation: pixelDaisyRunningFrames .9s steps(1,end) infinite; }
 @media(max-width: 440px) { .park-layout { grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; height: 320px; }.daisy-park { border-width: 6px; border-radius: 16px; }.park-toys img { width: 42px; height: 36px; } }
 
-@media(max-width: 520px) { .park-layout { grid-template-columns: 1fr; height: auto; gap: 16px; }.daisy-park { height: 350px; }.park-toys { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: 1fr; }.park-toys button { min-height: 70px; flex-direction: row; gap: 10px; } }
+@media(max-width: 520px) { .park-layout { grid-template-columns: 1fr; height: auto; gap: 16px; }.daisy-park { height: 350px; }.park-toys { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 1fr; }.park-toys button { min-height: 70px; flex-direction: row; gap: 10px; } }
 
 .daisy-lake, .daisy-bed { transition: filter .15s ease; }
 .daisy-lake:hover, .daisy-bed:hover { filter: brightness(1.04); }
@@ -26,3 +26,7 @@
 .daisy-airplane[hidden] { display: none; }
 .pixel-daisy.is-flying { opacity: 0; pointer-events: none; }
 @media(max-width: 520px) { .park-toys button { flex-direction: column; } }
+
+.pixel-daisy.is-fishing .pixel-daisy-sprite { visibility: hidden; }
+.pixel-daisy.is-fishing::after { content: ""; position: absolute; right: 0; bottom: 0; width: 200%; height: 120%; background: url('../images/optimized/daisy-fishing.webp?v=1') right bottom / contain no-repeat; image-rendering: pixelated; pointer-events: none; }
+@media(max-width: 520px) { .park-toys button { font-size: 12px; gap: 4px; padding: 4px; } }

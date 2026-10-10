@@ -10,7 +10,7 @@ function setup() {
   const cat = { offsetWidth: 88, offsetHeight: 88, style: { setProperty() {} }, dataset: {},
     classList: { add: x=>classes.add(x), remove: x=>classes.delete(x), toggle: (x,on)=>on?classes.add(x):classes.delete(x) }, setAttribute() {},
     getBoundingClientRect() { return { left: pet.catDrag.x, top: 800-pet.catDrag.bottom-88, width:88, height:88 }; } };
-  for (const id of ['daisy-park','daisy-lake','daisy-bed','lake-option','bed-option','daisy-status','airplane-option','daisy-airplane','fishing-option']) elements[id] = { style: {}, hidden: true, listeners: {}, addEventListener(k,f){this.listeners[k]=f}, clientLeft:8, clientTop:8, clientWidth:500, clientHeight:380 };
+  for (const id of ['daisy-park','daisy-lake','daisy-bed','lake-option','bed-option','daisy-status','airplane-option','daisy-airplane']) elements[id] = { style: {}, hidden: true, listeners: {}, addEventListener(k,f){this.listeners[k]=f}, clientLeft:8, clientTop:8, clientWidth:500, clientHeight:380 };
   elements['daisy-park'].getBoundingClientRect=()=>({left:100,top:100,width:516,height:396});
   elements['daisy-lake'].getBoundingClientRect=()=>({left:130,top:250,width:250,height:130});
   elements['daisy-bed'].getBoundingClientRect=()=>({left:440,top:350,width:130,height:80});
@@ -75,14 +75,4 @@ test('flight sways, completes one central loop and levels out',()=>{
  park.fly(3.5-.6125);assert.equal(plane.style.left,'50%');assert(Math.abs(Number(plane.style.transform.match(/rotate\(([-\d.]+)deg/)[1])-180)<.001);
  park.fly(1.75);assert(parseFloat(plane.style.left)>50);assert(!plane.style.transform.includes('rotate(180deg)'));
  park.fly(1.75);assert.equal(park.mode,null);assert.equal(plane.hidden,true);
-});
-
-test('fishing stays active until dragging or choosing another toy',()=>{
- const {park,pet,classes,elements}=setup();elements['fishing-option'].listeners.click();
- assert.equal(park.mode,'fish');assert(classes.has('is-fishing'));assert.equal(pet.cat.dataset.behavior,'sitting');
- const position=[pet.catDrag.x,pet.catDrag.bottom];park.update(120000,120,{name:'walking'});
- assert.equal(park.mode,'fish');assert.deepEqual([pet.catDrag.x,pet.catDrag.bottom],position);
- park.beginDrag();assert(!classes.has('is-fishing'));assert.equal(park.mode,null);
- park.start('fish');park.start('swim');assert(!classes.has('is-fishing'));assert.equal(park.mode,'swim');
- park.beginDrag();park.inside=false;park.start('fish');assert.equal(park.mode,null);
 });

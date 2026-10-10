@@ -20,7 +20,6 @@
       for (const id of ["daisy-lake", "lake-option"]) document.getElementById(id).addEventListener("click", () => this.start("swim"));
       for (const id of ["daisy-bed", "bed-option"]) document.getElementById(id).addEventListener("click", () => this.start("bed"));
       document.getElementById("airplane-option").addEventListener("click", () => this.start("fly"));
-      document.getElementById("fishing-option").addEventListener("click", () => this.start("fish"));
       this.announce();
     }
     bounds() {
@@ -29,9 +28,9 @@
     }
     contains(r, x, y) { return x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height; }
     activate() { this.pet.cat.setAttribute("aria-label", "Daisy in her park; drag her onto a toy or out to explore"); this.announce(); }
-    announce() { this.status.textContent = !this.inside ? "daisy is out exploring." : this.mode === "swim" ? "just keep swimming, daisy!" : this.mode === "fly" ? "up in the clouds, daisy!" : this.mode === "fish" ? "gone fishing, daisy!" : this.mode === "bed" ? "sweet dreams, daisy." : "play with daisy!"; }
+    announce() { this.status.textContent = !this.inside ? "daisy is out exploring." : this.mode === "swim" ? "just keep swimming, daisy!" : this.mode === "fly" ? "up in the clouds, daisy!" : this.mode === "bed" ? "sweet dreams, daisy." : "play with daisy!"; }
     save() { appStorage.setJson(this.key, { inside: this.inside, x: this.x, y: this.y }); }
-    beginDrag() { this.mode = null; this.pet.cat.classList.remove("is-swimming"); this.pet.cat.classList.remove("is-flying"); this.pet.cat.classList.remove("is-fishing"); this.plane.hidden = true; this.pet.cat.style.clipPath = ""; this.announce(); }
+    beginDrag() { this.mode = null; this.pet.cat.classList.remove("is-swimming"); this.pet.cat.classList.remove("is-flying"); this.plane.hidden = true; this.pet.cat.style.clipPath = ""; this.announce(); }
     cancelDrag() { if (this.inside) this.place(); }
     drop() {
       const c = this.pet.cat.getBoundingClientRect();
@@ -60,7 +59,7 @@
     }
     place() { const r = this.bounds(); this.placeAt(r.left + this.x * Math.max(0, r.width - this.pet.cat.offsetWidth), r.top + this.y * Math.max(0, r.height - this.pet.cat.offsetHeight)); }
     rememberPosition() { const r = this.bounds(), c = this.pet.cat.getBoundingClientRect(); this.x = clamp((c.left - r.left) / Math.max(1, r.width - c.width), 0, 1); this.y = clamp((c.top - r.top) / Math.max(1, r.height - c.height), 0, 1); }
-    start(mode) { if (!this.inside || this.pet.catDrag.isDragging) return; this.beginDrag(); this.mode = mode; this.elapsed = 0; this.announce(); if (mode === "fly") { this.pet.cat.classList.add("is-flying"); this.plane.hidden = false; this.fly(0); } else if (mode === "fish") { this.pet.cat.classList.add("is-fishing"); this.fish(); } }
+    start(mode) { if (!this.inside || this.pet.catDrag.isDragging) return; this.beginDrag(); this.mode = mode; this.elapsed = 0; this.announce(); if (mode === "fly") { this.pet.cat.classList.add("is-flying"); this.plane.hidden = false; this.fly(0); } }
     swim(dt) {
       this.elapsed += dt;
       const r = this.lake.getBoundingClientRect(), c = this.pet.cat;
@@ -113,20 +112,11 @@
       this.plane.style.left = `${across * 100}%`;
       this.plane.style.transform = `translateX(${-across * 100}%) translate(${dx}px, ${dy}px) rotate(${rotation}deg)`;
     }
-    fish() {
-      const r = this.lake.getBoundingClientRect(), c = this.pet.cat;
-      c.dataset.behavior = "sitting";
-      this.placeAt(r.left + r.width * 1.02 - c.offsetWidth * .20, r.top + r.height * .36 - c.offsetHeight * .85);
-      // the rod extends left of her draggable body and over the water.
-      c.style.clipPath = "none";
-      this.rememberPosition();
-    }
     update(time, dt, behavior) {
       if (!this.inside) return false;
       if (this.pet.catDrag.isDragging) return true;
       if (this.mode === "swim") this.swim(dt);
       else if (this.mode === "fly") this.fly(dt);
-      else if (this.mode === "fish") this.fish();
       else if (this.mode === "bed") {
         const r = this.bed.getBoundingClientRect(), c = this.pet.cat;
         c.dataset.behavior = "idle";

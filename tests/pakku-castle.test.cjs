@@ -13,7 +13,7 @@ function setup(){
  return {room:new context.window.PakkuSandbox(pet),pet,classes,elements};
 }
 test('castle hides pakku, peeks at both windows and returns him',()=>{
- const {room,classes,elements}=setup();elements['castle-option'].listeners.click();assert(classes.has('in-castle'));
+ const {room,classes,elements}=setup();elements['castle-option'].listeners.click();assert(!classes.has('in-castle'));room.castleFrame(10);assert(classes.has('in-castle'));
  room.castleFrame(1);assert.equal(elements['sandbox-castle'].dataset.peek,'left');
  room.castleFrame(2.2);assert.equal(elements['sandbox-castle'].dataset.peek,'right');
  room.castleFrame(3);assert.equal(room.castleRun,null);assert(!classes.has('in-castle'));assert.equal(elements['sandbox-castle'].dataset.peek,'');
@@ -25,4 +25,14 @@ test('switching toys and leaving restore pakku; outside activation does nothing'
 });
 test('reduced motion has a single still peek and returns',()=>{
  const {room,pet,elements,classes}=setup();pet.reducedMotion.matches=true;room.startCastle();room.castleFrame(1);assert.equal(elements['sandbox-castle'].dataset.peek,'left');room.castleFrame(2);assert(!classes.has('in-castle'));assert.equal(room.castleRun,null);
+});
+
+test('pakku walks visibly to the doorway before the peek timer begins',()=>{
+ const {room,pet,classes,elements}=setup();room.startCastle();
+ const before=pet.cat.getBoundingClientRect();room.castleFrame(.1);const after=pet.cat.getBoundingClientRect();
+ assert.equal(pet.cat.dataset.behavior,'walking');assert(!classes.has('in-castle'));assert.equal(elements['sandbox-castle'].dataset.peek,'');
+ assert(Math.hypot(after.left-before.left,after.top-before.top)<=10.51);assert.equal(room.castleRun.elapsed,0);
+ room.castleFrame(10);assert(classes.has('in-castle'));assert.equal(room.castleRun.elapsed,0);assert.equal(elements['sandbox-castle'].dataset.peek,'');
+ room.castleFrame(1);assert.equal(elements['sandbox-castle'].dataset.peek,'left');
+ room.beginDrag();assert.equal(room.castleRun,null);assert(!classes.has('in-castle'));
 });

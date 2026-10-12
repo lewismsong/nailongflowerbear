@@ -177,17 +177,36 @@
       if (!this.inside || this.pet.catDrag.isDragging) return;
       this.beginDrag();
       this.selectToy('castle');
-      this.castleRun = { elapsed: 0 };
+      this.castleRun = { elapsed: 0, phase: 'walking' };
       this.castleFrame(0);
     }
 
     castleFrame(dt) {
       const run = this.castleRun;
-      run.elapsed += dt;
       const r = this.castle.getBoundingClientRect(), cat = this.pet.cat;
       const reduced = this.pet.reducedMotion.matches;
       const doorX = r.left + r.width * .5 - cat.offsetWidth / 2;
       const doorY = r.top + r.height * .95 - cat.offsetHeight * .75;
+      if (run.phase === 'walking') {
+        const area = this.bounds();
+        const targetX = clamp(doorX, area.left, area.left + Math.max(0, area.width - cat.offsetWidth));
+        const targetY = clamp(doorY, area.top, area.top + Math.max(0, area.height - cat.offsetHeight));
+        const current = cat.getBoundingClientRect();
+        const dx = targetX - current.left, dy = targetY - current.top;
+        const distance = Math.hypot(dx, dy);
+        const step = reduced ? distance : Math.min(distance, 105 * dt);
+        if (distance > 1) {
+          cat.dataset.behavior = 'walking';
+          if (Math.abs(dx) > 1) this.pet.direction = dx > 0 ? 1 : -1;
+          this.placeAt(current.left + dx / distance * step, current.top + dy / distance * step);
+          this.rememberPosition();
+          if (step < distance) return;
+        }
+        run.phase = 'inside';
+        run.elapsed = 0;
+      } else {
+        run.elapsed += dt;
+      }
       cat.dataset.behavior = 'sitting';
       this.placeAt(doorX, doorY);
       const t = run.elapsed;

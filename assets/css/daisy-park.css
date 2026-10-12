@@ -27,6 +27,8 @@
 .pixel-daisy.is-flying { opacity: 0; pointer-events: none; }
 @media(max-width: 520px) { .park-toys button { flex-direction: column; } }
 
-.park-poofy { position: absolute; left: 20%; top: 71%; width: 11%; height: 12%; pointer-events: none; user-select: none; }
-.park-poofy::before { content: ""; position: absolute; left: 0; right: 0; bottom: 43%; height: 14%; border: 1px solid #b9e9df; border-radius: 50%; opacity: .75; }
-.park-poofy img { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; clip-path: inset(0 0 50% 0); }
+.park-poofy { position: absolute; z-index: 59; left: 20%; top: 71%; width: 11%; height: 12%; pointer-events: none; user-select: none; }
+.park-poofy::before { content: ""; position: absolute; left: 0; right: 0; bottom: 23%; height: 14%; border: 1px solid #b9e9df; border-radius: 50%; opacity: .75; }
+.park-poofy img { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; clip-path: inset(0 0 28% 0); }
+
+.pixel-daisy.is-swimming { z-index: 58; }

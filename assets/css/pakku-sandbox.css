@@ -2,7 +2,7 @@
 .pakku-home h1 { font: 700 clamp(28px, 6vw, 42px) 'Fraunces', Georgia, serif; margin: 0 0 24px; }
 .pakku-playroom { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 16px; height: 420px; }
 .pakku-sandbox { position: relative; min-width: 0; border: 8px solid var(--room-frame); border-radius: 20px; background: linear-gradient(160deg, #fffaf5 0%, #f4edf9 58%, #e8f3ee 100%); box-shadow: inset 0 0 0 2px #fff4dda8, 0 5px 0 var(--room-frame-dark), 0 12px 24px #74452624; transition: border-color .15s; }
-.sandbox-slide { position: absolute; width: 35%; height: 46%; padding: 0; border: 0; background: transparent; left: 5%; bottom: 18%; cursor: pointer; touch-action: manipulation; }
+.sandbox-slide { position: absolute; width: 35%; height: 46%; padding: 0; border: 0; background: transparent; right: 5%; bottom: 28%; cursor: pointer; touch-action: manipulation; }
 .sandbox-slide img { width: 100%; height: 100%; object-fit: contain; display: block; image-rendering: pixelated; pointer-events: none; }
 .sandbox-toys { display: grid; grid-template-rows: repeat(4, 1fr); gap: 10px; }
 .toy-slot { min-height: 0; padding: 5px; border: 1px solid var(--room-edge); border-radius: 14px; background: #fffaf080; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text); font: inherit; }
@@ -25,7 +25,7 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .toy-slot[type="button"] { cursor: pointer; }
 .toy-slot:hover { background-color: #fff5e5; }
 .toy-slot.empty:hover { background: #ffffff35; }
-.sandbox-yarn { position: absolute; width: 8%; height: 13%; bottom: 7%; left: 45%; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.sandbox-yarn { position: absolute; width: 8%; height: 13%; bottom: 1%; left: 14%; border: 0; padding: 0; background: transparent; cursor: pointer; }
 .sandbox-yarn img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
 .toy-slot:focus-visible, .sandbox-slide:focus-visible, .sandbox-yarn:focus-visible { outline: 2px solid var(--room-frame-dark); outline-offset: 3px; border-radius: 12px; }
 
@@ -36,7 +36,7 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .pakku-sandbox::before, .pakku-sandbox::after { content: ''; position: absolute; z-index: 0; top: -26px; width: 36px; height: 26px; background: var(--room-frame); clip-path: polygon(0 100%, 14% 22%, 34% 0, 100% 100%); pointer-events: none; }
 .pakku-sandbox::before { left: 14px; }
 .pakku-sandbox::after { right: 14px; transform: scaleX(-1); }
-.sandbox-suitcase { position: absolute; right: 9%; bottom: 8%; width: 18%; height: 24%; border: 0; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.sandbox-suitcase { position: absolute; right: 12%; bottom: 12%; width: min(30%, 100px); aspect-ratio: 96 / 80; height: auto; border: 0; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
 .suitcase-art { display: block; width: 100%; height: 100%; background: url('../images/optimized/pakku-suitcase.webp?v=2') center / contain no-repeat; image-rendering: pixelated; pointer-events: none; }
 .suitcase-art > span { display: none; }
 .toy-slot .suitcase-art { width: 54px; height: 45px; margin: 3px 0; }
@@ -58,13 +58,13 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 
 
 
-.sandbox-castle { position: absolute; right: 8%; bottom: 34%; width: 29%; height: 36%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.sandbox-castle { position: absolute; left: 7%; bottom: 34%; width: 29%; height: 36%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
 .sandbox-castle img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
 .sandbox-castle:focus-visible { outline: 2px solid var(--room-frame-dark); outline-offset: 3px; border-radius: 50%; }
 #castle-option span { font-size: 11px; }
 
 /* A quiet plush friend on the floor by the back wall. */
-.sandbox-whale { position: absolute; left: 10%; bottom: 4%; width: 15%; height: 19%; object-fit: contain; pointer-events: none; user-select: none; image-rendering: pixelated; filter: drop-shadow(0 3px 2px #8e78932b); }
+.sandbox-whale { position: absolute; left: 10%; bottom: 10%; width: 15%; height: 19%; object-fit: contain; pointer-events: none; user-select: none; image-rendering: pixelated; filter: drop-shadow(0 3px 2px #8e78932b); }
 
 @media(max-width: 520px) { .pakku-playroom { grid-template-columns: 1fr; height: auto; gap: 16px; }.pakku-sandbox { height: 350px; }.sandbox-toys { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 1fr; }.toy-slot { min-height: 76px; } }
 
@@ -75,3 +75,5 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 .castle-window::after { content: ""; position: absolute; inset: 0; background: url('../images/optimized/pakku-castle-peek.webp') center bottom / contain no-repeat; opacity: 0; }
 .sandbox-castle[data-peek="left"] .castle-window-left::after, .sandbox-castle[data-peek="right"] .castle-window-right::after { opacity: 1; }
 .pixel-cat.in-castle { opacity: 0; pointer-events: none; }
+
+.sandbox-slide img, #slide-option img { transform: scaleX(-1); }

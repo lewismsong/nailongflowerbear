@@ -36,3 +36,8 @@ test('pakku walks visibly to the doorway before the peek timer begins',()=>{
  room.castleFrame(1);assert.equal(elements['sandbox-castle'].dataset.peek,'left');
  room.beginDrag();assert.equal(room.castleRun,null);assert(!classes.has('in-castle'));
 });
+test('yarn stays in its front play area and mirrored slide moves left',()=>{
+ const {room,pet}=setup();room.startYarn();assert.equal(room.yarnRun.from,.14);assert.equal(room.yarnRun.target,.94);
+ room.yarnX=.94;room.startYarn();assert.equal(room.yarnRun.target,.14);
+ room.startSlide();room.slideFrame(0);const start=pet.catDrag.x;room.slideFrame(.8);assert(pet.catDrag.x<start);assert.equal(pet.direction,-1);
+});

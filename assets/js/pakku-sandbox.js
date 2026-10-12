@@ -13,7 +13,7 @@
       this.castle = document.getElementById('sandbox-castle');
       this.castleRun = null;
       this.inSuitcase = false;
-      this.yarnX = .45;
+      this.yarnX = .14;
       this.yarnRun = null;
       const saved = appStorage.getJson(KEY, {});
       this.inside = saved.inside === true;
@@ -145,7 +145,7 @@
       this.beginDrag();
       this.selectToy('slide');
       this.ride = { elapsed: 0 };
-      this.pet.direction = 1;
+      this.pet.direction = -1;
       this.pet.cat.classList.add('is-sliding');
     }
 
@@ -161,7 +161,7 @@
       if (this.pet.catDrag.isDragging) return;
       this.beginDrag();
       this.selectToy('yarn');
-      this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .12 : .82, caught: 0 };
+      this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .14 : .94, caught: 0 };
     }
 
     startSuitcase() {
@@ -283,9 +283,10 @@
       const progress = clamp(this.ride.elapsed / duration, 0, 1);
       const t = progress * progress;
       const r = this.slide.getBoundingClientRect();
-      // Follow the chute in the generated sprite, from its top to the right-hand exit.
-      const x = r.left + r.width * (.40 + .46 * t);
-      const y = r.top + r.height * (.29 + .47 * t);
+      // follow the mirrored chute toward the middle, accounting for image letterboxing.
+      const size = Math.min(r.width, r.height);
+      const x = r.left + (r.width - size) / 2 + size * (.60 - .46 * t);
+      const y = r.top + (r.height - size) / 2 + size * (.29 + .47 * t);
       this.placeAt(x - this.pet.cat.offsetWidth / 2, y - this.pet.cat.offsetHeight * .78);
       if (progress === 1) {
         this.rememberPosition();

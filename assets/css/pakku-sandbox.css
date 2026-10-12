@@ -58,12 +58,20 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 
 
 
-.sandbox-trampoline { position: absolute; right: 9%; bottom: 35%; width: 26%; height: 20%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
-.sandbox-trampoline img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
-.sandbox-trampoline:focus-visible { outline: 2px solid var(--room-frame-dark); outline-offset: 3px; border-radius: 50%; }
-#trampoline-option span { font-size: 11px; }
+.sandbox-castle { position: absolute; right: 8%; bottom: 34%; width: 29%; height: 36%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.sandbox-castle img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.sandbox-castle:focus-visible { outline: 2px solid var(--room-frame-dark); outline-offset: 3px; border-radius: 50%; }
+#castle-option span { font-size: 11px; }
 
 /* A quiet plush friend on the floor by the back wall. */
 .sandbox-whale { position: absolute; left: 10%; bottom: 4%; width: 15%; height: 19%; object-fit: contain; pointer-events: none; user-select: none; image-rendering: pixelated; filter: drop-shadow(0 3px 2px #8e78932b); }
 
 @media(max-width: 520px) { .pakku-playroom { grid-template-columns: 1fr; height: auto; gap: 16px; }.pakku-sandbox { height: 350px; }.sandbox-toys { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 1fr; }.toy-slot { min-height: 76px; } }
+
+.sandbox-castle img { object-fit: fill; }
+.castle-window { position: absolute; top: 33%; width: 10.5%; height: 20.5%; overflow: hidden; pointer-events: none; border-radius: 45% 45% 0 0; }
+.castle-window-left { left: 9.5%; }
+.castle-window-right { left: 80%; }
+.castle-window::after { content: ""; position: absolute; inset: 0; background: url('../images/optimized/pakku-castle-peek.webp') center bottom / contain no-repeat; opacity: 0; }
+.sandbox-castle[data-peek="left"] .castle-window-left::after, .sandbox-castle[data-peek="right"] .castle-window-right::after { opacity: 1; }
+.pixel-cat.in-castle { opacity: 0; pointer-events: none; }

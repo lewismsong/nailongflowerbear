@@ -10,10 +10,10 @@
       this.slide = document.getElementById('sandbox-slide');
       this.yarn = document.getElementById('sandbox-yarn');
       this.suitcase = document.getElementById('sandbox-suitcase');
-      this.trampoline = document.getElementById('sandbox-trampoline');
-      this.bounce = null;
+      this.castle = document.getElementById('sandbox-castle');
+      this.castleRun = null;
       this.inSuitcase = false;
-      this.yarnX = .78;
+      this.yarnX = .45;
       this.yarnRun = null;
       const saved = appStorage.getJson(KEY, {});
       this.inside = saved.inside === true;
@@ -32,8 +32,8 @@
       document.getElementById('yarn-option').addEventListener('click', () => this.startYarn());
       this.suitcase.addEventListener('click', () => this.startSuitcase());
       document.getElementById('suitcase-option').addEventListener('click', () => this.startSuitcase());
-      this.trampoline.addEventListener('click', () => this.startBounce());
-      document.getElementById('trampoline-option').addEventListener('click', () => this.startBounce());
+      this.castle.addEventListener('click', () => this.startCastle());
+      document.getElementById('castle-option').addEventListener('click', () => this.startCastle());
       window.addEventListener('pagehide', () => this.save());
     }
 
@@ -65,12 +65,14 @@
     }
 
     beginDrag() {
-      this.bounce = null;
+      this.castleRun = null;
       this.inSuitcase = false;
       this.ride = null;
       this.yarnRun = null;
       this.pet.cat.classList.remove('is-sliding');
       this.pet.cat.style.clipPath = '';
+      this.pet.cat.classList.remove('in-castle');
+      this.castle.dataset.peek = '';
     }
 
     cancelDrag() {
@@ -93,7 +95,7 @@
       this.y = clamp((point.y - r.top - this.pet.cat.offsetHeight / 2) / Math.max(1, r.height - this.pet.cat.offsetHeight), 0, 1);
       this.place();
       this.save();
-      if (this.contains(this.trampoline.getBoundingClientRect(), point.x, point.y)) this.startBounce();
+      if (this.contains(this.castle.getBoundingClientRect(), point.x, point.y)) this.startCastle();
       else if (this.contains(this.suitcase.getBoundingClientRect(), point.x, point.y)) this.startSuitcase();
       else if (this.contains(this.yarn.getBoundingClientRect(), point.x, point.y)) this.startYarn();
       else if (this.contains(this.slide.getBoundingClientRect(), point.x, point.y)) this.startSlide();
@@ -102,12 +104,14 @@
 
     leave(keepDropPosition = false) {
       this.inside = false;
-      this.bounce = null;
+      this.castleRun = null;
       this.inSuitcase = false;
       this.ride = null;
       this.yarnRun = null;
       this.pet.cat.classList.remove('in-sandbox', 'is-sliding');
       this.pet.cat.style.clipPath = '';
+      this.pet.cat.classList.remove('in-castle');
+      this.castle.dataset.peek = '';
       this.pet.cat.setAttribute('aria-label', 'drag Pakku or select him to send some love');
       this.pet.scheduleNextSleep();
       this.pet.catDrag.setPosition(this.pet.catDrag.x, keepDropPosition ? this.pet.catDrag.bottom : 8);
@@ -138,9 +142,7 @@
 
     startSlide() {
       if (!this.inside || this.pet.catDrag.isDragging || this.ride) return;
-      this.yarnRun = null;
-      this.bounce = null;
-      this.inSuitcase = false;
+      this.beginDrag();
       this.selectToy('slide');
       this.ride = { elapsed: 0 };
       this.pet.direction = 1;
@@ -148,7 +150,7 @@
     }
 
     selectToy(name) {
-      document.getElementById('trampoline-option').classList.toggle('selected', name === 'trampoline');
+      document.getElementById('castle-option').classList.toggle('selected', name === 'castle');
       document.getElementById('slide-option').classList.toggle('selected', name === 'slide');
       document.getElementById('yarn-option').classList.toggle('selected', name === 'yarn');
       document.getElementById('suitcase-option').classList.toggle('selected', name === 'suitcase');
@@ -157,10 +159,7 @@
     startYarn() {
       if (!this.inside) return;
       if (this.pet.catDrag.isDragging) return;
-      this.ride = null;
-      this.pet.cat.classList.remove('is-sliding');
-      this.bounce = null;
-      this.inSuitcase = false;
+      this.beginDrag();
       this.selectToy('yarn');
       this.yarnRun = { elapsed: 0, from: this.yarnX, target: this.yarnX > .5 ? .12 : .82, caught: 0 };
     }
@@ -174,33 +173,31 @@
       this.save();
     }
 
-    startBounce() {
+    startCastle() {
       if (!this.inside || this.pet.catDrag.isDragging) return;
       this.beginDrag();
-      this.selectToy('trampoline');
-      this.bounce = { elapsed: 0 };
-      this.bounceFrame(0);
+      this.selectToy('castle');
+      this.castleRun = { elapsed: 0 };
+      this.castleFrame(0);
     }
 
-    bounceFrame(dt) {
-      const run = this.bounce;
+    castleFrame(dt) {
+      const run = this.castleRun;
       run.elapsed += dt;
-      const durations = [1.05, .75, .42];
-      const heights = [1, .48, .10];
-      let phase = run.elapsed, index = 0;
-      while (index < 3 && phase >= durations[index]) phase -= durations[index++];
-      const r = this.trampoline.getBoundingClientRect();
-      const cat = this.pet.cat;
-      const base = r.top + r.height * .40 - cat.offsetHeight * .85;
-      const available = Math.max(0, base - this.bounds().top - 4);
-      const maximum = this.pet.reducedMotion.matches ? Math.min(8, available) : Math.min(120, available);
-      const progress = index < 3 ? phase / durations[index] : 0;
-      const lift = index < 3 ? 4 * progress * (1 - progress) * maximum * heights[index] : 0;
+      const r = this.castle.getBoundingClientRect(), cat = this.pet.cat;
+      const reduced = this.pet.reducedMotion.matches;
+      const doorX = r.left + r.width * .5 - cat.offsetWidth / 2;
+      const doorY = r.top + r.height * .95 - cat.offsetHeight * .75;
       cat.dataset.behavior = 'sitting';
-      this.placeAt(r.left + r.width / 2 - cat.offsetWidth / 2, base - lift);
-      this.rememberPosition();
-      if (index === 3) {
-        this.bounce = null;
+      this.placeAt(doorX, doorY);
+      const t = run.elapsed;
+      cat.classList.toggle('in-castle', t < (reduced ? 2.5 : 5.4));
+      this.castle.dataset.peek = reduced ? 'left' : t >= .8 && t < 2.5 ? 'left' : t >= 3 && t < 4.8 ? 'right' : '';
+      if (t >= (reduced ? 2.5 : 5.4)) {
+        this.castleRun = null;
+        this.castle.dataset.peek = '';
+        cat.classList.remove('in-castle');
+        this.rememberPosition();
         this.save();
       }
     }
@@ -285,7 +282,7 @@
         return this.inside;
       }
       if (!this.inside) return false;
-      if (this.bounce) this.bounceFrame(dt);
+      if (this.castleRun) this.castleFrame(dt);
       else if (this.ride) this.slideFrame(dt);
       else if (this.yarnRun) this.yarnFrame(dt);
       else if (this.inSuitcase) this.suitcaseFrame();

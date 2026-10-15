@@ -349,9 +349,6 @@ function renderCal() {
   // trophy count: completed days only — today isn't decided yet
   const wins = GameScore.tally(days, todayKey, includeFranceInScore);
   $("streak").textContent = "🏆 khali " + wins.khali + " – " + wins.lewis + " lewis";
-  $("france-score-note").textContent = includeFranceInScore
-    ? "france days count · aug 13–27, 2026"
-    : "france days excluded · aug 13–27, 2026";
   $("today-score").textContent = "today's result is hidden · " + timeLeftToronto() + " left";
 }
 

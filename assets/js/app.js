@@ -240,6 +240,16 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) renderRevealCountdown();
 });
 
+const franceScoreToggle = $("count-france");
+const franceScorePreferenceKey = () => "ily:countFrance:" + (name || "guest");
+let includeFranceInScore = appStorage.get(franceScorePreferenceKey(), "true") !== "false";
+franceScoreToggle.checked = includeFranceInScore;
+franceScoreToggle.addEventListener("change", () => {
+  includeFranceInScore = franceScoreToggle.checked;
+  appStorage.set(franceScorePreferenceKey(), String(includeFranceInScore));
+  renderCal();
+});
+
 let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
 const CAL_FIRST_MONTH = { year: 2026, month: 7 }; // nothing exists before july 2026
 
@@ -309,6 +319,7 @@ function renderCal() {
     const key = dayKeyFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const record = days[key] || { k: 0, l: 0 };
     const isToday = key === todayKey;
+    const excluded = !includeFranceInScore && GameScore.isFranceDay(key);
 
     const cell = document.createElement("div");
     cell.className = "day";
@@ -317,6 +328,7 @@ function renderCal() {
     else if (!isToday && record.l > record.k) cell.classList.add("l");
     else if (!isToday && record.k > 0) cell.classList.add("b");
     if (isToday) cell.classList.add("today");
+    if (excluded) cell.classList.add("score-excluded");
 
     if (!isToday && (record.k > 0 || record.l > 0)) {
       const khaliScore = document.createElement("span");
@@ -330,19 +342,16 @@ function renderCal() {
     cell.title = isToday
       ? "today · result hidden until the day ends"
       : key + " · khali " + record.k + " – " + record.l + " lewis";
+    if (excluded) cell.title += " · france: excluded from trophy score";
     grid.appendChild(cell);
   }
 
   // trophy count: completed days only — today isn't decided yet
-  let khaliWins = 0;
-  let lewisWins = 0;
-  for (const key in days) {
-    if (key === todayKey) continue;
-    const record = days[key];
-    if (record.k > record.l) khaliWins++;
-    else if (record.l > record.k) lewisWins++;
-  }
-  $("streak").textContent = "🏆 khali " + khaliWins + " – " + lewisWins + " lewis";
+  const wins = GameScore.tally(days, todayKey, includeFranceInScore);
+  $("streak").textContent = "🏆 khali " + wins.khali + " – " + wins.lewis + " lewis";
+  $("france-score-note").textContent = includeFranceInScore
+    ? "france days count · aug 13–27, 2026"
+    : "france days excluded · aug 13–27, 2026";
   $("today-score").textContent = "today's result is hidden · " + timeLeftToronto() + " left";
 }
 
@@ -359,6 +368,8 @@ $("cal-next").addEventListener("click", () => {
 });
 
 function showMain() {
+  includeFranceInScore = appStorage.get(franceScorePreferenceKey(), "true") !== "false";
+  franceScoreToggle.checked = includeFranceInScore;
   setupEl.classList.add("hidden");
   mainEl.classList.remove("hidden");
   $("who").textContent = name;

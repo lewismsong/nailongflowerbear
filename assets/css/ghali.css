@@ -29,3 +29,18 @@ h1 { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -.04em; }
 @keyframes glow-rise { from { opacity: .9; transform: translateY(0) scale(.7); } to { opacity: 0; transform: translateY(-150px) scale(1.1); } }
 @media (prefers-reduced-motion: reduce) { .glow-heart { display: none; } #gakku-button { transition: none; } }
 @media (max-height: 740px) { .miss-room { margin-top: 25px; } .gakku-halo { margin-top: 12px; } #gakku-button { min-height: 290px; } .gakku { height: 190px; } .secret-note { margin-top: 22px; } }
+
+/* the same soft storybook typography and pixel art as the main site. */
+:root { color-scheme: light; font-family: 'Nunito Sans', system-ui, sans-serif; color: #3d543a; background: #edf3d7; }
+body { background: radial-gradient(ellipse at 50% 45%, #f8f9e8, #e8f0d1 65%, #d7e6bd); }
+h1, .gakku-name, .miss-total strong { font-family: 'Fraunces', Georgia, serif; }
+.eyebrow, .room-note, .button-note, .miss-total span, .secret-note { color: #6e805d; }
+.signout { background: #f7fae9; color: #526c43; border-color: #b7ca96; box-shadow: 0 3px 0 #ccdab2; }
+.gakku-halo { border: 2px solid #c5d7a4; background: #f7fae880; box-shadow: 0 5px 0 #d4e1bc, 0 12px 30px #647d3c12; }
+#gakku-button { color: #405b35; }
+.gakku { display: block; width: 210px; height: 210px; background: url('../images/optimized/gakku-sprites.webp') 50% 100% / 300% 200% no-repeat; image-rendering: pixelated; filter: drop-shadow(0 4px 2px #647d3c20); }
+.response { color: #536d43; }.spark { color: #799a51; }.glow-heart { color: #7f9d4c; }
+#gakku-companion { position: fixed; z-index: 60; width: 92px; height: 92px; border: 0; padding: 0; background: transparent; cursor: grab; touch-action: none; user-select: none; }
+#gakku-companion.dragging { cursor: grabbing; }
+#gakku-companion span { display: block; width: 100%; height: 100%; background: url('../images/optimized/gakku-sprites.webp') 50% 100% / 300% 200% no-repeat; image-rendering: pixelated; filter: drop-shadow(0 3px 2px #536d4326); pointer-events: none; }
+@media(max-width: 520px) { #gakku-companion { width: 80px; height: 80px; } }

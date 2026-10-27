@@ -1,0 +1,31 @@
+:root { color-scheme: dark; font-family: ui-rounded, 'Avenir Next', system-ui, sans-serif; color: #d6e8ba; background: #172c22; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; background: radial-gradient(ellipse at 50% 48%, #35513a 0%, #203b2c 42%, #14271f 100%); }
+button { font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: 2px solid #e3f9af; outline-offset: 7px; }
+.ghali-room { width: min(100% - 40px, 620px); margin: auto; padding: max(28px, env(safe-area-inset-top)) 0 max(28px, env(safe-area-inset-bottom)); }
+header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.eyebrow { font-size: 10px; letter-spacing: .2em; color: #9db58d; margin: 0 0 7px; }
+h1 { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -.04em; }
+.signout { border: 1px solid #638055; color: #c2d8ad; background: #264331; padding: 10px 16px; border-radius: 24px; font-size: 12px; }
+.miss-room { text-align: center; position: relative; margin-top: clamp(32px, 8vh, 80px); }
+.room-note { font-size: 13px; color: #a9c095; letter-spacing: .015em; }
+.gakku-halo { width: min(100%, 330px); margin: 24px auto 0; border: 1px solid #a8cd702b; border-radius: 50%; background: radial-gradient(circle, #d2ed9730, #b9dc770a 60%, transparent 72%); box-shadow: 0 0 70px #b4dd7d0b; }
+#gakku-button { width: 100%; min-height: 350px; padding: 8px 30px 33px; border: 0; border-radius: 50%; background: transparent; color: #e0efc6; display: flex; flex-direction: column; align-items: center; transition: background .2s; }
+#gakku-button:hover { background: #d8f7ae08; }
+#gakku-button:active { background: #d8f7ae15; }
+.gakku { width: 210px; max-width: 100%; height: 230px; filter: drop-shadow(0 0 12px #ceef9560); pointer-events: none; }
+.gakku-name { font-size: 24px; letter-spacing: .08em; font-weight: 500; }
+.button-note { font-size: 12px; margin-top: 7px; color: #b7cf9d; }
+.response { font-size: 13px; margin: 25px 0; min-height: 20px; color: #d2e8b1; }
+.miss-total { display: flex; flex-direction: column; gap: 5px; }
+.miss-total strong { font-size: 35px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.miss-total span, .secret-note { font-size: 11px; color: #9bb28a; }
+.secret-note { margin-top: 40px; letter-spacing: .08em; }
+.spark { position: absolute; color: #bbd98f; opacity: .55; pointer-events: none; }
+.spark-one { left: 13%; top: 20%; font-size: 22px; }.spark-two { right: 12%; top: 45%; font-size: 15px; }
+#ghali-sparks { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+.glow-heart { position: absolute; left: var(--x); top: 60%; color: #d8f2a3; font-size: 18px; animation: glow-rise 1.8s ease-out forwards; }
+@keyframes glow-rise { from { opacity: .9; transform: translateY(0) scale(.7); } to { opacity: 0; transform: translateY(-150px) scale(1.1); } }
+@media (prefers-reduced-motion: reduce) { .glow-heart { display: none; } #gakku-button { transition: none; } }
+@media (max-height: 740px) { .miss-room { margin-top: 25px; } .gakku-halo { margin-top: 12px; } #gakku-button { min-height: 290px; } .gakku { height: 190px; } .secret-note { margin-top: 22px; } }

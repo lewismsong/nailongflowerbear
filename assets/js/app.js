@@ -390,7 +390,7 @@ startBtn.addEventListener("click", () => {
   const enteredName = nameIn.value.trim();
   if (!enteredName) return;
   const normalizedEnteredName = normalizeName(enteredName);
-  if (!["khali", "lewis"].includes(normalizedEnteredName)) {
+  if (!["khali", "lewis", "ghali"].includes(normalizedEnteredName)) {
     $("name-err").textContent = "that's not khali, fix it.";
     return;
   }
@@ -399,7 +399,8 @@ startBtn.addEventListener("click", () => {
     $("name-err").textContent = "couldn't save your login — check browser storage permissions.";
     return;
   }
-  window.location.reload();
+  if (normalizedEnteredName === "ghali") window.location.replace("ghali.html");
+  else window.location.reload();
 });
 
 

@@ -50,7 +50,7 @@ test('shared settings only write on explicit apply, propagate subscriptions, and
   subscription({ val: () => null });
   await window.appSettings.ready;
   assert.deepEqual(writes, []);
-  assert.equal(styles.get('--site-bg-bottom'), '#e7c9c4');
+  assert.equal(styles.get('--site-bg-bottom'), '#f1ddcf');
   subscription({ val: () => ({ colors: { khali: '#112233', lewis: '#AABBCC' }, house: 'cat-house' }) });
   assert.equal(window.appSettings.current.house, 'cat-house');
   assert.equal(styles.get('--yellow'), '#112233');

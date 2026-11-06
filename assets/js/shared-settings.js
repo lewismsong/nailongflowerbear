@@ -17,6 +17,13 @@
     return "#" + channels.map(channel => Math.round(channel + (target - channel) * amount).toString(16).padStart(2, "0")).join("");
   }
 
+  // tint warm neutrals gently so the background supports the colourful accents.
+  function tint(base, neutral, amount) {
+    const source = base.match(/[\da-f]{2}/gi).map(channel => parseInt(channel, 16));
+    return "#" + neutral.match(/[\da-f]{2}/gi).map((channel, index) =>
+      Math.round(parseInt(channel, 16) * (1 - amount) + source[index] * amount).toString(16).padStart(2, "0")).join("");
+  }
+
   function rgb(hex) {
     return hex.match(/[\da-f]{2}/gi).map(channel => parseInt(channel, 16)).join(", ");
   }
@@ -26,14 +33,14 @@
     const customLewis = normalizeHex(value?.colors?.lewis);
     const base = normalizeHex(value?.colors?.base) || DEFAULTS.colors.base;
     const properties = {
-      "--site-bg-top": mix(base, 255, 0.94),
-      "--site-bg-bottom": mix(base, 255, 0.66),
-      "--site-surface": mix(base, 255, 0.90),
-      "--site-deep": mix(base, 0, 0.64),
-      "--site-text": mix(base, 0, 0.70),
-      "--site-muted": mix(base, 0, 0.48),
-      "--site-card": "rgba(" + rgb(base) + ", 0.06)",
-      "--site-edge": "rgba(" + rgb(base) + ", 0.22)",
+      "--site-bg-top": tint(base, "#FFFCF5", 0.02),
+      "--site-bg-bottom": tint(base, "#F7EBDD", 0.10),
+      "--site-surface": tint(base, "#FFFCF7", 0.03),
+      "--site-deep": tint(base, "#493C32", 0.10),
+      "--site-text": tint(base, "#3E3731", 0.05),
+      "--site-muted": tint(base, "#74675B", 0.08),
+      "--site-card": "rgba(" + rgb(base) + ", 0.035)",
+      "--site-edge": "rgba(" + rgb(base) + ", 0.14)",
       "--yellow": customKhali,
       "--yellow-deep": customKhali && (customKhali === DEFAULTS.colors.khali ? "#9B522E" : mix(customKhali, 0, 0.42)),
       "--accent-rgb": customKhali && rgb(customKhali),

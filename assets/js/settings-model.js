@@ -3,7 +3,7 @@
 
   const DEFAULTS = { colors: { khali: "#CF6265", lewis: "#63977B", base: "#719783" }, house: "christmas-tree" };
   const HOUSES = {
-    "christmas-tree": { label: "christmas tree", image: "assets/images/optimized/christmas-tree.webp" },
+    "christmas-tree": { label: "christmas tree", image: "assets/images/optimized/christmas-cat-tree.webp" },
     temple: { label: "temple", image: "assets/images/optimized/chinese-temple.webp" },
     "cat-house": { label: "cat house", image: "assets/images/optimized/cat-house.webp" },
     "koala-tree": { label: "mango tree", image: "assets/images/optimized/mango-tree-heart.webp" },

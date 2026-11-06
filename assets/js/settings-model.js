@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const DEFAULTS = { colors: { khali: "#EDB878", lewis: "#EF948F" }, house: "koala-tree" };
+  const DEFAULTS = { colors: { khali: "#EDB878", lewis: "#EF948F", base: "#B95F50" }, house: "koala-tree" };
   const HOUSES = {
     temple: { label: "temple", image: "assets/images/optimized/chinese-temple.webp" },
     "cat-house": { label: "cat house", image: "assets/images/optimized/cat-house.webp" },

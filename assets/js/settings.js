@@ -11,7 +11,7 @@
   const wheel = document.getElementById("colour-wheel");
   const context = wheel.getContext("2d");
   const brightness = document.getElementById("colour-brightness");
-  const people = ["khali", "lewis"];
+  const people = ["khali", "lewis", "base"];
   let baseline;
   let draft;
   let saving = false;
@@ -77,7 +77,7 @@
       hue = !difference ? 0 : maximum === red ? 60 * (((green - blue) / difference + 6) % 6)
         : maximum === green ? 60 * ((blue - red) / difference + 2) : 60 * ((red - green) / difference + 4);
       brightness.value = Math.round(value * 100);
-      document.getElementById("picker-title").textContent = person + "’s colour";
+      document.getElementById("picker-title").textContent = person === "base" ? "website colour" : person + "’s colour";
       document.getElementById("picker-hex").textContent = draft.colors[person];
       drawWheel();
       dialog.showModal();

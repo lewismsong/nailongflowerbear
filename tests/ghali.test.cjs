@@ -3,10 +3,10 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const route=fs.readFileSync('assets/js/profile-route.js','utf8');
-function routing(name,path){let target;const doc={documentElement:{hidden:false}};vm.runInNewContext(route,{localStorage:{getItem:()=>name},document:doc,window:{location:{pathname:path,replace:p=>target=p}}});return target;}
-test('ghali is confined to the secret miss screen; normal profiles keep their routes',()=>{
- for(const path of ['/nailongflowerbear/','/nailongflowerbear/pakku.html','/nailongflowerbear/settings.html']) assert.equal(routing(' GhAli ',path),'ghali.html');
- assert.equal(routing('ghali','/nailongflowerbear/ghali.html'),undefined);
+function routing(name,path){let target;const doc={documentElement:{hidden:false}};vm.runInNewContext(route,{localStorage:{getItem:()=>name,removeItem:()=>{}},document:doc,window:{location:{pathname:path,replace:p=>target=p}}});return target;}
+test('ghali is paused and normal profiles keep their routes',()=>{
+ for(const path of ['/nailongflowerbear/','/nailongflowerbear/pakku.html','/nailongflowerbear/settings.html']) assert.equal(routing(' GhAli ',path),undefined);
+ assert.equal(routing('ghali','/nailongflowerbear/ghali.html'),'index.html');
  assert.equal(routing('khali','/nailongflowerbear/ghali.html'),'index.html');
  assert.equal(routing('lewis','/nailongflowerbear/pakku.html'),undefined);
  assert.equal(routing(null,'/nailongflowerbear/'),undefined);

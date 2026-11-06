@@ -1,12 +1,10 @@
 (() => {
   'use strict';
-  let ghali = false;
-  try { ghali = (localStorage.getItem('ily:name') || '').trim().toLowerCase() === 'ghali'; } catch {}
-  const onGhali = window.location.pathname.endsWith('/ghali.html');
-  if (ghali && !onGhali) {
-    document.documentElement.hidden = true;
-    window.location.replace('ghali.html');
-  } else if (!ghali && onGhali) {
+  // ghali is paused; keep its artwork and local progress for later.
+  try {
+    if ((localStorage.getItem('ily:name') || '').trim().toLowerCase() === 'ghali') localStorage.removeItem('ily:name');
+  } catch {}
+  if (window.location.pathname.endsWith('/ghali.html')) {
     document.documentElement.hidden = true;
     window.location.replace('index.html');
   }

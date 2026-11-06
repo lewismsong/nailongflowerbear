@@ -12,7 +12,7 @@
     if (document.documentElement.dataset.season === theme) return;
     document.documentElement.dataset.season = theme;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = birthday ? "#F4DFED" : "#F3DDC1";
+    if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue("--bg-bottom").trim();
   }
   updateSeasonalTheme();
   setInterval(() => { if (!document.hidden) updateSeasonalTheme(); }, 60000);

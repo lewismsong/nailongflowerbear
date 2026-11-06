@@ -24,7 +24,16 @@
   function applyColors(value) {
     const customKhali = normalizeHex(value?.colors?.khali);
     const customLewis = normalizeHex(value?.colors?.lewis);
+    const base = normalizeHex(value?.colors?.base) || DEFAULTS.colors.base;
     const properties = {
+      "--site-bg-top": mix(base, 255, 0.94),
+      "--site-bg-bottom": mix(base, 255, 0.66),
+      "--site-surface": mix(base, 255, 0.90),
+      "--site-deep": mix(base, 0, 0.64),
+      "--site-text": mix(base, 0, 0.70),
+      "--site-muted": mix(base, 0, 0.48),
+      "--site-card": "rgba(" + rgb(base) + ", 0.06)",
+      "--site-edge": "rgba(" + rgb(base) + ", 0.22)",
       "--yellow": customKhali,
       "--yellow-deep": customKhali && (customKhali === DEFAULTS.colors.khali ? "#9B522E" : mix(customKhali, 0, 0.42)),
       "--accent-rgb": customKhali && rgb(customKhali),
@@ -40,6 +49,8 @@
       if (color) root.style.setProperty(property, color);
       else root.style.removeProperty(property);
     }
+    const meta = document.querySelector?.('meta[name="theme-color"]');
+    if (meta) meta.content = getComputedStyle(root).getPropertyValue("--bg-bottom").trim();
   }
 
   function reportError(error) {

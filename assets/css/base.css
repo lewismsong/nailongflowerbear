@@ -5,20 +5,20 @@
   --accent-deep-rgb: 155, 82, 46;
   --accent-light: #FFE6B8;
   --accent-shadow: #CE884E;
-  --surface-warm: #FFF6E8;
-  --bg-top: #FFFCF5;
-  --bg-bottom: #F3DDC1;
-  --deep: #563C2C;
-  --card: rgba(112, 70, 38, 0.045);
-  --card-edge: rgba(112, 70, 38, 0.15);
+  --surface-warm: var(--site-surface, #F8EFEE);
+  --bg-top: var(--site-bg-top, #FBF5F4);
+  --bg-bottom: var(--site-bg-bottom, #E7C9C4);
+  --deep: var(--site-deep, #43221D);
+  --card: var(--site-card, rgba(185, 95, 80, 0.06));
+  --card-edge: var(--site-edge, rgba(185, 95, 80, 0.22));
   --yellow: #EDB878;
   --yellow-deep: #9B522E;
   --lewis-rgb: 239, 148, 143;
   --lewis-deep-rgb: 196, 105, 99;
   --blue: #EF948F;
   --blue-deep: #9B4945;
-  --text: #503B2E;
-  --muted: #78604D;
+  --text: var(--site-text, #381C18);
+  --muted: var(--site-muted, #60312A);
   --pink-deep: #B14F67;
 }
 

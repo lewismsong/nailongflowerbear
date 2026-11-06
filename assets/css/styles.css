@@ -137,12 +137,11 @@ h2.feed-title.cal-title { margin: 0; }
 
 /* Autumn leaves fall from above the viewport. */
 #sky { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
-.miss-leaf { position: absolute; top: -42px; width: var(--leaf-size); height: calc(var(--leaf-size) * 1.15); background: var(--leaf-color); opacity: 0; animation: leavesFall linear both; clip-path: polygon(50% 0, 62% 24%, 84% 15%, 79% 40%, 100% 43%, 75% 67%, 57% 78%, 54% 100%, 46% 100%, 44% 78%, 24% 67%, 0 43%, 21% 40%, 16% 15%, 38% 24%); }
-.miss-leaf::after { content: ""; position: absolute; left: 48%; top: 28%; width: 1px; height: 68%; background: rgba(100,55,25,.3); }
+.miss-snow { position: absolute; top: -42px; width: var(--leaf-size); height: var(--leaf-size); border-radius: 50%; background: var(--leaf-color); box-shadow: 0 1px 3px rgba(71,102,86,.18); opacity: 0; animation: snowFall linear both; pointer-events: none; }
 
 /* original yellow: rgba(255,201,77,0.4) / rgba(255,183,50,0.65) */
 @keyframes breathe { 0%,100% { box-shadow: 0 0 40px 8px rgba(var(--accent-rgb),0.4); } 50% { box-shadow: 0 0 75px 20px rgba(var(--accent-rgb),0.65); } }
-@keyframes leavesFall {
+@keyframes snowFall {
   0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
   8% { opacity: .95; }
   80% { opacity: .95; }
@@ -150,7 +149,7 @@ h2.feed-title.cal-title { margin: 0; }
 }
 @keyframes popIn { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  #beacon, .miss-leaf, #feed li { animation: none !important; }
+  #beacon, .miss-snow, #feed li { animation: none !important; }
 }
 
 

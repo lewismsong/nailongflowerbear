@@ -16,3 +16,6 @@
 [data-season="birthday"] .floor-leaf:nth-child(3n) { background: var(--blue); }
 [data-season="birthday"] .floor-leaf::after { display: none; }
 [data-season="birthday"] .bear-tab-image { border-color: #DFABC9; box-shadow: 0 3px 12px rgba(151,83,118,.15); }
+
+[data-season="christmas"] .floor-leaf { width: 12px; height: 12px; background: #fff; clip-path: polygon(42% 0,58% 0,58% 32%,83% 17%,91% 31%,66% 46%,100% 46%,100% 60%,66% 60%,91% 76%,83% 90%,58% 75%,58% 100%,42% 100%,42% 75%,17% 90%,9% 76%,34% 60%,0 60%,0 46%,34% 46%,9% 31%,17% 17%,42% 32%); filter: drop-shadow(0 1px 1px rgba(71,102,86,.22)); }
+[data-season="christmas"] .floor-leaf::after { display: none; }

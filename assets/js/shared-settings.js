@@ -34,23 +34,23 @@
     const base = normalizeHex(value?.colors?.base) || DEFAULTS.colors.base;
     const properties = {
       "--site-bg-top": tint(base, "#FFFCF5", 0.02),
-      "--site-bg-bottom": tint(base, "#F7EBDD", 0.10),
+      "--site-bg-bottom": tint(base, "#F1F3EA", 0.10),
       "--site-surface": tint(base, "#FFFCF7", 0.03),
-      "--site-deep": tint(base, "#493C32", 0.10),
-      "--site-text": tint(base, "#3E3731", 0.05),
-      "--site-muted": tint(base, "#74675B", 0.08),
+      "--site-deep": tint(base, "#34443B", 0.10),
+      "--site-text": tint(base, "#303C35", 0.05),
+      "--site-muted": tint(base, "#627167", 0.08),
       "--site-card": "rgba(" + rgb(base) + ", 0.035)",
       "--site-edge": "rgba(" + rgb(base) + ", 0.14)",
       "--yellow": customKhali,
-      "--yellow-deep": customKhali && (customKhali === DEFAULTS.colors.khali ? "#9B522E" : mix(customKhali, 0, 0.42)),
+      "--yellow-deep": customKhali && (customKhali === DEFAULTS.colors.khali ? "#78393B" : mix(customKhali, 0, 0.42)),
       "--accent-rgb": customKhali && rgb(customKhali),
-      "--accent-deep-rgb": customKhali && rgb(customKhali === DEFAULTS.colors.khali ? "#9B522E" : mix(customKhali, 0, 0.42)),
+      "--accent-deep-rgb": customKhali && rgb(customKhali === DEFAULTS.colors.khali ? "#78393B" : mix(customKhali, 0, 0.42)),
       "--accent-light": customKhali && mix(customKhali, 255, 0.65),
       "--accent-shadow": customKhali && mix(customKhali, 0, 0.2),
       "--blue": customLewis,
-      "--blue-deep": customLewis && (customLewis === DEFAULTS.colors.lewis ? "#9B4945" : mix(customLewis, 0, 0.42)),
+      "--blue-deep": customLewis && (customLewis === DEFAULTS.colors.lewis ? "#345944" : mix(customLewis, 0, 0.42)),
       "--lewis-rgb": customLewis && rgb(customLewis),
-      "--lewis-deep-rgb": customLewis && rgb(customLewis === DEFAULTS.colors.lewis ? "#9B4945" : mix(customLewis, 0, 0.42)),
+      "--lewis-deep-rgb": customLewis && rgb(customLewis === DEFAULTS.colors.lewis ? "#345944" : mix(customLewis, 0, 0.42)),
     };
     for (const [property, color] of Object.entries(properties)) {
       if (color) root.style.setProperty(property, color);

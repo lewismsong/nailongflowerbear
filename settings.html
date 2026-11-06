@@ -5,17 +5,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>settings 🤍</title>
-<meta name="theme-color" content="#F1DDCF" />
+<meta name="theme-color" content="#E4EAE0" />
 <link rel="icon" href="assets/images/optimized/pakku.webp" />
 <script src="assets/js/platform.js?v=2"></script>
 <script src="assets/js/auth-guard.js?v=3"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
-<link rel="stylesheet" href="assets/css/base.css?v=14" />
-<link rel="stylesheet" href="assets/css/seasonal-theme.css?v=1" />
+<link rel="stylesheet" href="assets/css/base.css?v=15" />
+<link rel="stylesheet" href="assets/css/seasonal-theme.css?v=2" />
 <link rel="stylesheet" href="assets/css/settings.css?v=1" />
-<script src="assets/js/seasonal-theme.js?v=2"></script>
+<script src="assets/js/seasonal-theme.js?v=3"></script>
 </head>
 <body>
 <main class="settings-page">
@@ -29,15 +29,15 @@
         <div class="colour-rows">
           <div class="colour-row">
             <label for="khali-hex">khali <span aria-hidden="true">🐻‍❄️</span></label>
-            <div class="colour-controls"><button class="colour-swatch" id="khali-swatch" type="button" data-person="khali" aria-label="Choose Khali’s accent colour" aria-haspopup="dialog"></button><input id="khali-hex" aria-label="Khali’s hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#EDB878" required pattern="#?[0-9a-fA-F]{6}" /></div>
+            <div class="colour-controls"><button class="colour-swatch" id="khali-swatch" type="button" data-person="khali" aria-label="Choose Khali’s accent colour" aria-haspopup="dialog"></button><input id="khali-hex" aria-label="Khali’s hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#CF6265" required pattern="#?[0-9a-fA-F]{6}" /></div>
           </div>
           <div class="colour-row">
             <label for="lewis-hex">lewis <span aria-hidden="true">🐻</span></label>
-            <div class="colour-controls"><button class="colour-swatch" id="lewis-swatch" type="button" data-person="lewis" aria-label="Choose Lewis’ accent colour" aria-haspopup="dialog"></button><input id="lewis-hex" aria-label="Lewis’ hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#EF948F" required pattern="#?[0-9a-fA-F]{6}" /></div>
+            <div class="colour-controls"><button class="colour-swatch" id="lewis-swatch" type="button" data-person="lewis" aria-label="Choose Lewis’ accent colour" aria-haspopup="dialog"></button><input id="lewis-hex" aria-label="Lewis’ hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#63977B" required pattern="#?[0-9a-fA-F]{6}" /></div>
           </div>
           <div class="colour-row">
             <label for="base-hex">website</label>
-            <div class="colour-controls"><button class="colour-swatch" id="base-swatch" type="button" aria-label="choose website colour" aria-haspopup="dialog"></button><input id="base-hex" aria-label="website hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#B95F50" required pattern="#?[0-9a-fA-F]{6}" /></div>
+            <div class="colour-controls"><button class="colour-swatch" id="base-swatch" type="button" aria-label="choose website colour" aria-haspopup="dialog"></button><input id="base-hex" aria-label="website hex colour" type="text" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#719783" required pattern="#?[0-9a-fA-F]{6}" /></div>
           </div>
         </div>
         <p class="settings-intro">one colour becomes a soft gradient with matching text and borders. your accents stay separate.</p>
@@ -45,6 +45,7 @@
       <section class="house-section" aria-labelledby="house-title">
         <h2 id="house-title">pakku’s house</h2>
         <div class="house-options">
+          <label class="house-option"><input type="radio" name="house" value="christmas-tree" /><span class="house-preview"><img src="assets/images/optimized/christmas-tree.webp" alt="a snowy christmas tree with red ornaments and a golden star" /></span><span class="house-caption">christmas tree</span></label>
           <label class="house-option"><input type="radio" name="house" value="temple" /><span class="house-preview"><img src="assets/images/optimized/chinese-temple.webp" alt="A Chinese temple" /></span><span class="house-caption">temple</span></label>
           <label class="house-option"><input type="radio" name="house" value="cat-house" /><span class="house-preview"><img src="assets/images/optimized/cat-house.webp" alt="A little cat house" /></span><span class="house-caption">cat house</span></label>
           <label class="house-option"><input type="radio" name="house" value="koala-tree" /><span class="house-preview"><img src="assets/images/optimized/mango-tree-heart.webp" alt="an autumn mango tree with tiny green mangoes" /></span><span class="house-caption">mango tree</span></label>
@@ -64,8 +65,8 @@
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script defer src="assets/js/config.js?v=2"></script>
-<script defer src="assets/js/settings-model.js?v=5"></script>
-<script defer src="assets/js/shared-settings.js?v=3"></script>
+<script defer src="assets/js/settings-model.js?v=6"></script>
+<script defer src="assets/js/shared-settings.js?v=4"></script>
 <script defer src="assets/js/settings.js?v=2"></script>
 </body>
 </html>

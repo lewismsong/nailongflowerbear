@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#edf3d7" />
+<title>ghali + gakku</title>
+<script src="assets/js/profile-route.js?v=2"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&amp;family=Nunito+Sans:wght@400;600;700&amp;display=swap" />
+<link rel="stylesheet" href="assets/css/ghali.css?v=2" />
+<script defer src="assets/js/platform.js?v=2"></script>
+<script defer src="assets/js/ghali.js?v=1"></script>
+</head>
+<body>
+<main class="ghali-room">
+  <header><div><p class="eyebrow">a little secret</p><h1>hi, ghali.</h1></div><button id="ghali-signout" class="signout" type="button">not you?</button></header>
+  <section class="miss-room" aria-label="gakku's miss screen">
+    <span class="spark spark-one" aria-hidden="true">✧</span><span class="spark spark-two" aria-hidden="true">✧</span>
+    <p class="room-note">someone small is thinking of you.</p>
+    <div class="gakku-halo">
+      <button id="gakku-button" type="button" aria-label="Send Gakku a little miss">
+        <span class="gakku" aria-hidden="true"></span>
+        <span class="gakku-name">gakku</span><span class="button-note">i miss you</span>
+      </button>
+    </div>
+    <p id="ghali-response" class="response" role="status">a tiny glow, just for you.</p>
+    <div class="miss-total"><strong id="ghali-count">0</strong><span>little misses</span></div>
+    <p class="secret-note">our secret green corner.</p>
+  </section>
+  <div id="ghali-sparks" aria-hidden="true"></div>
+</main>
+<button id="gakku-companion" type="button" aria-label="gakku; drag to move, or use arrow keys"><span aria-hidden="true"></span></button>
+<script defer src="assets/js/gakku-companion.js?v=1"></script>
+</body>
+</html>

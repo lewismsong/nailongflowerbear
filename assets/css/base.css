@@ -1,24 +1,24 @@
 
 :root {
-  /* Autumn palette; birthday colours override these on November 30. */
-  --accent-rgb: 237, 184, 120;
-  --accent-deep-rgb: 155, 82, 46;
-  --accent-light: #FFE6B8;
-  --accent-shadow: #CE884E;
-  --surface-warm: #FFF6E8;
-  --bg-top: #FFFCF5;
-  --bg-bottom: #F3DDC1;
-  --deep: #563C2C;
-  --card: rgba(112, 70, 38, 0.045);
-  --card-edge: rgba(112, 70, 38, 0.15);
-  --yellow: #EDB878;
-  --yellow-deep: #9B522E;
-  --lewis-rgb: 239, 148, 143;
-  --lewis-deep-rgb: 196, 105, 99;
-  --blue: #EF948F;
-  --blue-deep: #9B4945;
-  --text: #503B2E;
-  --muted: #78604D;
+  /* christmas palette; birthday colours override these on November 30. */
+  --accent-rgb: 207, 98, 101;
+  --accent-deep-rgb: 120, 57, 59;
+  --accent-light: #F8D8D4;
+  --accent-shadow: #B34C50;
+  --surface-warm: var(--site-surface, #FBF9F4);
+  --bg-top: var(--site-bg-top, #FCFAF3);
+  --bg-bottom: var(--site-bg-bottom, #E4EAE0);
+  --deep: var(--site-deep, #3A4C42);
+  --card: var(--site-card, rgba(113, 151, 131, 0.035));
+  --card-edge: var(--site-edge, rgba(113, 151, 131, 0.14));
+  --yellow: #CF6265;
+  --yellow-deep: #78393B;
+  --lewis-rgb: 99, 151, 123;
+  --lewis-deep-rgb: 52, 89, 68;
+  --blue: #63977B;
+  --blue-deep: #345944;
+  --text: var(--site-text, #334139);
+  --muted: var(--site-muted, #637469);
   --pink-deep: #B14F67;
 }
 

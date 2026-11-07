@@ -36,7 +36,7 @@
     </span>`;
   const HOUSE_MARKUP = `
     <span class="pixel-house-zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
-    <img class="pixel-house-image" src="assets/images/optimized/koala-tree-autumn.webp" alt="" draggable="false" />`;
+    <img class="pixel-house-image" src="assets/images/optimized/christmas-cat-tree.webp" alt="" draggable="false" />`;
   const HEART_MARKUP = `
     <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
       <path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" />
@@ -212,9 +212,11 @@
     }
   }
 
+  window.CompanionDraggable = PersistentDraggable;
+
   class PixelCompanions {
     constructor() {
-      this.house = createButton("pixel-house", "drag the koala tree or select it to make it shake", HOUSE_MARKUP);
+      this.house = createButton("pixel-house", "drag the christmas tree or select it to make it shake", HOUSE_MARKUP);
       this.cat = createButton("pixel-cat", "drag Pakku or select him to send some love", CAT_MARKUP);
       document.body.append(this.house, this.cat);
       this.updateHouse(window.appSettings.current.house);
@@ -273,6 +275,15 @@
             this.sendToPlayroom();
             return true;
           }
+          const park = document.getElementById("daisy-park");
+          if (park && this.catDrag.dragged) {
+            const r = park.getBoundingClientRect(), c = this.cat.getBoundingClientRect();
+            const x = c.left + c.width / 2, y = c.top + c.height / 2;
+            if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+              this.catDrag.setPosition(this.catDrag.x, 8);
+              return true;
+            }
+          }
           if (this.sandbox && this.catDrag.dragged && this.sandbox.drop()) return true;
           if (!this.isCatOverHouse()) return false;
           this.enterHouse();
@@ -300,7 +311,7 @@
         this.sandbox.activate();
         this.sandbox.place();
         this.sandbox.save();
-        this.sandbox.announce();
+
       } else {
         appStorage.setJson("ily:pakkuSandbox", { inside: true, x: .2, y: .8 });
         window.location.assign("pakku.html");
@@ -510,6 +521,7 @@
     if (!pixelCompanions && !document.querySelector(".pixel-cat, .pixel-house")) {
       pixelCompanions = new PixelCompanions();
     }
+    window.initializeDaisy?.();
     return pixelCompanions;
   }
 

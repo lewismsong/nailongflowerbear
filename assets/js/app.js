@@ -93,16 +93,16 @@ function ago(timestamp, now) {
   return new Date(timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function spawnLeaves(count) {
+function spawnSnow(count) {
   const sky = $("sky");
   if (!sky || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   sky.replaceChildren();
-  const colors = ["#D47738", "#E8B647", "#B9533B", "#C58D46", "#D99B59"];
+  const colors = ["#FFFFFF", "#F8FCFF", "#E8F0EC"];
   for (let index = 0; index < count; index++) {
     const leaf = document.createElement("div");
-    leaf.className = "miss-leaf";
+    leaf.className = "miss-snow";
     leaf.style.left = (3 + Math.random() * 94) + "%";
-    leaf.style.setProperty("--leaf-size", (16 + Math.random() * 17) + "px");
+    leaf.style.setProperty("--leaf-size", (4 + Math.random() * 7) + "px");
     leaf.style.setProperty("--leaf-color", colors[index % colors.length]);
     leaf.style.setProperty("--drift", ((Math.random() - 0.5) * 140) + "px");
     leaf.style.setProperty("--spin", ((Math.random() - 0.5) * 540) + "deg");
@@ -240,6 +240,16 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) renderRevealCountdown();
 });
 
+const franceScoreToggle = $("count-france");
+const franceScorePreferenceKey = () => "ily:countFrance:" + (name || "guest");
+let includeFranceInScore = appStorage.get(franceScorePreferenceKey(), "true") !== "false";
+franceScoreToggle.checked = includeFranceInScore;
+franceScoreToggle.addEventListener("change", () => {
+  includeFranceInScore = franceScoreToggle.checked;
+  appStorage.set(franceScorePreferenceKey(), String(includeFranceInScore));
+  renderCal();
+});
+
 let calMonthOffset = 0; // 0 = this month, -1 = last month, +1 = next
 const CAL_FIRST_MONTH = { year: 2026, month: 7 }; // nothing exists before july 2026
 
@@ -309,6 +319,7 @@ function renderCal() {
     const key = dayKeyFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const record = days[key] || { k: 0, l: 0 };
     const isToday = key === todayKey;
+    const excluded = !includeFranceInScore && GameScore.isFranceDay(key);
 
     const cell = document.createElement("div");
     cell.className = "day";
@@ -317,6 +328,7 @@ function renderCal() {
     else if (!isToday && record.l > record.k) cell.classList.add("l");
     else if (!isToday && record.k > 0) cell.classList.add("b");
     if (isToday) cell.classList.add("today");
+    if (excluded) cell.classList.add("score-excluded");
 
     if (!isToday && (record.k > 0 || record.l > 0)) {
       const khaliScore = document.createElement("span");
@@ -330,19 +342,13 @@ function renderCal() {
     cell.title = isToday
       ? "today · result hidden until the day ends"
       : key + " · khali " + record.k + " – " + record.l + " lewis";
+    if (excluded) cell.title += " · france: excluded from trophy score";
     grid.appendChild(cell);
   }
 
   // trophy count: completed days only — today isn't decided yet
-  let khaliWins = 0;
-  let lewisWins = 0;
-  for (const key in days) {
-    if (key === todayKey) continue;
-    const record = days[key];
-    if (record.k > record.l) khaliWins++;
-    else if (record.l > record.k) lewisWins++;
-  }
-  $("streak").textContent = "🏆 khali " + khaliWins + " – " + lewisWins + " lewis";
+  const wins = GameScore.tally(days, todayKey, includeFranceInScore);
+  $("streak").textContent = "🏆 khali " + wins.khali + " – " + wins.lewis + " lewis";
   $("today-score").textContent = "today's result is hidden · " + timeLeftToronto() + " left";
 }
 
@@ -359,6 +365,8 @@ $("cal-next").addEventListener("click", () => {
 });
 
 function showMain() {
+  includeFranceInScore = appStorage.get(franceScorePreferenceKey(), "true") !== "false";
+  franceScoreToggle.checked = includeFranceInScore;
   setupEl.classList.add("hidden");
   mainEl.classList.remove("hidden");
   $("who").textContent = name;
@@ -438,7 +446,7 @@ beacon.addEventListener("click", async () => {
     const ev = { from: name, at: firebase.database.ServerValue.TIMESTAMP };
     await eventsRef.push(ev);
     appStorage.set("ily:lastSent", serverNow());
-    spawnLeaves(36);
+    spawnSnow(36);
     render();
     renderFeed();
   } catch (error) {
@@ -472,7 +480,7 @@ function connectFirebase() {
       else missHistory.update(snapshot.key, snapshot.val());
       const event = missHistory.records.get(snapshot.key);
       if (historyReady && !previous && event && event.from !== normalizeName(name)) {
-        spawnLeaves(44);
+        spawnSnow(44);
         try {
           navigator.vibrate?.([90, 50, 90]);
         } catch (error) {

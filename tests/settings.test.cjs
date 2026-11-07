@@ -9,7 +9,7 @@ test('settings validate hex colours and keep supported house selections', () => 
   assert.equal(model.normalizeHex('#aBcDeF'), '#ABCDEF');
   for (const value of ['', '#abc', '#GGGGGG', 'red', null, 12]) assert.equal(model.normalizeHex(value), null);
   assert.deepEqual(model.normalize({ colors: { khali: 'abc123', lewis: 'bad' }, house: '__proto__' }), {
-    colors: { khali: '#ABC123', lewis: '#EF948F' }, house: 'koala-tree',
+    colors: { khali: '#ABC123', lewis: '#63977B', base: '#719783' }, house: 'christmas-tree',
   });
   assert.equal(model.normalize({ house: 'temple' }).house, 'temple');
 });
@@ -50,7 +50,7 @@ test('shared settings only write on explicit apply, propagate subscriptions, and
   subscription({ val: () => null });
   await window.appSettings.ready;
   assert.deepEqual(writes, []);
-  assert.equal(styles.size, 0);
+  assert.equal(styles.get('--site-bg-bottom'), '#e4eae0');
   subscription({ val: () => ({ colors: { khali: '#112233', lewis: '#AABBCC' }, house: 'cat-house' }) });
   assert.equal(window.appSettings.current.house, 'cat-house');
   assert.equal(styles.get('--yellow'), '#112233');
@@ -61,4 +61,11 @@ test('shared settings only write on explicit apply, propagate subscriptions, and
   assert.deepEqual(writes, [{ house: 'temple' }]);
   failWrite = true;
   await assert.rejects(window.appSettings.apply({ house: 'koala-tree' }), /permission denied/);
+});
+
+test('base colour changes preserve personal accents and other settings', () => {
+ const previous = model.normalize(null);
+ const next = model.normalize({ colors: { base: '#336699' } });
+ assert.deepEqual(model.changes(previous, next), { 'colors/base': '#336699' });
+ assert.equal(model.normalize({colors:{base:'invalid'}}).colors.base, '#719783');
 });

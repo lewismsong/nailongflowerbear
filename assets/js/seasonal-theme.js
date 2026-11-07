@@ -8,11 +8,11 @@
     const month = parts.find(part => part.type === "month").value;
     const day = parts.find(part => part.type === "day").value;
     const birthday = month === "11" && day === "30";
-    const theme = birthday ? "birthday" : "autumn";
+    const theme = birthday ? "birthday" : "christmas";
     if (document.documentElement.dataset.season === theme) return;
     document.documentElement.dataset.season = theme;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = birthday ? "#F4DFED" : "#F3DDC1";
+    if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue("--bg-bottom").trim();
   }
   updateSeasonalTheme();
   setInterval(() => { if (!document.hidden) updateSeasonalTheme(); }, 60000);

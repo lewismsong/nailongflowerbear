@@ -29,4 +29,20 @@
 <path fill="none" stroke="#d79654" stroke-width="3" d="M0 213h500M0 261h500M0 310h500"/>
 <path fill="none" stroke="#95502f" stroke-width="2" d="M0 217h500M0 265h500M0 314h500M88 175v38M252 175v38M414 175v38M38 217v44M174 217v44M337 217v44M474 217v44M91 265v45M253 265v45M416 265v45M35 314v46M171 314v46M334 314v46M470 314v46"/>
 <path fill="#c98244" d="M5 179h78v4H5zM257 229h74v4h-74zM96 277h68v4H96zM341 326h79v4h-79z"/>
+
+<!-- two tiny stockings on the fireplace mantel -->
+<g transform="translate(211 40)">
+<path d="M3 0V-4H8V0" fill="none" stroke="#ecd7ac" stroke-width="2"/>
+<path d="M1 3H18V20H25V23H28V30H25V33H5V30H1Z" fill="#a7434b"/>
+<path d="M4 7H15V23H24V29H7V26H4Z" fill="#cc6261"/>
+<path d="M0 2H19V9H0Z M20 24H26V29H20Z" fill="#fff1d9"/>
+<path d="M6 13H9V16H6Z M11 13H14V16H11Z M8 18H12V21H8Z" fill="#f5d8a9"/>
+</g>
+<g transform="translate(268 40)">
+<path d="M3 0V-4H8V0" fill="none" stroke="#ecd7ac" stroke-width="2"/>
+<path d="M1 3H18V20H25V23H28V30H25V33H5V30H1Z" fill="#46765b"/>
+<path d="M4 7H15V23H24V29H7V26H4Z" fill="#719b7d"/>
+<path d="M0 2H19V9H0Z M20 24H26V29H20Z" fill="#fff1d9"/>
+<path d="M6 13H9V16H6Z M11 13H14V16H11Z M8 18H12V21H8Z" fill="#f5d8a9"/>
+</g>
 </svg>

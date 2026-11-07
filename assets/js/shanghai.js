@@ -10,13 +10,13 @@ function renderCountdown() {
   if (!document.hidden) document.getElementById("france-count").textContent = window.shanghaiTrip.countdown();
 }
 
-const days = Array.from({ length: window.shanghaiTrip.dayCount }, (unused, index) => ({
+const days = Array.from({ length: window.shanghaiTrip.dayCount + 1 }, (unused, index) => ({
   key: "day-" + (index + 1),
   label: window.shanghaiTrip.dateForDay(index).toLocaleDateString("en-US", {
     timeZone: "UTC", weekday: "short", month: "short", day: "numeric",
   }).toLowerCase(),
 }));
-document.getElementById("trip-dates").textContent = window.shanghaiTrip.label;
+document.getElementById("trip-dates").textContent = window.shanghaiTrip.label + " · home dec 14";
 initializeTripItinerary(tripRef, days, showTripError);
 initializeTripReservations(tripRef, showTripError);
 

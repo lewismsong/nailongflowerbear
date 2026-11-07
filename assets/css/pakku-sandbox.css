@@ -46,7 +46,7 @@ body { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 
 
 /* the flat room perspective matches the front-facing toy sprites. */
-.pakku-sandbox { background: #d89a55 url('../images/pakku-room.svg?v=4') center / 100% 100% no-repeat; }
+.pakku-sandbox { background: #d89a55 url('../images/optimized/pakku-room-winter.webp') center / 100% 100% no-repeat; }
 
 
 

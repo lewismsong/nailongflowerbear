@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
 <link rel="stylesheet" href="assets/css/base.css?v=12" />
-<link rel="stylesheet" href="assets/css/styles.css?v=35" />
+<link rel="stylesheet" href="assets/css/styles.css?v=36" />
 <link rel="stylesheet" href="assets/css/pixel-companions.css?v=8" />
 <link rel="stylesheet" href="assets/css/all-time-adjustments.css?v=3" />
 <link rel="stylesheet" href="assets/css/seasonal-theme.css?v=1" />
@@ -109,6 +109,23 @@
     <p id="empty">no misses have been sent yet</p>
     <ul id="feed"></ul>
 
+    <aside class="quick-notes" aria-labelledby="quick-notes-title">
+      <div class="quick-notes-head">
+        <div>
+          <h2 id="quick-notes-title">notes</h2>
+          <p class="quick-notes-subtitle">quick scratchpad</p>
+        </div>
+        <a id="quick-notes-open" href="todo.html">open all →</a>
+      </div>
+      <form id="quick-notes-form" class="quick-notes-form">
+        <input id="quick-notes-input" maxlength="280" placeholder="leave a note" autocomplete="off" disabled />
+        <button type="submit" disabled aria-label="add note">+</button>
+      </form>
+      <p id="quick-notes-empty" class="quick-notes-empty">loading notes…</p>
+      <ul id="quick-notes-list" class="quick-notes-list"></ul>
+      <p id="quick-notes-error" class="quick-notes-error" role="status"></p>
+    </aside>
+
     <div class="cal-head">
       <h2 class="feed-title cal-title">thinking of you</h2>
       <div class="cal-nav">
@@ -150,6 +167,7 @@
 <script defer src="assets/js/daisy-companion.js?v=1"></script>
 <script defer src="assets/js/miss-history.js?v=1"></script>
 <script defer src="assets/js/app.js?v=30"></script>
+<script defer src="assets/js/quick-notes.js?v=1"></script>
 <script defer src="assets/js/shanghai-trip.js?v=2"></script>
 </body>
 </html>

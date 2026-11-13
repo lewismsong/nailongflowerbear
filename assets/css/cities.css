@@ -71,6 +71,33 @@ html { scroll-behavior: smooth; }
 .data-credit a { color: inherit; }
 .sr-only { width: 1px; height: 1px; position: absolute; overflow: hidden; clip: rect(0,0,0,0); clip-path: inset(50%); white-space: nowrap; }
 
+:root[data-appearance="dark"] .world-card,
+:root[data-appearance="dark"] .visits-card {
+  background: rgba(230, 235, 231, .06);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+}
+:root[data-appearance="dark"] .world-map {
+  background: radial-gradient(circle at 50% 45%, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .05) 55%, rgba(0, 0, 0, .08) 76%);
+}
+:root[data-appearance="dark"] .world-map path { fill: #555C57; stroke: #2B302D; }
+:root[data-appearance="dark"] .world-map path.visited {
+  fill: var(--yellow);
+  stroke: #D6D0C6;
+  filter: drop-shadow(0 0 3px rgba(var(--accent-rgb), .3));
+}
+:root[data-appearance="dark"] .map-legend span { border-color: #D6D0C6; box-shadow: 0 0 4px rgba(var(--accent-rgb), .28); }
+:root[data-appearance="dark"] .visit-item { border-color: rgba(225, 230, 226, .11); background: rgba(225, 230, 226, .055); }
+:root[data-appearance="dark"] .city-combobox input,
+:root[data-appearance="dark"] .city-results,
+:root[data-appearance="dark"] .visit-date-fields input { background: var(--surface-warm); }
+:root[data-appearance="dark"] .city-search-form > button {
+  border-color: var(--card-edge);
+  background: rgba(225, 230, 226, .1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+:root[data-appearance="dark"] .city-search-form > button:hover:not(:disabled) { border-color: rgba(225, 230, 226, .3); background: rgba(225, 230, 226, .16); }
+:root[data-appearance="dark"] .city-search-form > button:disabled { border-color: var(--card-edge); background: rgba(225, 230, 226, .04); color: var(--muted); opacity: .5; }
+
 @media (max-width: 759px) {
   .cities-wrap { width: min(100% - 24px, 620px); padding-top: 34px; }
   .cities-header h1 { font-size: clamp(36px, 11vw, 48px); }

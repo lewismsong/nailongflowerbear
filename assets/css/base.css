@@ -37,6 +37,10 @@ body {
 
 :root[data-appearance="dark"] {
   color-scheme: dark;
+  --dark-panel: #2F3431;
+  --dark-panel-raised: #383D3A;
+  --dark-panel-text: #C6CCC7;
+  --dark-panel-muted: #979F99;
   --bg-top: var(--dark-bg-top, #303431);
   --bg-bottom: var(--dark-bg-bottom, #222523);
   --surface-warm: var(--dark-surface, #383C39);

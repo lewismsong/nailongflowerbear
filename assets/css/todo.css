@@ -141,6 +141,30 @@
 .todo-delete:focus-visible { opacity: 1; outline: 2px solid var(--yellow-deep); border-radius: 5px; }
 .todo-error { color: var(--pink-deep); font-size: 12px; min-height: 1em; margin: 16px 0 0; text-align: center; }
 
+:root[data-appearance="dark"] .scratchpad {
+  border-color: rgba(225, 230, 226, .13);
+  background: var(--dark-panel);
+  color: var(--dark-panel-text);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .24);
+}
+:root[data-appearance="dark"] .scratchpad::before {
+  opacity: .18;
+  background: repeating-linear-gradient(transparent 0, transparent 35px, rgba(225, 230, 226, .13) 36px, transparent 37px);
+}
+:root[data-appearance="dark"] .todo-progress-copy,
+:root[data-appearance="dark"] .todo-stamp { color: var(--dark-panel-muted); }
+:root[data-appearance="dark"] #todo-count,
+:root[data-appearance="dark"] .todo-text { color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .todo-form input,
+:root[data-appearance="dark"] .todo-tab-input { border-color: rgba(225, 230, 226, .14); background: var(--dark-panel-raised); color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .todo-tabs { background: rgba(18, 21, 19, .2); scrollbar-color: rgba(225, 230, 226, .18) transparent; }
+:root[data-appearance="dark"] .todo-tabs::-webkit-scrollbar-thumb { background: rgba(225, 230, 226, .18); }
+:root[data-appearance="dark"] .todo-tab[aria-selected="true"] { background: var(--dark-panel-raised); color: var(--dark-panel-text); box-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
+:root[data-appearance="dark"] .todo-tab-grip { color: var(--dark-panel-muted); }
+:root[data-appearance="dark"] .todo-check { border-color: rgba(225, 230, 226, .28); background: #272C29; }
+:root[data-appearance="dark"] .todo-text:focus { background: var(--dark-panel-raised); }
+:root[data-appearance="dark"] .todo-item.done { opacity: .72; }
+
 @media (max-width: 520px) {
   .todo-wrap { width: min(100% - 24px, 680px); padding-top: 14px; }
   .back-link { margin-bottom: 14px; }

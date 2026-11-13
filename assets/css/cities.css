@@ -36,6 +36,7 @@ html { scroll-behavior: smooth; }
 .world-count { color: var(--muted); font-size: 12px; white-space: nowrap; margin: 0; }
 .world-map { width: 100%; min-height: 390px; display: grid; place-items: center; margin-top: 10px; overflow: hidden; border-radius: 16px; background: radial-gradient(circle at 50% 45%, rgba(239, 148, 143,0.2), rgba(239, 148, 143,0.08) 55%, transparent 75%); }
 .world-map svg { width: 100%; height: auto; display: block; overflow: visible; }
+.world-map-fallback { display: block; width: 100%; height: auto; }
 .world-map path { fill: #eadfc9; stroke: #fffdf7; stroke-width: 0.7; vector-effect: non-scaling-stroke; transition: fill 0.3s ease, filter 0.3s ease; }
 .world-map path.visited { fill: var(--yellow); stroke: #fff7de; filter: drop-shadow(0 1px 1px rgba(74,53,36,0.18)); }
 .map-loading { color: var(--muted); font-size: 13px; }
@@ -80,6 +81,7 @@ html { scroll-behavior: smooth; }
   background: radial-gradient(circle at 50% 45%, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .05) 55%, rgba(0, 0, 0, .08) 76%);
 }
 :root[data-appearance="dark"] .world-map path { fill: #555C57; stroke: #2B302D; }
+:root[data-appearance="dark"] .world-map-fallback { filter: grayscale(.75) brightness(.58) contrast(1.18); }
 :root[data-appearance="dark"] .world-map path.visited {
   fill: var(--yellow);
   stroke: #D6D0C6;

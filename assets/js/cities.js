@@ -170,7 +170,19 @@ function formatDateInput(event) {
     .join("/");
 }
 
+function showStaticWorldMap() {
+  const fallback = document.createElement("img");
+  fallback.className = "world-map-fallback";
+  fallback.src = "assets/data/world.svg";
+  fallback.alt = "world map";
+  worldMap.replaceChildren(fallback);
+}
+
 async function loadWorldMap() {
+  if (window.location.protocol === "file:") {
+    showStaticWorldMap();
+    return;
+  }
   try {
     const response = await fetch("assets/data/world.svg");
     if (!response.ok) throw new Error("map returned " + response.status);
@@ -195,10 +207,7 @@ async function loadWorldMap() {
     updateMap();
   } catch (error) {
     console.error("world map failed to load:", error);
-    const message = document.createElement("p");
-    message.className = "map-loading";
-    message.textContent = "couldn't draw the map — refresh to try again";
-    worldMap.replaceChildren(message);
+    showStaticWorldMap();
   }
 }
 

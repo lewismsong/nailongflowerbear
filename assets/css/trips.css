@@ -53,6 +53,19 @@
 .trip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .trip-grid .trip-card { margin: 0; box-shadow: 0 6px 20px rgba(74,53,36,0.05); }
 .trip-card:focus-visible, .trips-jump:focus-visible { outline: 3px solid var(--deep); outline-offset: 4px; }
+:root[data-appearance="dark"] .trip-card,
+:root[data-appearance="dark"] .world-trips .trip-next {
+  border-color: rgba(225, 230, 226, .13);
+  background: var(--dark-panel);
+  color: var(--dark-panel-text);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+}
+:root[data-appearance="dark"] .trip-card:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, .27); }
+:root[data-appearance="dark"] .trip-name { color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .trip-when,
+:root[data-appearance="dark"] .trip-go { color: var(--dark-panel-muted); }
+:root[data-appearance="dark"] .trips-jump { background: var(--dark-panel-raised); color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .trips-jump:hover { background: #414743; }
 @media (max-width: 759px) {
   .trip-grid { grid-template-columns: 1fr; gap: 10px; }
   .world-trips { margin-top: 28px; padding-top: 24px; }

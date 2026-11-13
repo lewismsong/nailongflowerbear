@@ -538,6 +538,49 @@
   text-align: center;
 }
 
+:root[data-appearance="dark"] .france-header {
+  border-color: rgba(225, 230, 226, .13);
+  background: linear-gradient(120deg, rgba(47, 52, 49, .98), rgba(56, 61, 58, .96));
+  box-shadow: 0 22px 58px rgba(0, 0, 0, .25);
+}
+:root[data-appearance="dark"] .france-header::before { background: rgba(var(--accent-rgb), .1); }
+:root[data-appearance="dark"] .france-header::after { background: rgba(var(--lewis-rgb), .1); }
+:root[data-appearance="dark"] .france-header h1,
+:root[data-appearance="dark"] .section-heading h2 { color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .france-count,
+:root[data-appearance="dark"] .itinerary-toggle {
+  border-color: rgba(225, 230, 226, .13);
+  background: var(--dark-panel-raised);
+  color: var(--dark-panel-muted);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+}
+:root[data-appearance="dark"] .day-card,
+:root[data-appearance="dark"] .day-card:nth-child(even) {
+  border-color: rgba(225, 230, 226, .12);
+  background: var(--dark-panel);
+  color: var(--dark-panel-text);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .2);
+}
+:root[data-appearance="dark"] .day-card:hover,
+:root[data-appearance="dark"] .day-card:focus-within { box-shadow: 0 14px 34px rgba(0, 0, 0, .27); }
+:root[data-appearance="dark"] .day-date,
+:root[data-appearance="dark"] .day-notes:empty::before { color: var(--dark-panel-muted); }
+:root[data-appearance="dark"] .day-notes:focus { background: var(--dark-panel-raised); }
+:root[data-appearance="dark"] .resv {
+  border-color: rgba(225, 230, 226, .11);
+  background: rgba(47, 52, 49, .74);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
+}
+:root[data-appearance="dark"] .resv-col {
+  border-color: rgba(225, 230, 226, .12);
+  background: linear-gradient(180deg, var(--resv-tint), var(--dark-panel) 130px);
+  color: var(--dark-panel-text);
+}
+:root[data-appearance="dark"] .resv-head { color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .resv-card { border-color: rgba(225, 230, 226, .11); background: var(--dark-panel-raised); box-shadow: 0 5px 16px rgba(0, 0, 0, .18); }
+:root[data-appearance="dark"] .resv-input { border-color: rgba(225, 230, 226, .14); background: var(--dark-panel-raised); color: var(--dark-panel-text); }
+:root[data-appearance="dark"] .resv-cancel { background: rgba(225, 230, 226, .08); color: var(--dark-panel-muted); }
+
 @media (max-width: 759px) {
   .france-page {
     padding-bottom: 36px;

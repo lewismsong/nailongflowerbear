@@ -3,6 +3,16 @@
 h1 { margin: 22px 0 8px; font: 700 34px 'Fraunces', Georgia, serif; }
 .settings-intro { color: var(--muted); font-size: 14px; line-height: 1.6; }
 .settings-intro { margin: 0 0 32px; }
+.appearance-section { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 32px; padding: 16px 18px; border: 1px solid var(--card-edge); border-radius: 18px; background: rgba(255,255,255,.5); }
+.appearance-copy h2 { margin: 0 0 3px; }
+.appearance-copy .settings-intro { margin: 0; font-size: 12px; }
+.theme-switch { display: flex; flex-direction: column; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.theme-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.theme-switch-track { width: 48px; height: 28px; padding: 3px; border: 1px solid var(--card-edge); border-radius: 999px; background: rgba(74,53,36,.12); transition: background .18s ease, border-color .18s ease; }
+.theme-switch-track span { display: block; width: 20px; height: 20px; border-radius: 50%; background: #fffdf8; box-shadow: 0 2px 5px rgba(38,41,39,.22); transition: transform .18s ease; }
+.theme-switch input:checked + .theme-switch-track { border-color: #7E8781; background: #4A504C; }
+.theme-switch input:checked + .theme-switch-track span { transform: translateX(20px); background: #E7EAE7; }
+.theme-switch input:focus-visible + .theme-switch-track { outline: 2px solid var(--yellow-deep); outline-offset: 3px; }
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 h2 { margin: 0; font-size: 16px; font-weight: 700; }
 .settings-page section > h2 { margin-bottom: 18px; }
@@ -44,4 +54,9 @@ dialog::backdrop { background: rgba(74,53,36,.18); }
 #colour-brightness { width: 100%; margin: 10px 0; accent-color: var(--yellow-deep); }
 #picker-hex { margin: 6px 0 12px; text-align: center; font: 13px 'IBM Plex Mono', monospace; }
 #done-picker { width: 100%; border-radius: 10px; padding: 10px; font: inherit; cursor: pointer; }
+:root[data-appearance="dark"] .appearance-section,
+:root[data-appearance="dark"] .colour-rows,
+:root[data-appearance="dark"] .house-preview { background: rgba(225,230,226,.06); }
+:root[data-appearance="dark"] .colour-controls input { background: rgba(225,230,226,.08); }
+:root[data-appearance="dark"] dialog::backdrop { background: rgba(11,13,12,.62); }
 @media (max-width: 380px) { .settings-page { padding-inline: 18px; } .colour-rows { padding-inline: 12px; } .colour-controls { gap: 8px; } .house-options { gap: 8px; } .house-preview { padding: 6px; } .settings-footer { right: 18px; } }

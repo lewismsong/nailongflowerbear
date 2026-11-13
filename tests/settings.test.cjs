@@ -4,6 +4,27 @@ const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 const model = require('../assets/js/settings-model.js');
 
+test('dark mode applies immediately and stays in session storage only', () => {
+  const stored = new Map();
+  const events = [];
+  const window = { dispatchEvent: event => events.push(event) };
+  const context = vm.createContext({
+    window, console,
+    document: { documentElement: { dataset: {} } },
+    sessionStorage: {
+      getItem: key => stored.get(key) ?? null,
+      setItem: (key, value) => stored.set(key, value),
+    },
+    CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
+  });
+  vm.runInContext(readFileSync('assets/js/session-appearance.js', 'utf8'), context);
+  assert.equal(window.SessionAppearance.current, 'light');
+  window.SessionAppearance.set('dark');
+  assert.equal(context.document.documentElement.dataset.appearance, 'dark');
+  assert.equal(stored.get('ily:sessionAppearance'), 'dark');
+  assert.equal(events.at(-1).type, 'session-appearance-change');
+});
+
 test('settings validate hex colours and keep supported house selections', () => {
   assert.equal(model.normalizeHex('  abc123 '), '#ABC123');
   assert.equal(model.normalizeHex('#aBcDeF'), '#ABCDEF');
@@ -34,14 +55,18 @@ test('shared settings only write on explicit apply, propagate subscriptions, and
       writes.push(updates);
     },
   };
-  const window = { dispatchEvent: event => events.push(event) };
+  let appearanceHandler;
+  const window = {
+    dispatchEvent: event => events.push(event),
+    addEventListener: (type, handler) => { if (type === 'session-appearance-change') appearanceHandler = handler; },
+  };
   const context = vm.createContext({
     window, SettingsModel: model, console,
     getComputedStyle: () => ({ getPropertyValue: property => property === "--yellow" ? "#EDB878" : "#EF948F" }),
     isAppAuthenticated: () => true,
     initializeFirebaseDatabase: () => ({ ref: path => { assert.equal(path, 'settings'); return reference; } }),
     document: {
-      documentElement: { style: { setProperty: (key, value) => styles.set(key, value), removeProperty: key => styles.delete(key) } },
+      documentElement: { dataset: {}, style: { setProperty: (key, value) => styles.set(key, value), removeProperty: key => styles.delete(key) } },
       getElementById: () => null,
     },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
@@ -57,6 +82,9 @@ test('shared settings only write on explicit apply, propagate subscriptions, and
   assert.equal(styles.get('--lewis-rgb'), '170, 187, 204');
   assert.equal(events.at(-1).type, 'app-settings-change');
   assert.deepEqual(writes, []);
+  context.document.documentElement.dataset.appearance = 'dark';
+  appearanceHandler();
+  assert.notEqual(styles.get('--yellow'), '#112233');
   await window.appSettings.apply({ house: 'temple' });
   assert.deepEqual(writes, [{ house: 'temple' }]);
   failWrite = true;

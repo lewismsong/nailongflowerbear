@@ -350,6 +350,7 @@
     updateHouse(selection) {
       const house = SettingsModel.HOUSES[selection];
       this.houseName = house.label;
+      this.house.dataset.house = selection;
       this.house.querySelector("img").src = house.image;
       this.updateHouseLabel(this.house.classList.contains("sleeping"));
     }

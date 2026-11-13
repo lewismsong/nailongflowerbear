@@ -35,6 +35,19 @@ body {
   font-family: 'Nunito Sans', system-ui, sans-serif;
 }
 
+:root[data-appearance="dark"] {
+  color-scheme: dark;
+  --bg-top: var(--dark-bg-top, #303431);
+  --bg-bottom: var(--dark-bg-bottom, #222523);
+  --surface-warm: var(--dark-surface, #383C39);
+  --deep: #E7EAE7;
+  --text: #E0E4E0;
+  --muted: #A7AFA9;
+  --card: rgba(235, 239, 236, 0.055);
+  --card-edge: var(--dark-edge, rgba(225, 230, 226, 0.16));
+  --pink-deep: #D88498;
+}
+
 .display { font-family: 'Fraunces', Georgia, serif; }
 .hidden { display: none !important; }
 .trademark { margin: 0 0 4px; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; font: inherit; font-size: 11px; letter-spacing: 1px; text-align: center; user-select: none; }

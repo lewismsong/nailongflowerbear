@@ -33,3 +33,7 @@
   pointer-events: none;
   background: url("../images/christmas-lights.svg") repeat-x center top / 240px 44px;
 }
+
+[data-season="christmas"][data-appearance="dark"] body::before {
+  filter: drop-shadow(0 0 5px rgba(255, 224, 144, .78)) drop-shadow(0 0 11px rgba(255, 190, 91, .42));
+}

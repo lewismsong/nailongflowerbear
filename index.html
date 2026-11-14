@@ -15,10 +15,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
-<link rel="stylesheet" href="assets/css/base.css?v=17" />
-<link rel="stylesheet" href="assets/css/styles.css?v=40" />
-<link rel="stylesheet" href="assets/css/pixel-companions.css?v=10" />
-<link rel="stylesheet" href="assets/css/all-time-adjustments.css?v=3" />
+<link rel="stylesheet" href="assets/css/base.css?v=19" />
+<link rel="stylesheet" href="assets/css/styles.css?v=42" />
+<link rel="stylesheet" href="assets/css/pixel-companions.css?v=11" />
+<link rel="stylesheet" href="assets/css/all-time-adjustments.css?v=4" />
 <link rel="stylesheet" href="assets/css/seasonal-theme.css?v=4" />
 <script src="assets/js/seasonal-theme.js?v=3"></script>
 </head>
@@ -85,18 +85,18 @@
     </div>
     <div class="tally" aria-label="Yesterday's miss results">
       <div class="k">
-        <div class="num k-num" id="yesterday-khali-count">0</div>
+        <div class="num k-num" id="yesterday-khali-count" aria-label="loading">···</div>
         <div class="cap">khali's misses 🐻‍❄️</div>
       </div>
       <div class="l">
-        <div class="num l-num" id="yesterday-lewis-count">0</div>
+        <div class="num l-num" id="yesterday-lewis-count" aria-label="loading">···</div>
         <div class="cap">lewis' misses 🐻</div>
       </div>
     </div>
     <div class="total-box all-time-total-box">
       <button class="all-time-adjust-button" type="button" data-all-time-delta="-1" aria-label="deduct one all-time miss" hidden>−</button>
       <div class="all-time-total-copy">
-        <div class="num" id="total-count">0</div>
+        <div class="num" id="total-count" aria-label="loading">···</div>
         <div class="cap">misses sent 🐻‍❄️🐻</div>
       </div>
       <button class="all-time-adjust-button" type="button" data-all-time-delta="1" aria-label="add one all-time miss" hidden>+</button>
@@ -108,7 +108,7 @@
       <h2 class="feed-title">latest miss</h2>
       <button id="reset-btn">not you?</button>
     </div>
-    <p id="empty">no misses have been sent yet</p>
+    <p id="empty" role="status">loading misses…</p>
     <ul id="feed"></ul>
 
     <aside class="quick-notes" aria-labelledby="quick-notes-title">
@@ -146,7 +146,7 @@
       <span class="dot db"></span> tie
       </p>
     <div class="score-controls">
-      <span class="streak" id="streak" aria-live="polite"></span>
+      <span class="streak" id="streak" aria-live="polite">loading scores…</span>
       <label class="france-score-toggle"><input id="count-france" type="checkbox" role="switch" checked /> count france</label>
     </div>
     <p class="today-score" id="today-score">today's result is hidden until the day ends</p>
@@ -172,7 +172,7 @@
 <script defer src="assets/js/daisy-companion.js?v=2"></script>
 <script defer src="assets/js/miss-history.js?v=1"></script>
 <script defer src="assets/js/game-score.js?v=1"></script>
-<script defer src="assets/js/app.js?v=35"></script>
+<script defer src="assets/js/app.js?v=36"></script>
 <script defer src="assets/js/quick-notes.js?v=1"></script>
 <script defer src="assets/js/shanghai-trip.js?v=2"></script>
 </body>

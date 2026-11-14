@@ -80,8 +80,8 @@
 }
 .pixel-house.dragging { cursor: grabbing; }
 .pixel-house-image { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
-:root[data-appearance="dark"] .pixel-house[data-house="christmas-tree"] {
-  filter: drop-shadow(0 4px 3px rgba(0,0,0,.34)) drop-shadow(0 0 8px rgba(255,218,130,.58)) drop-shadow(0 0 18px rgba(224,118,82,.3));
+:root[data-appearance="dark"] .pixel-house {
+  filter: drop-shadow(0 4px 3px rgba(0,0,0,.34)) drop-shadow(0 0 7px rgba(255, 224, 154, .38)) drop-shadow(0 0 15px rgba(186, 216, 193, .18));
 }
 .pixel-house-zzz {
   display: none;

@@ -15,7 +15,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 92;
 ringFg.setAttribute("stroke-dasharray", CIRCUMFERENCE);
 
 let name = currentAuthenticatedUser();
-const missHistory = new MissHistory(torontoDayKey);
+let missHistory = new MissHistory(torontoDayKey);
 let db = null;
 let eventsRef = null;
 let historyReady = false;
@@ -27,6 +27,26 @@ let resolveServerClock;
 const serverClockReady = new Promise((resolve) => {
   resolveServerClock = resolve;
 });
+
+function setHistoryLoading(loading) {
+  mainEl.classList.toggle("is-history-loading", loading);
+  for (const id of ["yesterday-khali-count", "yesterday-lewis-count", "total-count"]) {
+    const count = $(id);
+    if (loading) {
+      count.textContent = "···";
+      count.setAttribute("aria-label", "loading");
+    } else {
+      count.removeAttribute("aria-label");
+    }
+  }
+}
+
+function loadMissHistory(snapshot) {
+  const completeHistory = new MissHistory(torontoDayKey);
+  snapshot.forEach((child) => completeHistory.update(child.key, child.val()));
+  missHistory = completeHistory;
+  statsCache = null;
+}
 
 const normalizeName = (value) => (value || "").trim().toLowerCase();
 
@@ -154,6 +174,7 @@ function renderPartnerClock(normalizedName, now) {
 
 let statsCache = null;
 function renderStats() {
+  if (!historyReady) return;
   const todayKey = torontoDayKey(serverNow());
   if (statsCache?.version === missHistory.version && statsCache.adjust === adjust && statsCache.day === todayKey) return;
   const yesterdayKey = previousTorontoDayKey(serverNow());
@@ -176,9 +197,17 @@ function render() {
 
 function renderFeed() {
   const feedEl = $("feed");
+  const empty = $("empty");
+  if (!historyReady) {
+    empty.textContent = "loading misses…";
+    empty.classList.remove("hidden");
+    feedEl.replaceChildren();
+    return;
+  }
   const latest = missHistory.latest;
-  $("empty").classList.toggle("hidden", Boolean(latest));
-  feedEl.innerHTML = "";
+  empty.textContent = "no misses have been sent yet";
+  empty.classList.toggle("hidden", Boolean(latest));
+  feedEl.replaceChildren();
   if (!latest) return;
 
   const normalizedSender = normalizeName(latest.from);
@@ -288,6 +317,14 @@ function dayScores() {
 
 function renderCal() {
   const grid = $("cal-grid");
+  if (!historyReady) {
+    grid.replaceChildren();
+    $("cal-month").textContent = "loading scores…";
+    $("streak").textContent = "loading scores…";
+    $("cal-prev").disabled = true;
+    $("cal-next").disabled = true;
+    return;
+  }
   const days = dayScores();
   const todayKey = torontoDayKey(serverNow());
   const todayParts = torontoParts(serverNow());
@@ -313,7 +350,7 @@ function renderCal() {
   const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
   const cellCount = Math.ceil((firstDayIndex + daysInMonth) / 7) * 7;
 
-  grid.innerHTML = "";
+  const fragment = document.createDocumentFragment();
   for (let index = 0; index < cellCount; index++) {
     const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
     const key = dayKeyFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
@@ -343,8 +380,9 @@ function renderCal() {
       ? "today · result hidden until the day ends"
       : key + " · khali " + record.k + " – " + record.l + " lewis";
     if (excluded) cell.title += " · france: excluded from trophy score";
-    grid.appendChild(cell);
+    fragment.appendChild(cell);
   }
+  grid.replaceChildren(fragment);
 
   // trophy count: completed days only — today isn't decided yet
   const wins = GameScore.tally(days, todayKey, includeFranceInScore);
@@ -369,6 +407,7 @@ function showMain() {
   franceScoreToggle.checked = includeFranceInScore;
   setupEl.classList.add("hidden");
   mainEl.classList.remove("hidden");
+  setHistoryLoading(!historyReady);
   $("who").textContent = name;
   renderRevealCountdown();
   render();
@@ -487,7 +526,8 @@ function connectFirebase() {
           console.warn("vibration failed:", error);
         }
       }
-      // initial child events arrive in a burst; render them together.
+      // initial child events arrive in a burst; keep the loading state until the full snapshot confirms them.
+      if (!historyReady) return;
       if (historyRenderTimer !== null) return;
       historyRenderTimer = setTimeout(() => {
         historyRenderTimer = null;
@@ -501,7 +541,16 @@ function connectFirebase() {
     eventsRef.on("child_added", (snapshot) => updateMiss(snapshot), showSubscriptionError);
     eventsRef.on("child_changed", (snapshot) => updateMiss(snapshot), showSubscriptionError);
     eventsRef.on("child_removed", (snapshot) => updateMiss(snapshot, true), showSubscriptionError);
-    eventsRef.once("value").then(() => { historyReady = true; }).catch(showSubscriptionError);
+    eventsRef.once("value").then((snapshot) => {
+      loadMissHistory(snapshot);
+      historyReady = true;
+      setHistoryLoading(false);
+      if (name) {
+        render();
+        renderFeed();
+        renderCal();
+      }
+    }).catch(showSubscriptionError);
   } catch (error) {
     console.error("firebase initialization failed:", error);
     $("err").textContent = "couldn't connect to the misses database";

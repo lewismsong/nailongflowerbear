@@ -4,25 +4,38 @@ const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 const model = require('../assets/js/settings-model.js');
 
-test('dark mode applies immediately and stays in session storage only', () => {
+test('dark mode applies immediately and persists in local storage', () => {
   const stored = new Map();
+  const sessionStored = new Map();
   const events = [];
   const window = { dispatchEvent: event => events.push(event) };
   const context = vm.createContext({
     window, console,
     document: { documentElement: { dataset: {} } },
-    sessionStorage: {
+    localStorage: {
       getItem: key => stored.get(key) ?? null,
       setItem: (key, value) => stored.set(key, value),
     },
+    sessionStorage: { getItem: key => sessionStored.get(key) ?? null },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
   });
   vm.runInContext(readFileSync('assets/js/session-appearance.js', 'utf8'), context);
   assert.equal(window.SessionAppearance.current, 'light');
   window.SessionAppearance.set('dark');
   assert.equal(context.document.documentElement.dataset.appearance, 'dark');
-  assert.equal(stored.get('ily:sessionAppearance'), 'dark');
+  assert.equal(stored.get('ily:appearance'), 'dark');
   assert.equal(events.at(-1).type, 'session-appearance-change');
+
+  context.document.documentElement.dataset.appearance = '';
+  vm.runInContext(readFileSync('assets/js/session-appearance.js', 'utf8'), context);
+  assert.equal(window.SessionAppearance.current, 'dark');
+
+  stored.clear();
+  sessionStored.set('ily:sessionAppearance', 'dark');
+  context.document.documentElement.dataset.appearance = '';
+  vm.runInContext(readFileSync('assets/js/session-appearance.js', 'utf8'), context);
+  assert.equal(window.SessionAppearance.current, 'dark');
+  assert.equal(stored.get('ily:appearance'), 'dark');
 });
 
 test('settings validate hex colours and keep supported house selections', () => {

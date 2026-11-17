@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>settings 🤍</title>
 <meta name="theme-color" content="#E4EAE0" />
-<script src="assets/js/session-appearance.js?v=2"></script>
-<script defer src="assets/js/settings-appearance.js?v=1"></script>
+<script src="assets/js/session-appearance.js?v=3"></script>
+<script defer src="assets/js/settings-appearance.js?v=2"></script>
 <link rel="icon" href="assets/images/optimized/pakku.webp" />
 <script src="assets/js/platform.js?v=2"></script>
 <script src="assets/js/auth-guard.js?v=3"></script>
@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Nunito+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" />
 <link rel="stylesheet" href="assets/css/base.css?v=19" />
 <link rel="stylesheet" href="assets/css/seasonal-theme.css?v=4" />
-<link rel="stylesheet" href="assets/css/settings.css?v=2" />
+<link rel="stylesheet" href="assets/css/settings.css?v=3" />
 <script src="assets/js/seasonal-theme.js?v=3"></script>
 </head>
 <body>
@@ -24,10 +24,11 @@
   <a class="back-link" href="index.html">← home</a>
   <h1>settings</h1>
   <p class="settings-intro">change colours and pakku's house across devices</p>
-  <section class="appearance-section" aria-labelledby="appearance-title">
+  <form id="appearance-form" aria-labelledby="appearance-title">
+  <section class="appearance-section">
     <div class="appearance-copy">
       <h2 id="appearance-title">appearance</h2>
-      <p class="settings-intro">saved on this browser</p>
+      <p class="settings-intro">choose a mode, then apply · saved on this browser</p>
     </div>
     <label class="theme-switch" for="dark-mode">
       <span>dark mode</span>
@@ -35,6 +36,9 @@
       <span class="theme-switch-track" aria-hidden="true"><span></span></span>
     </label>
   </section>
+  <div class="settings-actions"><button id="apply-appearance" type="submit" disabled>apply</button></div>
+  <p id="appearance-status" class="settings-status" role="status"></p>
+  </form>
   <form id="settings-form">
     <fieldset id="settings-fields" disabled>
       <section aria-labelledby="colours-title">

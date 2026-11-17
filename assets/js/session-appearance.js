@@ -32,14 +32,9 @@
 
   function apply(value, persist) {
     const appearance = normalize(value);
+    // persist first so a failed write cannot look like a successful save.
+    if (persist) localStorage.setItem(STORAGE_KEY, appearance);
     root.dataset.appearance = appearance;
-    if (persist) {
-      try {
-        localStorage.setItem(STORAGE_KEY, appearance);
-      } catch (error) {
-        console.error("could not save the appearance:", error);
-      }
-    }
     window.dispatchEvent(new CustomEvent("session-appearance-change", { detail: appearance }));
   }
 
